@@ -1,0 +1,21 @@
+{
+  "name": "luta-studio",
+  "version": "1.0.0",
+  "description": "Luta Studio Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/englutandula/Luta-studio-window-.git"
+  },
+  "author": "Luta Studio",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^44.0.0",
+    "electron-is-dev": "^3.0.1"
+  }
+}
