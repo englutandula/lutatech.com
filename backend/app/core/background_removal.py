@@ -13,15 +13,17 @@ def _get_session():
     if _session is None:
         import onnxruntime as ort
         opts = ort.SessionOptions()
-        opts.intra_op_num_threads = 1
+        # Utilize available CPU cores (up to 4) for high-speed multi-threaded inference on VPS
+        cpu_threads = min(4, os.cpu_count() or 2)
+        opts.intra_op_num_threads = cpu_threads
         opts.inter_op_num_threads = 1
-        opts.enable_cpu_mem_arena = False
         opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
 
         u2net_dir = os.path.expanduser("~/.u2net")
-        preferred_model = os.getenv("REMBG_MODEL", "u2netp")
-        candidates = [preferred_model, "u2netp", "u2net"]
-        selected_model = "u2netp"
+        # Default to full studio-grade u2net model on VPS/high-RAM, with u2netp fallback
+        preferred_model = os.getenv("REMBG_MODEL", "u2net")
+        candidates = [preferred_model, "u2net", "u2netp"]
+        selected_model = "u2net"
         for name in candidates:
             if os.path.exists(os.path.join(u2net_dir, f"{name}.onnx")):
                 selected_model = name
@@ -30,15 +32,15 @@ def _get_session():
             _session = new_session(selected_model, session_options=opts)
         except Exception:
             try:
-                _session = new_session("u2netp", session_options=opts)
-            except Exception:
                 _session = new_session("u2net", session_options=opts)
+            except Exception:
+                _session = new_session("u2netp", session_options=opts)
     return _session
 
 
 def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Image:
-    # Downscale large images for fast ONNX mask prediction (640px is optimal for crisp mask & ~1s speed on CPU)
-    MAX_INFERENCE_DIM = 640
+    # High-definition 1024px inference for ultra-fine hair strands and edge precision
+    MAX_INFERENCE_DIM = 1024
     orig_w, orig_h = image.size
     scale = min(1.0, MAX_INFERENCE_DIM / max(orig_w, orig_h))
 

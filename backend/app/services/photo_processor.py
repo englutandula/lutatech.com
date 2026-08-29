@@ -87,8 +87,8 @@ def process_photo(
     image = ImageOps.exif_transpose(image)
     image = image.convert("RGB")
 
-    # Downscale oversized camera photos to 1200px (4x passport 600x600 resolution) for fast, low-memory inference
-    MAX_INPUT_DIM = 1200
+    # Preserve full photographic fidelity up to 3000px with high-precision Lanczos resampling
+    MAX_INPUT_DIM = 3000
     if max(image.size) > MAX_INPUT_DIM:
         image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
 

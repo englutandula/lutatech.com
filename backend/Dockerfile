@@ -17,9 +17,9 @@ RUN mkdir -p /home/user/.u2net /home/user/models && chown -R user:user /home/use
 USER user
 ENV PATH="/home/user/.local/bin:$PATH"
 ENV HOME="/home/user"
-ENV REMBG_MODEL="u2netp"
+ENV REMBG_MODEL="u2net"
 
-RUN python -c "from rembg import new_session; new_session('u2netp')"
+RUN python -c "from rembg import new_session; new_session('u2net'); new_session('u2netp')"
 RUN python -c "import urllib.request; urllib.request.urlretrieve('https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite', '/home/user/models/blaze_face_short_range.tflite')"
 
 # Copy Backend Code
