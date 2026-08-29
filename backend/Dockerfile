@@ -25,6 +25,7 @@ RUN python -c "import urllib.request; urllib.request.urlretrieve('https://storag
 # Copy Backend Code
 COPY --chown=user . /app
 
+EXPOSE 10000
 EXPOSE 8000
-ENV PORT=8000
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+
+CMD ["./start.sh"]

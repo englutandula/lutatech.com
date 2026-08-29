@@ -38,7 +38,7 @@ COPY --chown=user shared/ /app/shared/
 COPY --chown=user --from=frontend-builder /app/frontend/out /app/frontend/out
 
 WORKDIR /app/backend
+EXPOSE 10000
 EXPOSE 8000
 
-ENV PORT=8000
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["./start.sh"]
