@@ -87,8 +87,8 @@ def process_photo(
     image = ImageOps.exif_transpose(image)
     image = image.convert("RGB")
 
-    # Downscale oversized camera photos (>2048px) to speed up pipeline while retaining crisp 300 DPI passport resolution
-    MAX_INPUT_DIM = 2048
+    # Downscale oversized camera photos to 1200px (4x passport 600x600 resolution) for fast, low-memory inference
+    MAX_INPUT_DIM = 1200
     if max(image.size) > MAX_INPUT_DIM:
         image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
 
@@ -99,30 +99,15 @@ def process_photo(
     if not (brightness == 50 and contrast == 50 and saturation == 50):
         image = enhance_image(image, brightness=brightness, contrast=contrast, saturation=saturation)
 
-    # ── Run face detection & background removal in parallel ────────────────
-    face: dict | None = None
-    bg_image: Image.Image | None = None
-
-    def _detect():
-        return get_primary_face(image)
-
-    def _remove_bg():
-        return remove_background(image, bg_color=bg_color) if remove_bg else None
-
-    futures = {
-        _executor.submit(_detect): "face",
-        _executor.submit(_remove_bg): "bg",
-    }
-    for future in as_completed(futures):
-        key = futures[future]
-        if key == "face":
-            face = future.result()
-        else:
-            bg_image = future.result()
-    # ──────────────────────────────────────────────────────────────────────
-
+    # 1. Run face detection first (takes ~0.05s, uses <20MB RAM)
+    face = get_primary_face(image)
     face_detected = face is not None
     face_confidence = face["confidence"] if face else 0.0
+
+    # 2. Run background removal sequentially (avoids concurrent model RAM collision)
+    bg_image: Image.Image | None = None
+    if remove_bg:
+        bg_image = remove_background(image, bg_color=bg_color)
 
     bg_removed_encoded = None
     if remove_bg and bg_image is not None:
