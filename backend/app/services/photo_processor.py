@@ -156,6 +156,12 @@ def process_photo(
     elif face_confidence < 0.7:
         warnings.insert(0, "Low face detection confidence. Results may be less accurate.")
 
+    del image, image_bytes_out
+    if bg_image is not None:
+        del bg_image
+    import gc
+    gc.collect()
+
     return {
         "success": True,
         "processed_image": encoded,

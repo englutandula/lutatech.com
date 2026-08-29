@@ -12,9 +12,10 @@ def _get_session():
     global _session
     if _session is None:
         u2net_dir = os.path.expanduser("~/.u2net")
-        # Check local cached models in priority order to avoid slow remote downloads
-        candidates = ["u2net", "u2netp", "isnet-general-use"]
-        selected_model = "u2net"
+        # Default to u2netp (ultra-lightweight 4.5MB model, <200MB RAM) for smooth execution on 512MB hosts
+        preferred_model = os.getenv("REMBG_MODEL", "u2netp")
+        candidates = [preferred_model, "u2netp", "u2net"]
+        selected_model = "u2netp"
         for name in candidates:
             if os.path.exists(os.path.join(u2net_dir, f"{name}.onnx")):
                 selected_model = name
