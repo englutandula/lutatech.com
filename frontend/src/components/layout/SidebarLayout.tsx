@@ -94,7 +94,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <span className="text-[11px] font-mono text-gray-400 dark:text-slate-500">v1.0.0</span>
             </div>
             <p className="mt-1.5 text-[11px] text-gray-400 dark:text-slate-500 leading-tight">
-              100% Free & Open Source AI Studio
+              AI Passport Photo & Studio Suite
             </p>
           </div>
         </aside>
