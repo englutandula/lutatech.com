@@ -5,7 +5,7 @@ import { getRequirements } from '@/lib/api'
 import { useImageUpload } from '@/hooks/useImageUpload'
 import { usePhotoProcess } from '@/hooks/usePhotoProcess'
 import { base64ToObjectUrl } from '@/lib/utils'
-import { DEFAULT_DOCUMENT } from '@/constants/photoRequirements'
+import { DEFAULT_DOCUMENT, DEFAULT_SPECS } from '@/constants/photoRequirements'
 import type { PhotoSpec, ProcessOptions } from '@/lib/types'
 import type { PrintPhotoItem } from '@/lib/printLayout'
 import PhotoUploader from '@/components/PhotoUploader'
@@ -19,10 +19,11 @@ import Card from '@/components/ui/Card'
 import Select from '@/components/ui/Select'
 import Spinner from '@/components/ui/Spinner'
 import PrintSheetSection from '@/components/PrintSheetSection'
+import ProcessingStepper from '@/components/ProcessingStepper'
 
 export default function PhotoTool() {
-  const [specs, setSpecs] = useState<Record<string, PhotoSpec>>({})
-  const [specsLoading, setSpecsLoading] = useState(true)
+  const [specs, setSpecs] = useState<Record<string, PhotoSpec>>(DEFAULT_SPECS)
+  const [specsLoading, setSpecsLoading] = useState(false)
   const [documentType, setDocumentType] = useState(DEFAULT_DOCUMENT)
   const [options, setOptions] = useState<ProcessOptions>({
     brightness: 50,
@@ -50,9 +51,10 @@ export default function PhotoTool() {
 
   useEffect(() => {
     getRequirements()
-      .then((data) => setSpecs(data.countries))
+      .then((data) => {
+        if (data?.countries) setSpecs(data.countries)
+      })
       .catch(() => {})
-      .finally(() => setSpecsLoading(false))
   }, [])
 
   useEffect(() => {
@@ -283,17 +285,8 @@ export default function PhotoTool() {
           )}
 
           {status === 'processing' && (
-            <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 sm:p-12 flex flex-col items-center justify-center min-h-48 sm:min-h-96 space-y-4 animate-fade-in">
-              <Spinner size="lg" />
-              <div className="text-center">
-                <p className="font-semibold text-gray-700 dark:text-gray-300">Processing your photo...</p>
-                <p className="text-sm text-gray-400 mt-1">This usually takes 1 minute</p>
-              </div>
-              <div className="flex flex-col items-center gap-1.5 text-xs text-gray-300">
-                {['Detecting face', 'Removing background', 'Auto-cropping to spec', 'Enhancing quality'].map((step) => (
-                  <span key={step}>{step}</span>
-                ))}
-              </div>
+            <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40 p-4 sm:p-8 flex flex-col items-center justify-center min-h-48 sm:min-h-96 animate-fade-in">
+              <ProcessingStepper isProcessing={status === 'processing'} />
             </div>
           )}
 

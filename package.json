@@ -1,21 +1,26 @@
 {
-  "name": "luta-studio",
+  "name": "luta-studio-web",
   "version": "1.0.0",
-  "description": "Luta Studio Desktop Application",
-  "main": "main.js",
+  "description": "Luta Studio Web - AI-Powered Passport Photo Maker & Background Remover",
   "scripts": {
-    "start": "electron .",
-    "build:frontend": "cd frontend && npm run build"
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && ([ -f ./venv/bin/uvicorn ] && ./venv/bin/uvicorn app.main:app --reload --port 8000 || uvicorn app.main:app --reload --port 8000 || python3 -m uvicorn app.main:app --reload --port 8000)",
+    "build": "npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && ([ -f ./venv/bin/uvicorn ] && ./venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 || uvicorn app.main:app --host 0.0.0.0 --port 8000 || python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000)",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm install && npm run install:frontend"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/englutandula/Luta-studio-window-.git"
+    "url": "https://github.com/englutandula/Luta-Studio-web-.git"
   },
   "author": "Luta Studio",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^44.0.0",
-    "electron-is-dev": "^3.0.1"
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3"
   }
 }

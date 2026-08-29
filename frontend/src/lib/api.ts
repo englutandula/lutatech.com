@@ -1,9 +1,30 @@
 import axios from 'axios'
 import type { FaceDetectResult, PhotoRequirements, PhotoSpec, ProcessOptions, ProcessResult } from './types'
 
-const BASE_URL = 'http://127.0.0.1:8000'
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL
+  }
+  if (typeof window !== 'undefined') {
+    // In dev mode (Next.js dev server on port 3000), point to FastAPI backend on port 8000
+    if (window.location.port === '3000') {
+      return 'http://127.0.0.1:8000'
+    }
+    // In production web server (FastAPI serving static frontend or reverse proxy), use relative path
+    return ''
+  }
+  return 'http://127.0.0.1:8000'
+}
 
-const client = axios.create({ baseURL: BASE_URL })
+const client = axios.create({
+  baseURL: getApiBaseUrl(),
+  timeout: 25000,
+})
+
+client.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl()
+  return config
+})
 
 export async function getRequirements(): Promise<PhotoRequirements> {
   const res = await client.get('/api/requirements')

@@ -1,8 +1,11 @@
+import os
 import threading
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import health, process, requirements
 from app.config import settings
@@ -31,7 +34,7 @@ app = FastAPI(title=settings.app_name, version=settings.version, lifespan=lifesp
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,8 +43,23 @@ app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(requirements.router, prefix="/api", tags=["requirements"])
 app.include_router(process.router, prefix="/api", tags=["process"])
 
-import os
-from fastapi.staticfiles import StaticFiles
-frontend_build_dir = os.path.join(os.path.dirname(__file__), "../../frontend/out")
+# Mount static build of Next.js frontend if available
+frontend_build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/out"))
 if os.path.exists(frontend_build_dir):
+    @app.middleware("http")
+    async def spa_fallback_middleware(request: Request, call_next):
+        response = await call_next(request)
+        if response.status_code == 404 and not request.url.path.startswith("/api"):
+            clean_path = request.url.path.strip("/")
+            candidate_html = os.path.join(frontend_build_dir, f"{clean_path}.html")
+            candidate_dir_index = os.path.join(frontend_build_dir, clean_path, "index.html")
+            if clean_path and os.path.exists(candidate_html):
+                return FileResponse(candidate_html)
+            elif clean_path and os.path.exists(candidate_dir_index):
+                return FileResponse(candidate_dir_index)
+            index_path = os.path.join(frontend_build_dir, "index.html")
+            if os.path.exists(index_path):
+                return FileResponse(index_path)
+        return response
+
     app.mount("/", StaticFiles(directory=frontend_build_dir, html=True), name="frontend")

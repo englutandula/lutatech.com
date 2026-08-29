@@ -87,6 +87,11 @@ def process_photo(
     image = ImageOps.exif_transpose(image)
     image = image.convert("RGB")
 
+    # Downscale oversized camera photos (>2048px) to speed up pipeline while retaining crisp 300 DPI passport resolution
+    MAX_INPUT_DIM = 2048
+    if max(image.size) > MAX_INPUT_DIM:
+        image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
+
     if do_auto_enhance:
         image = auto_enhance(image)
 

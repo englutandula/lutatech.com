@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { removeBackground } from '@/lib/api'
 
 const COLOR_PRESETS = [
   { color: 'transparent', label: 'Transparent', isTransparent: true, isLight: false },
@@ -61,21 +62,10 @@ export default function BackgroundRemover() {
     if (!selectedImage) return
 
     setIsProcessing(true)
-    const formData = new FormData()
-    formData.append('file', selectedImage)
-    formData.append('background_color', 'transparent')
-
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/remove-background', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!response.ok) throw new Error('Processing failed')
-
-      const data = await response.json()
-      if (data.success && data.processed_image) {
-        setProcessedUrl(`data:image/png;base64,${data.processed_image}`)
+      const processedBase64 = await removeBackground(selectedImage, 'transparent')
+      if (processedBase64) {
+        setProcessedUrl(`data:image/png;base64,${processedBase64}`)
       }
     } catch (error) {
       console.error(error)

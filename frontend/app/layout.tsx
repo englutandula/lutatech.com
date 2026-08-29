@@ -96,7 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} antialiased h-screen overflow-hidden`}>
+      <body className={`${inter.variable} antialiased min-h-screen bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100`}>
         <SidebarLayout>
           {children}
         </SidebarLayout>
