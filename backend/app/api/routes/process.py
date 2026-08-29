@@ -3,13 +3,18 @@ import io
 import json
 
 import pillow_heif
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, Depends
 from PIL import Image
 
 from app.core.background_removal import remove_background
 from app.core.face_detection import detect_faces
 from app.models.response import BackgroundRemoveResponse, FaceDetectResponse, FaceLocation, ProcessResponse
 from app.services.photo_processor import process_photo
+from app.api.deps import get_current_user
+from app.database import get_db
+from app.models.db_models import User, ToolJob
+from sqlalchemy.orm import Session
+from typing import Optional
 
 pillow_heif.register_heif_opener()
 
@@ -23,6 +28,8 @@ async def process_endpoint(
     file: UploadFile = File(...),
     document_type: str = Form(...),
     options: str = Form(default="{}"),
+    current_user: Optional[User] = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     image_bytes = await file.read()
     if len(image_bytes) > MAX_FILE_SIZE:
@@ -52,6 +59,18 @@ async def process_endpoint(
             custom_height=opts.get("custom_height"),
             custom_unit=opts.get("custom_unit", "mm"),
         )
+        
+        # Save history if user is logged in
+        if current_user:
+            job = ToolJob(
+                user_id=current_user.id,
+                tool_type="passport",
+                status="completed",
+                result_url=result.processed_image  # This is the base64 string
+            )
+            db.add(job)
+            db.commit()
+            
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -79,6 +98,8 @@ async def detect_face_endpoint(file: UploadFile = File(...)):
 async def remove_bg_endpoint(
     file: UploadFile = File(...),
     background_color: str = Form(default="transparent"),
+    current_user: Optional[User] = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     image_bytes = await file.read()
     try:
@@ -93,5 +114,16 @@ async def remove_bg_endpoint(
     else:
         result.save(buffer, format="JPEG", quality=92)
     encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    # Save history if user is logged in
+    if current_user:
+        job = ToolJob(
+            user_id=current_user.id,
+            tool_type="remove-bg",
+            status="completed",
+            result_url=encoded
+        )
+        db.add(job)
+        db.commit()
 
     return {"success": True, "processed_image": encoded}

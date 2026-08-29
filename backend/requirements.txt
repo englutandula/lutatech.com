@@ -6,6 +6,16 @@ pydantic>=2.6.0
 pydantic-settings>=2.2.0
 python-dotenv>=1.0.0
 
+# Database
+sqlalchemy>=2.0.0
+alembic>=1.13.0
+psycopg2-binary>=2.9.9
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0
+
 # Image I/O
 pillow>=10.0.0
 pillow-heif>=0.15.0
@@ -27,3 +37,4 @@ pooch>=1.7.0
 
 # Image processing
 scikit-image>=0.22.0
+firebase-admin>=6.4.0

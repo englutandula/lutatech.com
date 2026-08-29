@@ -1,4 +1,22 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: luta-studio-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: luta_studio
+      POSTGRES_USER: luta_user
+      POSTGRES_PASSWORD: luta_secret_local
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luta_user -d luta_studio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   luta-studio-web:
     build:
       context: .
@@ -8,4 +26,11 @@ services:
     environment:
       - PORT=8000
       - REMBG_MODEL=u2netp
+      - DATABASE_URL=postgresql://luta_user:luta_secret_local@db:5432/luta_studio
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  postgres_data:

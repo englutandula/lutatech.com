@@ -2,6 +2,10 @@ import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import Navbar from '@/components/layout/Navbar'
+import Footer from '@/components/layout/Footer'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { AuthProvider } from '@/lib/auth-context'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -85,23 +89,33 @@ const jsonLd = {
   ],
 }
 
-import SidebarLayout from '@/components/layout/SidebarLayout'
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} antialiased min-h-screen bg-gray-50 dark:bg-[#0B1120] text-gray-900 dark:text-gray-100`}>
-        <SidebarLayout>
-          {children}
-        </SidebarLayout>
-        <Analytics />
+      <body className={`${inter.variable} antialiased min-h-screen bg-[#F4F7FB] dark:bg-gray-950 text-[#0F172A] dark:text-gray-100 transition-colors`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <Navbar />
+            <main className="pt-16 min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )
 }
+

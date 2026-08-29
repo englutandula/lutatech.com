@@ -4,17 +4,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import health, process, requirements
+from app.api.routes import health, process, requirements, auth, jobs
 from app.config import settings
+from app.database import engine
+import app.models.db_models as db_models  # noqa: F401 — registers all models
 
 from contextlib import asynccontextmanager
 from app.core.background_removal import _get_session, remove_background
 from app.core.face_detection import get_primary_face
 from PIL import Image
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Pre-warm AI models in memory during startup so user requests respond in ~1s
+    # Create all DB tables if they don't exist
+    db_models.Base.metadata.create_all(bind=engine)
+
+
+
+    # Pre-warm AI models so first user request is fast
     try:
         dummy = Image.new("RGB", (160, 160), (200, 200, 200))
         get_primary_face(dummy)
@@ -37,6 +45,8 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(requirements.router, prefix="/api", tags=["requirements"])
 app.include_router(process.router, prefix="/api", tags=["process"])
+app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(jobs.router, prefix="/api", tags=["jobs"])
 
 # Mount static build of Next.js frontend if available
 frontend_build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/out"))

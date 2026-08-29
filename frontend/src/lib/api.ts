@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { FaceDetectResult, PhotoRequirements, PhotoSpec, ProcessOptions, ProcessResult } from './types'
+import { auth } from './firebase'
 
 export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) {
@@ -25,8 +26,20 @@ const client = axios.create({
   timeout: 75000, // 75s timeout to allow Render free tier backend to wake up from idle sleep
 })
 
-client.interceptors.request.use((config) => {
+client.interceptors.request.use(async (config) => {
   config.baseURL = getApiBaseUrl()
+  
+  if (auth.currentUser) {
+    try {
+      const token = await auth.currentUser.getIdToken()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+    } catch (e) {
+      console.error("Failed to get Firebase token", e)
+    }
+  }
+  
   return config
 })
 
@@ -78,4 +91,9 @@ export async function removeBackground(file: File, bgColor = '#FFFFFF'): Promise
   form.append('background_color', bgColor)
   const res = await client.post('/api/remove-background', form)
   return res.data.processed_image
+}
+
+export async function getHistory(): Promise<any[]> {
+  const res = await client.get('/api/jobs')
+  return res.data
 }

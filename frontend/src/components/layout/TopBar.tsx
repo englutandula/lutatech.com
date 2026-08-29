@@ -46,14 +46,14 @@ export default function TopBar() {
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="flex items-center gap-2 group text-xs text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          className="flex items-center gap-2 group text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
         >
           <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400">
             Luta Tech
           </span>
         </Link>
         <span className="text-gray-300 dark:text-slate-700">/</span>
-        <span className="text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/60 px-2 py-0.5 rounded-md border border-primary-100 dark:border-primary-900/40">
+        <span className="text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/60 px-2 py-0.5 rounded-md border border-primary-100 dark:border-primary-900/40">
           {getPageTitle()}
         </span>
       </div>
@@ -63,7 +63,7 @@ export default function TopBar() {
         {/* Backend Status indicator */}
         <div
           title={backendStatus === 'online' ? 'FastAPI AI Engine is running and ready' : backendStatus === 'offline' ? 'AI Backend is connecting or offline' : 'Checking AI status...'}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${
             backendStatus === 'online'
               ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
               : backendStatus === 'offline'
@@ -80,7 +80,7 @@ export default function TopBar() {
                 : 'bg-gray-400 animate-pulse'
             }`}
           />
-          <span className="hidden sm:inline text-[11px]">
+          <span className="hidden sm:inline">
             {backendStatus === 'online'
               ? 'AI Engine Ready'
               : backendStatus === 'offline'
