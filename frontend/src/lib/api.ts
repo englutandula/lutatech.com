@@ -6,19 +6,23 @@ export function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL
   }
   if (typeof window !== 'undefined') {
-    // In dev mode (Next.js dev server on port 3000), point to FastAPI backend on port 8000
+    // In local dev mode (Next.js on port 3000), point to local FastAPI backend on port 8000
     if (window.location.port === '3000') {
       return 'http://127.0.0.1:8000'
+    }
+    // When hosted on Vercel, automatically point to Render backend
+    if (window.location.hostname.includes('vercel.app')) {
+      return 'https://luta-studio.onrender.com'
     }
     // In production web server (FastAPI serving static frontend or reverse proxy), use relative path
     return ''
   }
-  return 'http://127.0.0.1:8000'
+  return 'https://luta-studio.onrender.com'
 }
 
 const client = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 25000,
+  timeout: 75000, // 75s timeout to allow Render free tier backend to wake up from idle sleep
 })
 
 client.interceptors.request.use((config) => {
