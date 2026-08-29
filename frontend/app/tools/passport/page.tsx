@@ -26,12 +26,12 @@ const STEPS = [
 ]
 
 const FAQS = [
-  { q: 'Is Luta Studio really free?', a: 'Yes — 100% free with no watermarks, no signup, and unlimited usage. Luta Studio is open-source software.' },
+  { q: 'Is Luta Tech really free?', a: 'Yes — 100% free with no watermarks, no signup, and unlimited usage. Luta Tech is open-source software.' },
   { q: 'Is my photo stored on your servers?', a: 'No. Your photo is processed and returned immediately. We do not store any images or personal data.' },
-  { q: 'What size is a US passport photo?', a: 'A US passport photo must be 2×2 inches (51×51 mm). Luta Studio automatically crops to this exact specification.' },
-  { q: 'Can I use this for visa applications?', a: 'Yes. Luta Studio supports passport and visa photo requirements for the US, UK, EU, Canada, Australia, India, China, Japan, and Germany.' },
+  { q: 'What size is a US passport photo?', a: 'A US passport photo must be 2×2 inches (51×51 mm). Luta Tech automatically crops to this exact specification.' },
+  { q: 'Can I use this for visa applications?', a: 'Yes. Luta Tech supports passport and visa photo requirements for the US, UK, EU, Canada, Australia, India, China, Japan, and Germany.' },
   { q: 'What if the automatic crop is wrong?', a: 'You can use the manual crop tool to adjust the framing yourself after AI processing.' },
-  { q: 'Do I need to remove the background myself?', a: 'No. Luta Studio uses AI to automatically remove the background and replace it with the correct color for your document type.' },
+  { q: 'Do I need to remove the background myself?', a: 'No. Luta Tech uses AI to automatically remove the background and replace it with the correct color for your document type.' },
 ]
 
 export default function Home() {

@@ -49,7 +49,7 @@ export default function TopBar() {
           className="flex items-center gap-2 group text-xs text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
         >
           <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400">
-            Luta Studio Web
+            Luta Tech
           </span>
         </Link>
         <span className="text-gray-300 dark:text-slate-700">/</span>

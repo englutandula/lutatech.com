@@ -44,12 +44,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           {/* Logo & Brand Header */}
           <div className="h-16 flex items-center px-5 border-b border-gray-200 dark:border-slate-800">
             <Link href="/" className="flex items-center gap-3 group">
-              <img src="/logo.png" alt="Luta Studio" className="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
+              <img src="/logo.png" alt="Luta Tech" className="w-8 h-8 object-contain transition-transform group-hover:scale-105" />
               <div className="flex flex-col">
                 <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-indigo-500 leading-tight">
-                  Luta Studio
+                  Luta Tech
                 </span>
-                <span className="text-[10px] text-gray-400 font-medium tracking-wide">Web AI Studio</span>
+                <span className="text-[10px] text-gray-400 font-medium tracking-wide">AI Photo Tools</span>
               </div>
             </Link>
           </div>
@@ -89,7 +89,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
               <div className="flex items-center gap-1.5">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="font-medium text-gray-700 dark:text-slate-300">Luta Studio Web</span>
+                <span className="font-medium text-gray-700 dark:text-slate-300">Luta Tech</span>
               </div>
               <span className="text-[11px] font-mono text-gray-400 dark:text-slate-500">v1.0.0</span>
             </div>
@@ -102,9 +102,9 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#0F172A] border-b border-gray-200 dark:border-slate-800 z-50 flex items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Luta Studio" className="w-7 h-7 object-contain" />
+            <img src="/logo.png" alt="Luta Tech" className="w-7 h-7 object-contain" />
             <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-indigo-500">
-              Luta Studio
+              Luta Tech
             </span>
           </Link>
           <button

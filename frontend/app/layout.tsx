@@ -8,12 +8,12 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutastudio.io'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Luta Studio - Free Passport Photo Maker Online | AI Passport Photo Generator',
-    template: '%s | Luta Studio',
+    default: 'Luta Tech - Free Passport Photo Maker Online | AI Passport Photo Generator',
+    template: '%s | Luta Tech',
   },
   description:
     'Create compliant passport and ID photos for free. AI-powered background removal, face detection, and auto-cropping for US, UK, EU, Canada, Australia, India, Japan, Germany, and China. No signup required, no watermark.',
@@ -37,11 +37,11 @@ export const metadata: Metadata = {
     'remove background passport photo',
   ],
   openGraph: {
-    title: 'Luta Studio - Free Passport Photo Maker',
+    title: 'Luta Tech - Free Passport Photo Maker',
     description:
       'Create compliant passport and ID photos instantly with AI. Background removal, face detection, auto-cropping for 9+ countries. 100% free, no signup.',
     url: SITE_URL,
-    siteName: 'Luta Studio',
+    siteName: 'Luta Tech',
     type: 'website',
     locale: 'en_US',
     images: [
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'Luta Studio - Free AI Passport Photo Maker',
+        alt: 'Luta Tech - Free AI Passport Photo Maker',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Luta Studio - Free Passport Photo Maker',
+    title: 'Luta Tech - Free Passport Photo Maker',
     description:
       'AI-powered passport photos for free. No signup, no watermark, no data stored.',
     images: [`${SITE_URL}/og-image.png`],
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Luta Studio',
+  name: 'Luta Tech',
   url: SITE_URL,
   description:
     'Free AI-powered passport and ID photo maker. Background removal, face detection, and auto-cropping for US, UK, EU, Canada, and more.',
