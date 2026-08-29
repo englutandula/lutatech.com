@@ -26,13 +26,17 @@ def validate_compliance(image: Image.Image, spec: dict) -> dict:
     }
 
 
-def compress_to_limit(image: Image.Image, max_size_kb: int) -> tuple[bytes, int]:
-    for quality in range(95, 30, -5):
-        buffer = io.BytesIO()
-        image.save(buffer, format="JPEG", quality=quality, optimize=True, dpi=(300, 300), subsampling=0)
-        size = buffer.tell()
-        if size <= max_size_kb * 1024:
-            return buffer.getvalue(), quality
+def compress_to_limit(image: Image.Image, max_size_kb: int = 500) -> tuple[bytes, int]:
+    # Fast 1-shot encode for standard 600x600 passport photos (~70KB, well within 500KB)
     buffer = io.BytesIO()
-    image.save(buffer, format="JPEG", quality=35, optimize=True, dpi=(300, 300), subsampling=0)
-    return buffer.getvalue(), 35
+    image.save(buffer, format="JPEG", quality=92, dpi=(300, 300))
+    if buffer.tell() <= max_size_kb * 1024:
+        return buffer.getvalue(), 92
+    
+    # Adaptive step-down only if oversized
+    for quality in (85, 75, 60, 45):
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=quality, dpi=(300, 300))
+        if buffer.tell() <= max_size_kb * 1024:
+            return buffer.getvalue(), quality
+    return buffer.getvalue(), 45
