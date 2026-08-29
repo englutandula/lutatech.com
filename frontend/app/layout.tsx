@@ -12,7 +12,7 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutastudio.io'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com'
 
 export const metadata: Metadata = {
   title: {
