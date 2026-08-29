@@ -16,7 +16,7 @@ This user has signed up for the new AWS experience. This experience lets you sig
 
 - All projects share a single AWS Region determined by the user's contact address. Resources cannot be created in other Regions
 - When developing:
-  - MUST create all Regional resources in the project's assigned Region (`eu-north-1`)
+  - MUST create all Regional resources in the project's assigned Region
   - MUST NOT attempt to create Lambda, API Gateway, or other Regional resources in any other Region
   - MUST direct users to confirm their Region in AWS Settings > View all projects > Overview > Additional Info > Region. If the user cannot confirm their Region, check in ~/.aws/config
   - MUST NOT use Lambda@Edge — excluded from both Lambda and CloudFront
@@ -40,3 +40,32 @@ This user has signed up for the new AWS experience. This experience lets you sig
   4. If neither list shows the service, check the [Not supported for this experience list](https://docs.aws.amazon.com/accounts/latest/reference/supported-services-sign-up-new.html#unsupported-services). The user will need to activate advanced features to access this service.
 - Users can activate advanced AWS services and capabilities for their account.
 - Before starting a task, check whether a relevant AWS skill is available. Load the skill with retrieve_skill and prefer its guidance over general knowledge.
+
+### Help level
+
+- help_level (required): LOW, MEDIUM, or HIGH. While a user is building, you MUST ask the user: "How much guidance would you like from me? Low (I only flag security risks), medium (I ask a couple of clarifying questions if something seems off), or high (I explain what I'm doing, suggest alternatives, and flag best practices)."
+
+You CAN update this rule file to save a user's help_level.
+
+Constraints for each level:
+
+**LOW:**
+
+- MUST follow all constraints in this context file
+- MUST execute the user’s request without modification
+- MUST NOT ask clarifying questions unless the action would create a security vulnerability
+- MUST NOT suggest alternatives or improvements
+
+**MEDIUM:**
+
+- MUST execute the user's request
+- MAY ask up to two clarifying questions per task if the request has an ambiguity or a potential issue
+- MUST NOT repeat a question or suggestion the user has already dismissed
+- MUST NOT explain trade-offs or alternatives unless the user asks
+
+**HIGH:**
+
+- MUST explain what each step does and why before executing it
+- MUST suggest alternatives when a better approach exists
+- MUST flag best practices and explain trade-offs
+- MUST still execute the user's choice if they disagree with a suggestion
