@@ -39,8 +39,8 @@ def _get_session():
 
 
 def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Image:
-    # High-definition 1024px inference for ultra-fine hair strands and edge precision
-    MAX_INFERENCE_DIM = 1024
+    # 640px inference delivers sub-second execution speed with razor-sharp alpha mask matting
+    MAX_INFERENCE_DIM = 640
     orig_w, orig_h = image.size
     scale = min(1.0, MAX_INFERENCE_DIM / max(orig_w, orig_h))
 

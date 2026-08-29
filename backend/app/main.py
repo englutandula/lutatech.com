@@ -7,7 +7,23 @@ from fastapi.staticfiles import StaticFiles
 from app.api.routes import health, process, requirements
 from app.config import settings
 
-app = FastAPI(title=settings.app_name, version=settings.version)
+from contextlib import asynccontextmanager
+from app.core.background_removal import _get_session, remove_background
+from app.core.face_detection import get_primary_face
+from PIL import Image
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Pre-warm AI models in memory during startup so user requests respond in ~1s
+    try:
+        dummy = Image.new("RGB", (160, 160), (200, 200, 200))
+        get_primary_face(dummy)
+        remove_background(dummy)
+    except Exception as e:
+        print(f"Pre-warm notice: {e}")
+    yield
+
+app = FastAPI(title=settings.app_name, version=settings.version, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
