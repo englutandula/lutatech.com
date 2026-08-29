@@ -39,13 +39,15 @@ def _get_mp_detector():
 
 
 def _detect_mediapipe(image: Image.Image) -> list[dict]:
-    img_array = np.array(image.convert("RGB"))
-    ih, iw = img_array.shape[:2]
-    detector = _get_mp_detector()
-    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img_array)
-    results = detector.detect(mp_image)
-
-    if not results.detections:
+    try:
+        img_array = np.array(image.convert("RGB"))
+        ih, iw = img_array.shape[:2]
+        detector = _get_mp_detector()
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img_array)
+        results = detector.detect(mp_image)
+        if not results or not results.detections:
+            return []
+    except Exception:
         return []
 
     faces = []

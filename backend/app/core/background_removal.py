@@ -11,8 +11,14 @@ _session = None
 def _get_session():
     global _session
     if _session is None:
+        import onnxruntime as ort
+        opts = ort.SessionOptions()
+        opts.intra_op_num_threads = 1
+        opts.inter_op_num_threads = 1
+        opts.enable_cpu_mem_arena = False
+        opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+
         u2net_dir = os.path.expanduser("~/.u2net")
-        # Default to u2netp (ultra-lightweight 4.5MB model, <200MB RAM) for smooth execution on 512MB hosts
         preferred_model = os.getenv("REMBG_MODEL", "u2netp")
         candidates = [preferred_model, "u2netp", "u2net"]
         selected_model = "u2netp"
@@ -21,12 +27,12 @@ def _get_session():
                 selected_model = name
                 break
         try:
-            _session = new_session(selected_model)
+            _session = new_session(selected_model, session_options=opts)
         except Exception:
             try:
-                _session = new_session("u2netp")
+                _session = new_session("u2netp", session_options=opts)
             except Exception:
-                _session = new_session("u2net")
+                _session = new_session("u2net", session_options=opts)
     return _session
 
 
