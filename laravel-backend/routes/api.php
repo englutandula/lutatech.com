@@ -32,9 +32,14 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    // Passport Photo Requirements & Processing
+    Route::get('/requirements', [AiToolController::class, 'getRequirements']);
+    Route::post('/process', [AiToolController::class, 'processPassport']);
+
     // AI Tools (Proxied securely to Python AI microservice on AWS)
     Route::prefix('ai')->group(function () {
         Route::post('/remove-background', [AiToolController::class, 'removeBackground']);
+        Route::post('/passport/process', [AiToolController::class, 'processPassport']);
     });
 
     // Normal Tools (Executed 100% in PHP/Laravel)

@@ -52,9 +52,13 @@ export default function PhotoTool() {
   useEffect(() => {
     getRequirements()
       .then((data) => {
-        if (data?.countries) setSpecs(data.countries)
+        if (data?.countries && typeof data.countries === 'object' && !Array.isArray(data.countries)) {
+          setSpecs(data.countries)
+        }
       })
-      .catch(() => {})
+      .catch(() => {
+        setSpecs(DEFAULT_SPECS)
+      })
   }, [])
 
   useEffect(() => {

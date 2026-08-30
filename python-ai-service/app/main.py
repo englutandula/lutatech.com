@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 from app.core.config import settings
-from app.api.routes import background_removal
+from app.api.routes import background_removal, photo_processing
 from app.services.background_removal import get_rembg_session, process_background_removal
 
 @asynccontextmanager
@@ -49,3 +49,4 @@ async def health_check():
 
 # Mount AI routes under /api/v1
 app.include_router(background_removal.router, prefix="/api/v1", tags=["Background Removal"])
+app.include_router(photo_processing.router, prefix="/api/v1", tags=["Passport Photo Processing"])

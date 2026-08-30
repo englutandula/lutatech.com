@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { FaceDetectResult, PhotoRequirements, PhotoSpec, ProcessOptions, ProcessResult } from './types';
 import { auth } from './firebase';
+import { DEFAULT_SPECS } from '@/constants/photoRequirements';
 
 export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) {
@@ -79,17 +80,12 @@ export async function removeBackground(file: File, bgColor = 'transparent'): Pro
 export async function getRequirements(): Promise<PhotoRequirements> {
   try {
     const res = await client.get('/requirements');
-    return res.data;
+    if (res.data?.countries && typeof res.data.countries === 'object' && !Array.isArray(res.data.countries)) {
+      return res.data;
+    }
+    return { countries: DEFAULT_SPECS as any };
   } catch {
-    return {
-      countries: [
-        { code: 'US', name: 'United States', width_mm: 50.8, height_mm: 50.8, background_color: '#FFFFFF' },
-        { code: 'TZ', name: 'Tanzania', width_mm: 35, height_mm: 45, background_color: '#38BDF8' },
-        { code: 'KE', name: 'Kenya', width_mm: 35, height_mm: 45, background_color: '#FFFFFF' },
-        { code: 'UK', name: 'United Kingdom', width_mm: 35, height_mm: 45, background_color: '#F1F5F9' },
-        { code: 'EU', name: 'Schengen / EU', width_mm: 35, height_mm: 45, background_color: '#F1F5F9' },
-      ] as any,
-    } as any;
+    return { countries: DEFAULT_SPECS as any };
   }
 }
 
