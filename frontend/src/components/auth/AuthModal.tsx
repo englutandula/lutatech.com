@@ -34,7 +34,9 @@ export default function AuthModal({
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +48,8 @@ export default function AuthModal({
       setMode(initialMode);
       setError(null);
       setResetSent(false);
+      setPassword('');
+      setConfirmPassword('');
     }
   }, [isOpen, initialMode]);
 
@@ -96,8 +100,12 @@ export default function AuthModal({
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
+    if (!email.trim() || !password || !confirmPassword) {
       setError('Please fill in all fields.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter your password.');
       return;
     }
     if (password.length < 6) {
@@ -321,6 +329,34 @@ export default function AuthModal({
                 </div>
                 {mode === 'register' && <PasswordStrengthMeter password={password} />}
               </div>
+
+              {/* Confirm Password field on Register */}
+              {mode === 'register' && (
+                <div>
+                  <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-0.5 cursor-pointer"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"
