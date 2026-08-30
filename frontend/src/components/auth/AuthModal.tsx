@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  X, Mail, Lock, User as UserIcon, AlertCircle, CheckCircle2,
-  Eye, EyeOff, ArrowRight, Sparkles, Loader2
+  X, Mail, Lock, AlertCircle, CheckCircle2,
+  Eye, EyeOff, ArrowRight, Loader2
 } from 'lucide-react';
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  updateProfile,
   sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
@@ -33,12 +32,9 @@ export default function AuthModal({
   onSuccess,
 }: AuthModalProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,11 +97,7 @@ export default function AuthModal({
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) {
-      setError('Please fill in all required fields.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('Please fill in all fields.');
       return;
     }
     if (password.length < 6) {
@@ -116,10 +108,7 @@ export default function AuthModal({
     try {
       setLoading(true);
       setError(null);
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      if (userCredential.user && name.trim()) {
-        await updateProfile(userCredential.user, { displayName: name.trim() });
-      }
+      await createUserWithEmailAndPassword(auth, email.trim(), password);
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
@@ -132,7 +121,7 @@ export default function AuthModal({
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      setError('Please enter your email address to receive the password reset link.');
+      setError('Please enter your email address.');
       return;
     }
 
@@ -149,50 +138,47 @@ export default function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Card */}
-      <div className="relative w-full max-w-md rounded-2xl border lt-border-color bg-[rgb(var(--lt-surface))] p-6 sm:p-8 shadow-2xl z-10 lt-scale-in">
+      {/* Modal Card - Compact Height */}
+      <div className="relative w-full max-w-sm sm:max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border lt-border-color bg-[rgb(var(--lt-surface))] p-5 sm:p-6 shadow-2xl z-10 lt-scale-in">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-1.5 text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))] transition-colors"
+          className="absolute right-3.5 top-3.5 rounded-xl p-1 text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))] transition-colors cursor-pointer"
           aria-label="Close"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
-        {/* Brand Header */}
-        <div className="flex items-center gap-2 mb-5">
-          <Logo className="h-6 w-auto" />
-          <span className="text-lg font-black tracking-tight text-[#0F172A] dark:text-white">
-            Luta<span className="text-[rgb(var(--lt-primary))]">Tech</span>
-          </span>
+        {/* Brand Header - ONLY Image Logo */}
+        <div className="flex justify-center mb-2">
+          <Logo className="h-8 w-auto" />
         </div>
 
         {/* Title */}
-        <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-[rgb(var(--lt-text))]">
+        <div className="text-center mb-3">
+          <h2 className="text-lg sm:text-xl font-bold text-[rgb(var(--lt-text))]">
             {mode === 'login' && 'Welcome back'}
-            {mode === 'register' && 'Create your free account'}
-            {mode === 'forgot-password' && 'Reset your password'}
+            {mode === 'register' && 'Create your account'}
+            {mode === 'forgot-password' && 'Reset password'}
           </h2>
-          <p className="mt-1 text-xs sm:text-sm lt-text-muted">
-            {mode === 'login' && 'Sign in to access your tools and saved history.'}
-            {mode === 'register' && 'Get started in seconds. No credit card required.'}
-            {mode === 'forgot-password' && "Enter your email and we'll send you a reset link."}
+          <p className="mt-0.5 text-xs lt-text-muted">
+            {mode === 'login' && 'Sign in to access your tools & history'}
+            {mode === 'register' && 'Get started for free in seconds'}
+            {mode === 'forgot-password' && "We'll send a password reset link to your email"}
           </p>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div className="mb-3 flex items-start gap-2 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))]">
+            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -200,37 +186,37 @@ export default function AuthModal({
         {/* ── Mode: Forgot Password ── */}
         {mode === 'forgot-password' ? (
           resetSent ? (
-            <div className="text-center py-4 space-y-4">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="h-6 w-6" />
+            <div className="text-center py-3 space-y-3">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-5 w-5" />
               </div>
-              <h3 className="font-bold text-[rgb(var(--lt-text))]">Check your inbox</h3>
-              <p className="text-xs sm:text-sm lt-text-muted">
-                We sent a password reset link to <strong className="text-[rgb(var(--lt-text))]">{email}</strong>.
+              <h3 className="font-bold text-sm text-[rgb(var(--lt-text))]">Reset link sent!</h3>
+              <p className="text-xs lt-text-muted">
+                Check <strong className="text-[rgb(var(--lt-text))]">{email}</strong> to reset your password.
               </p>
               <button
                 type="button"
                 onClick={() => { setMode('login'); setResetSent(false); }}
-                className="w-full rounded-xl bg-[rgb(var(--lt-primary))] py-2.5 text-sm font-semibold text-white hover:bg-[rgb(var(--lt-primary-dark))] transition-colors"
+                className="w-full rounded-xl bg-[rgb(var(--lt-primary))] py-2 text-xs font-semibold text-white hover:bg-[rgb(var(--lt-primary-dark))] transition-colors cursor-pointer"
               >
                 Back to Sign In
               </button>
             </div>
           ) : (
-            <form onSubmit={handleForgotPassword} className="space-y-4">
+            <form onSubmit={handleForgotPassword} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1.5">
+                <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-10 pr-4 py-2.5 text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-3 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -238,16 +224,16 @@ export default function AuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] py-2.5 text-sm font-semibold text-white hover:bg-[rgb(var(--lt-primary-dark))] transition-colors disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] py-2 text-xs sm:text-sm font-semibold text-white hover:bg-[rgb(var(--lt-primary-dark))] transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
               </button>
 
-              <div className="text-center pt-2">
+              <div className="text-center pt-1">
                 <button
                   type="button"
                   onClick={() => setMode('login')}
-                  className="text-xs font-semibold text-[rgb(var(--lt-primary))] hover:underline"
+                  className="text-xs font-semibold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
                 >
                   Back to Sign In
                 </button>
@@ -256,14 +242,14 @@ export default function AuthModal({
           )
         ) : (
           /* ── Mode: Sign In or Register ── */
-          <div className="space-y-5">
+          <div className="space-y-3">
             {/* Google OAuth Button */}
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.5 px-4 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              className="w-full flex items-center justify-center gap-2.5 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2 px-3 text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
             >
-              <svg className="h-4 w-4" viewBox="0 0 24 24">
+              <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -273,46 +259,28 @@ export default function AuthModal({
             </button>
 
             {/* Divider */}
-            <div className="relative flex items-center justify-center">
+            <div className="relative flex items-center justify-center my-2">
               <div className="w-full border-t lt-border-color" />
-              <span className="absolute bg-[rgb(var(--lt-surface))] px-3 text-xs lt-text-muted font-medium">
-                or continue with email
+              <span className="absolute bg-[rgb(var(--lt-surface))] px-2.5 text-[11px] lt-text-muted font-medium">
+                or email
               </span>
             </div>
 
             {/* Email Form */}
-            <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-3.5">
-              {mode === 'register' && (
-                <div>
-                  <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
-                    Full Name (Optional)
-                  </label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="John Doe"
-                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-10 pr-4 py-2.5 text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
-                    />
-                  </div>
-                </div>
-              )}
-
+            <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-2.5">
               <div>
                 <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-10 pr-4 py-2.5 text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-3 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -326,86 +294,61 @@ export default function AuthModal({
                     <button
                       type="button"
                       onClick={() => setMode('forgot-password')}
-                      className="text-xs font-medium text-[rgb(var(--lt-primary))] hover:underline"
+                      className="text-[11px] font-medium text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
                     >
                       Forgot password?
                     </button>
                   )}
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
+                    minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-10 pr-10 py-2.5 text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-0.5 cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                   </button>
                 </div>
                 {mode === 'register' && <PasswordStrengthMeter password={password} />}
               </div>
 
-              {mode === 'register' && (
-                <div>
-                  <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
-                    Confirm Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-10 pr-10 py-2.5 text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary-dark))] text-white py-2.5 px-4 text-sm font-bold shadow-md shadow-red-500/20 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full mt-1 flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary-dark))] text-white py-2 px-3 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
                     <span>{mode === 'login' ? 'Sign In' : 'Create Account'}</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </>
                 )}
               </button>
             </form>
 
             {/* Toggle Footer */}
-            <div className="pt-2 text-center text-xs sm:text-sm text-[rgb(var(--lt-text-muted))]">
+            <div className="pt-1 text-center text-xs text-[rgb(var(--lt-text-muted))]">
               {mode === 'login' ? (
                 <>
                   Don't have an account?{' '}
                   <button
                     type="button"
                     onClick={() => { setMode('register'); setError(null); }}
-                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline"
+                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
                   >
-                    Sign up for free
+                    Sign up
                   </button>
                 </>
               ) : (
@@ -414,7 +357,7 @@ export default function AuthModal({
                   <button
                     type="button"
                     onClick={() => { setMode('login'); setError(null); }}
-                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline"
+                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
                   >
                     Sign in
                   </button>

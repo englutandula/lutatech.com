@@ -67,15 +67,12 @@ function RegisterForm() {
   return (
     <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
       <div className="w-full max-w-md lt-fade-up">
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-2xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
+            className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none"
           >
-            <Logo className="h-[1.05em] w-auto shrink-0" />
-            <span className="leading-none flex items-center">
-              Luta<span className="text-[rgb(var(--lt-primary))]">Tech</span>
-            </span>
+            <Logo className="h-10 w-auto" />
           </Link>
         </div>
 
