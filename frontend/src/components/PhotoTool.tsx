@@ -304,16 +304,16 @@ export default function PhotoTool() {
                   <button
                     type="button"
                     onClick={handleManualCrop}
-                    className="mt-3 w-full py-2.5 sm:py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-xs font-medium text-gray-700 dark:text-slate-200 active:bg-white dark:active:bg-slate-700 transition-colors shadow-2xs"
+                    className="mt-3 w-full py-2.5 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface-3))] text-xs font-semibold text-[rgb(var(--lt-text))] transition-colors cursor-pointer"
                   >
-                    AI crop not right? <span className="font-semibold text-primary-600 dark:text-primary-400">Manual crop</span>
+                    AI crop not right? <span className="font-bold text-[rgb(var(--lt-primary))]">Manual crop</span>
                   </button>
 
                   {/* + Add Another Photo Button (located immediately below Manual crop) */}
                   <button
                     type="button"
                     onClick={handleAddAnotherPhoto}
-                    className="mt-2.5 w-full py-2.5 sm:py-2.5 rounded-lg bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.99] cursor-pointer"
+                    className="mt-2.5 w-full py-3 rounded-xl bg-[rgb(var(--lt-primary))] hover:opacity-95 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[rgb(var(--lt-primary)/0.25)] active:scale-[0.99] cursor-pointer"
                   >
                     <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />

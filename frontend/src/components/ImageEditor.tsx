@@ -2,6 +2,7 @@
 
 import type { ProcessOptions, ProcessingStatus } from '@/lib/types'
 import Button from './ui/Button'
+import { Sparkles, Check, Plus } from 'lucide-react'
 
 interface ImageEditorProps {
   options: ProcessOptions
@@ -29,29 +30,41 @@ export default function ImageEditor({ options, onChange, onProcess, status, hasF
     <div className="space-y-5">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Auto enhance</span>
+          <span className="text-xs font-semibold text-[rgb(var(--lt-text))]">Auto enhance</span>
           <button
             type="button"
             onClick={() => set('auto_enhance', !options.auto_enhance)}
-            className={`relative h-5 w-9 rounded-full transition-colors duration-200 ${options.auto_enhance ? 'bg-primary-600' : 'bg-gray-200 dark:bg-slate-700'}`}
+            className={`relative h-6 w-11 rounded-full transition-colors duration-200 cursor-pointer ${
+              options.auto_enhance ? 'bg-[rgb(var(--lt-primary))]' : 'bg-[rgb(var(--lt-surface-3))]'
+            }`}
           >
-            <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-200 ${options.auto_enhance ? 'translate-x-4' : ''}`} />
+            <span
+              className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                options.auto_enhance ? 'translate-x-5' : ''
+              }`}
+            />
           </button>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Remove background</span>
+          <span className="text-xs font-semibold text-[rgb(var(--lt-text))]">Remove background</span>
           <button
             type="button"
             onClick={() => set('remove_background', !options.remove_background)}
-            className={`relative h-5 w-9 rounded-full transition-colors duration-200 ${options.remove_background ? 'bg-primary-600' : 'bg-gray-200 dark:bg-slate-700'}`}
+            className={`relative h-6 w-11 rounded-full transition-colors duration-200 cursor-pointer ${
+              options.remove_background ? 'bg-[rgb(var(--lt-primary))]' : 'bg-[rgb(var(--lt-surface-3))]'
+            }`}
           >
-            <span className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white dark:bg-slate-800 shadow-sm transition-transform duration-200 ${options.remove_background ? 'translate-x-4' : ''}`} />
+            <span
+              className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                options.remove_background ? 'translate-x-5' : ''
+              }`}
+            />
           </button>
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs text-gray-400 font-medium">Background color</span>
+          <span className="text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Background color</span>
           <div className="flex flex-wrap gap-2 items-center">
             {bgColors.map(({ color, label }) => {
               const isSelected = options.background_color?.toUpperCase() === color.toUpperCase()
@@ -61,24 +74,22 @@ export default function ImageEditor({ options, onChange, onProcess, status, hasF
                   type="button"
                   title={label}
                   onClick={() => set('background_color', color)}
-                  className={`w-8 h-8 rounded-lg border-2 aspect-square flex-shrink-0 transition-all duration-150 flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-lg border-2 aspect-square flex-shrink-0 transition-all duration-150 flex items-center justify-center cursor-pointer ${
                     isSelected
-                      ? 'border-primary-500 ring-2 ring-primary-500/30 scale-105 shadow-sm'
-                      : 'border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:border-slate-600'
+                      ? 'border-[rgb(var(--lt-primary))] ring-2 ring-[rgb(var(--lt-primary)/0.3)] scale-105 shadow-sm'
+                      : 'lt-border-color hover:border-[rgb(var(--lt-primary)/0.5)]'
                   }`}
                   style={{ backgroundColor: color }}
                 >
                   {isSelected && (
-                    <svg className={`w-3.5 h-3.5 ${color === '#FFFFFF' ? 'text-gray-900' : 'text-white'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <Check className={`w-3.5 h-3.5 ${color === '#FFFFFF' ? 'text-gray-900' : 'text-white'}`} />
                   )}
                 </button>
               )
             })}
-            <label 
+            <label
               title="Pick custom color"
-              className="relative w-8 h-8 rounded-lg border-2 border-dashed border-gray-200 dark:border-slate-700 overflow-hidden cursor-pointer hover:border-gray-300 dark:border-slate-600 transition-colors flex items-center justify-center flex-shrink-0 aspect-square"
+              className="relative w-8 h-8 rounded-lg border-2 border-dashed lt-border-color overflow-hidden cursor-pointer hover:border-[rgb(var(--lt-primary))] transition-colors flex items-center justify-center flex-shrink-0 aspect-square bg-[rgb(var(--lt-surface-2))]"
             >
               <input
                 type="color"
@@ -86,15 +97,13 @@ export default function ImageEditor({ options, onChange, onProcess, status, hasF
                 onChange={(e) => set('background_color', e.target.value)}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 m-0 border-0"
               />
-              <svg className="h-3.5 w-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
+              <Plus className="h-3.5 w-3.5 text-[rgb(var(--lt-text-muted))] pointer-events-none" />
             </label>
-            <input 
+            <input
               type="text"
               value={options.background_color || '#FFFFFF'}
               onChange={(e) => set('background_color', e.target.value)}
-              className="ml-1 w-20 text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-primary-500 uppercase flex-shrink-0 font-mono"
+              className="ml-1 w-20 text-xs px-2.5 py-1.5 rounded-lg border lt-border-color bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text))] focus:outline-none focus:border-[rgb(var(--lt-primary))] uppercase flex-shrink-0 font-mono font-semibold"
               placeholder="#FFFFFF"
             />
           </div>
@@ -102,10 +111,11 @@ export default function ImageEditor({ options, onChange, onProcess, status, hasF
       </div>
 
       <Button
+        variant="primary"
         onClick={onProcess}
         loading={status === 'processing'}
         disabled={!hasFile || status === 'processing'}
-        className="w-full"
+        className="w-full py-3.5 font-extrabold shadow-lg shadow-[rgb(var(--lt-primary)/0.25)]"
         size="lg"
       >
         {status === 'processing'

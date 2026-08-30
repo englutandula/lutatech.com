@@ -52,13 +52,16 @@ client.interceptors.request.use(async (config) => {
   return config;
 });
 
+import { optimizeImageForUpload } from './utils';
+
 // ==========================================
 // AI Tools (Proxied via Laravel to AWS Python)
 // ==========================================
 
 export async function removeBackground(file: File, bgColor = 'transparent'): Promise<string> {
+  const optimizedFile = await optimizeImageForUpload(file);
   const form = new FormData();
-  form.append('file', file);
+  form.append('file', optimizedFile);
   form.append('bg_color', bgColor);
 
   const res = await client.post('/ai/remove-background', form, {
@@ -99,8 +102,9 @@ export async function processPhoto(
   documentType: string,
   options: Partial<ProcessOptions> = {}
 ): Promise<ProcessResult> {
+  const optimizedFile = await optimizeImageForUpload(file);
   const form = new FormData();
-  form.append('file', file);
+  form.append('file', optimizedFile);
   form.append('document_type', documentType);
   form.append('options', JSON.stringify(options));
 
