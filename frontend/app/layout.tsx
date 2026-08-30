@@ -1,121 +1,73 @@
-import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import { ThemeProvider } from '@/components/ThemeProvider'
-import { AuthProvider } from '@/lib/auth-context'
+import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { AuthProvider } from '@/lib/auth-context';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
+  display: 'swap',
   variable: '--font-inter',
-})
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+});
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Luta Tech - Free Passport Photo Maker Online | AI Passport Photo Generator',
+    default: 'Luta Tech - Fast, Private, Modern Digital Tools Platform',
     template: '%s | Luta Tech',
   },
   description:
-    'Create compliant passport and ID photos for free. AI-powered background removal, face detection, and auto-cropping for US, UK, EU, Canada, Australia, India, Japan, Germany, and China. No signup required, no watermark.',
+    'Luta Tech brings together high-performance digital tools for images, documents, utilities, and AI — private by design, running in your browser.',
   keywords: [
     'passport photo maker',
     'free passport photo',
-    'passport photo online',
-    'ID photo maker',
-    'visa photo maker',
-    'passport photo background removal',
-    'passport photo AI',
-    'passport photo app',
-    'make passport photo at home',
-    'passport photo 2x2',
-    'US passport photo online free',
-    'UK passport photo maker',
-    'Canada passport photo online',
-    'EU visa photo maker',
-    'passport photo no watermark',
-    'passport photo crop tool',
-    'remove background passport photo',
+    'background remover',
+    'image tools',
+    'pdf tools',
+    'online utilities',
+    'free online tools',
+    'ai tools',
   ],
   openGraph: {
-    title: 'Luta Tech - Free Passport Photo Maker',
+    title: 'Luta Tech - Fast, Private, Modern Digital Tools Platform',
     description:
-      'Create compliant passport and ID photos instantly with AI. Background removal, face detection, auto-cropping for 9+ countries. 100% free, no signup.',
+      'Luta Tech brings together high-performance digital tools for images, documents, utilities, and AI — private by design, running in your browser.',
     url: SITE_URL,
     siteName: 'Luta Tech',
     type: 'website',
     locale: 'en_US',
-    images: [
-      {
-        url: `${SITE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: 'Luta Tech - Free AI Passport Photo Maker',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Luta Tech - Free Passport Photo Maker',
+    title: 'Luta Tech - Modern Digital Tools Platform',
     description:
-      'AI-powered passport photos for free. No signup, no watermark, no data stored.',
-    images: [`${SITE_URL}/og-image.png`],
+      'High-performance digital tools for images, documents, and utilities — private by design, running in your browser.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: SITE_URL },
   metadataBase: new URL(SITE_URL),
-}
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Luta Tech',
-  url: SITE_URL,
-  description:
-    'Free AI-powered passport and ID photo maker. Background removal, face detection, and auto-cropping for US, UK, EU, Canada, and more.',
-  applicationCategory: 'PhotographyApplication',
-  operatingSystem: 'Web',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  featureList: [
-    'AI background removal',
-    'Face detection',
-    'Auto-cropping to official specs',
-    'US, UK, EU, Canada, Australia, India, Japan, Germany, China support',
-    'No watermark',
-    'No signup required',
-  ],
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      </head>
-      <body className={`${inter.variable} antialiased min-h-screen bg-[#F4F7FB] dark:bg-gray-950 text-[#0F172A] dark:text-gray-100 transition-colors`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] font-sans antialiased transition-colors">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <Navbar />
-            <main className="pt-16 min-h-screen">
-              {children}
-            </main>
-            <Footer />
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
           </AuthProvider>
           <Analytics />
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
-

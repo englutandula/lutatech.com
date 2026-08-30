@@ -1,166 +1,234 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { useTheme } from 'next-themes'
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
+import { Sun, Moon, Menu, X, LogOut, User as UserIcon, LayoutGrid, Search, Command } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { Logo } from './Logo';
+import { SearchDialog } from '../SearchDialog';
 
-export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [categoriesOpen, setCategoriesOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const pathname = usePathname()
-  const router = useRouter()
-  const { theme, setTheme } = useTheme()
-  const navRef = useRef<HTMLDivElement>(null)
+export function Navbar() {
+  const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenu, setUserMenu] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-    
-    const handleClickOutside = (event: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setCategoriesOpen(false)
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setUserMenu(false);
+  }, [pathname]);
+
+  // Global shortcut (⌘K / Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
       }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  useEffect(() => {
-    setCategoriesOpen(false)
-  }, [pathname])
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/', hasDropdown: false },
-    { name: 'All Tools', href: '/tools', hasDropdown: false },
-    { name: 'Categories', hasDropdown: true },
-    { name: 'About', href: '/about', hasDropdown: false },
-  ]
+    { label: 'Home', href: '/' },
+    { label: 'All Tools', href: '/tools' },
+    { label: 'Categories', href: '/categories' },
+    { label: 'Pricing', href: '/pricing' },
+    { label: 'About', href: '/about' },
+  ];
 
-  const categoriesList = [
-    { name: 'Photography & Images', items: ['Passport Photo Maker', 'Background Remover', 'Image Compressor', 'Image Upscaler'] },
-    { name: 'Documents & PDF', items: ['PDF to Word', 'Word to PDF', 'Merge PDF', 'Compress PDF'] },
-    { name: 'AI Generation', items: ['Text to Image', 'AI Copywriter', 'Logo Generator', 'Avatar Creator'] },
-  ]
+  const handleSignOut = async () => {
+    await signOut(auth);
+    setUserMenu(false);
+    router.push('/');
+  };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-colors">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-
-          {/* Left: Logo & Links */}
-          <div className="flex items-center gap-12" ref={navRef}>
-            <Link href="/" className="flex items-center gap-3">
-              <div className="relative w-8 h-8 flex flex-shrink-0 items-center justify-center">
-                <img src="/logo.png" alt="Luta Tech Logo" className="w-full h-full object-contain dark:hidden" />
-                <img src="/logo-white.png" alt="Luta Tech Logo" className="w-full h-full object-contain hidden dark:block" />
-              </div>
-              <span className="text-xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-                Luta Tech
+    <>
+      <header className="sticky top-0 z-40 border-b lt-border-color bg-[rgb(var(--lt-surface)/0.8)] backdrop-blur-xl transition-colors">
+        <nav className="lt-container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
+            >
+              <Logo className="h-[1.05em] w-auto shrink-0" />
+              <span className="leading-none flex items-center">
+                Luta<span className="text-[rgb(var(--lt-primary))]">Tech</span>
               </span>
             </Link>
 
-            <nav className="hidden lg:flex items-center gap-8 relative">
-              {navLinks.map((link) => (
-                <div key={link.name} className="relative group">
-                  <button
-                    onClick={() => link.hasDropdown ? setCategoriesOpen(!categoriesOpen) : null}
-                    className={`flex items-center gap-1.5 text-[15px] font-medium transition-colors py-2 ${pathname === link.href ? 'text-blue-600' : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'}`}
+            <div className="hidden items-center gap-1 md:flex">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+                      isActive
+                        ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
+                        : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
+                    }`}
                   >
-                    {link.hasDropdown ? (
-                      link.name
-                    ) : (
-                      <Link href={link.href!}>{link.name}</Link>
-                    )}
-                    {link.hasDropdown && (
-                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${categoriesOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Mega Menu for Categories */}
-                  {link.hasDropdown && categoriesOpen && (
-                    <div className="absolute top-[3.5rem] left-1/2 -translate-x-1/2 w-[700px] bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-8 grid grid-cols-3 gap-8">
-                      {categoriesList.map((col) => (
-                        <div key={col.name}>
-                          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">{col.name}</h4>
-                          <ul className="space-y-3">
-                            {col.items.map((item) => (
-                              <li key={item}>
-                                <Link href="#" className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                  {item}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </nav>
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Right: Actions */}
-          <div className="hidden lg:flex items-center gap-4">
-            
-            {/* Theme Toggle */}
-            <button 
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors"
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Quick Search Button */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 rounded-lg border lt-border-color bg-[rgb(var(--lt-surface-2))] px-2.5 py-1.5 text-xs text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-text))] transition-colors cursor-pointer"
             >
-              {mounted && theme === 'dark' ? (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              )}
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Search tools...</span>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded bg-[rgb(var(--lt-surface))] border lt-border-color px-1.5 py-0.5 text-[10px] font-mono">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="rounded-lg p-2 text-[rgb(var(--lt-text-muted))] transition-colors hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))] cursor-pointer"
+              aria-label="Toggle theme"
+            >
+              {mounted && theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+
+            {/* User Auth actions */}
+            {user ? (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setUserMenu((v) => !v)}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-[rgb(var(--lt-surface-2))] cursor-pointer"
+                >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] text-xs font-bold text-white shadow-xs">
+                    {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="max-w-[120px] truncate text-[rgb(var(--lt-text))] text-xs font-semibold">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                </button>
+                {userMenu && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setUserMenu(false)} />
+                    <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] p-1.5 shadow-xl lt-fade-in">
+                      <div className="border-b lt-border-color px-3 py-2">
+                        <p className="text-xs font-bold text-[rgb(var(--lt-text))] truncate">
+                          {user.displayName || 'Account'}
+                        </p>
+                        <p className="text-[11px] lt-text-muted truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setUserMenu(false)}
+                        className="mt-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-[rgb(var(--lt-text))] transition-colors hover:bg-[rgb(var(--lt-surface-2))]"
+                      >
+                        <LayoutGrid className="h-3.5 w-3.5" /> My Dashboard
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-[rgb(var(--lt-error))] transition-colors hover:bg-[rgb(var(--lt-error)/0.08)] cursor-pointer"
+                      >
+                        <LogOut className="h-3.5 w-3.5" /> Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="hidden items-center gap-2 md:flex">
+                <Link href="/login" className="lt-btn-secondary py-1.5 px-3 text-xs">
+                  <UserIcon className="h-3.5 w-3.5" /> Login
+                </Link>
+                <Link href="/register" className="lt-btn-primary py-1.5 px-3 text-xs">
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              className="rounded-lg p-2 text-[rgb(var(--lt-text-muted))] transition-colors hover:bg-[rgb(var(--lt-surface-2))] md:hidden cursor-pointer"
+              aria-label="Menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
+        </nav>
 
-
-          {/* Mobile menu button */}
-          <button
-            className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile nav */}
-      {mobileOpen && (
-        <div className="lg:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
-          <nav className="px-4 pt-2 pb-6 space-y-1">
-            {navLinks.map((link) => (
-              <button key={link.name} className="w-full flex items-center justify-between px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg">
-                {link.name}
-                {link.hasDropdown && (
-                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
-            <div className="pt-4 px-3 space-y-3">
-              <Link href="/dashboard" className="w-full flex justify-center px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
-                Dashboard
-              </Link>
+        {/* Mobile Drawer */}
+        {mobileOpen && (
+          <div className="border-t lt-border-color bg-[rgb(var(--lt-surface))] px-4 py-4 md:hidden lt-fade-in">
+            <div className="flex flex-col gap-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === link.href
+                      ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
+                      : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              {user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm font-medium text-[rgb(var(--lt-text-muted))] transition-colors hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]"
+                  >
+                    My Dashboard
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[rgb(var(--lt-error))] hover:bg-[rgb(var(--lt-error)/0.08)] cursor-pointer"
+                  >
+                    <LogOut className="h-4 w-4" /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <div className="mt-2 flex flex-col gap-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)} className="lt-btn-secondary w-full">
+                    Login
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)} className="lt-btn-primary w-full">
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
-          </nav>
-        </div>
-      )}
-    </header>
-  )
+          </div>
+        )}
+      </header>
+
+      {/* Global Search Modal */}
+      <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
+  );
 }
+
+export default Navbar;
