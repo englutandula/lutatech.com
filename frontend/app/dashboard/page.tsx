@@ -27,7 +27,7 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/firebase';
 import { signOut, updateProfile } from 'firebase/auth';
-import { getHistory } from '@/lib/api';
+import { getHistory, deleteHistoryItem, clearHistory } from '@/lib/api';
 import { getLiveTools, tools } from '@/lib/tools';
 import { ToolIcon } from '@/components/ToolIcon';
 
@@ -104,8 +104,16 @@ export default function DashboardPage() {
     router.push('/');
   };
 
-  const handleDeleteRecord = (id: string | number) => {
+  const handleDeleteRecord = async (id: string | number) => {
     setHistory((prev) => prev.filter((item) => item.id !== id));
+    await deleteHistoryItem(id);
+  };
+
+  const handleClearHistory = async () => {
+    if (window.confirm('Are you sure you want to clear all history?')) {
+      setHistory([]);
+      await clearHistory();
+    }
   };
 
   if (authLoading || !user) {

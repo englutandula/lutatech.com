@@ -68,11 +68,13 @@ async def process_endpoint(
                     user_id=current_user.id,
                     tool_type="passport",
                     status="completed",
+                    country_code=document_type,
                     result_url=result.processed_image,
                 )
                 db.add(job)
                 db.commit()
-            except Exception:
+            except Exception as ex:
+                print(f"Error saving passport job: {ex}")
                 db.rollback()
 
         return result

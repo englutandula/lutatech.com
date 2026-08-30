@@ -185,9 +185,22 @@ export default function AuthModal({
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-3 flex items-start gap-2 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))]">
-            <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>{error}</span>
+          <div className="mb-3 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))]">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <div className="flex-1">
+                <span>{error}</span>
+                {mode === 'register' && error.toLowerCase().includes('already exists') && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('login'); setError(null); }}
+                    className="mt-1.5 block font-bold text-[rgb(var(--lt-primary))] underline cursor-pointer"
+                  >
+                    Click here to Sign In with this email →
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

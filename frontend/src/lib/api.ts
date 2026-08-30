@@ -27,23 +27,24 @@ const client = axios.create({
 client.interceptors.request.use(async (config) => {
   config.baseURL = getApiBaseUrl();
 
-  // Attach local auth token if present
+  // 1. Primary: If user is logged into Firebase, attach fresh Firebase ID token
+  if (auth?.currentUser) {
+    try {
+      const fbToken = await auth.currentUser.getIdToken();
+      if (fbToken) {
+        config.headers.Authorization = `Bearer ${fbToken}`;
+        return config;
+      }
+    } catch (e) {
+      console.warn('Failed to retrieve Firebase ID token:', e);
+    }
+  }
+
+  // 2. Fallback: Attach local auth token if present
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
-  // Firebase auth fallback if present
-  if (auth?.currentUser) {
-    try {
-      const fbToken = await auth.currentUser.getIdToken();
-      if (fbToken && !config.headers.Authorization) {
-        config.headers.Authorization = `Bearer ${fbToken}`;
-      }
-    } catch {
-      // Ignored
     }
   }
 
@@ -122,9 +123,27 @@ export async function detectFaces(file: File): Promise<FaceDetectResult> {
 export async function getHistory(): Promise<any[]> {
   try {
     const res = await client.get('/jobs');
-    return res.data;
+    return Array.isArray(res.data) ? res.data : [];
   } catch {
     return [];
+  }
+}
+
+export async function deleteHistoryItem(jobId: number | string): Promise<boolean> {
+  try {
+    await client.delete(`/jobs/${jobId}`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function clearHistory(): Promise<boolean> {
+  try {
+    await client.delete('/jobs');
+    return true;
+  } catch {
+    return false;
   }
 }
 

@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     temp_dir: str = "/tmp/lutatech"
     rembg_model: str = "u2netp"
 
-    # Database
-    database_url: str = "postgresql://luta_user:luta_secret_local@localhost:5432/luta_studio"
+    # Database (MySQL via PyMySQL)
+    database_url: str = "mysql+pymysql://root:@127.0.0.1:3306/luta_studio"
 
     # JWT Auth
     secret_key: str = "change-me-in-production"

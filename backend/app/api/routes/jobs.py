@@ -27,7 +27,7 @@ class JobResponse(BaseModel):
 def list_jobs(
     current_user: User = Depends(require_auth),
     db: Session = Depends(get_db),
-    limit: int = 20,
+    limit: int = 50,
     offset: int = 0,
 ):
     """Get the authenticated user's tool job history."""
@@ -40,3 +40,28 @@ def list_jobs(
         .all()
     )
     return jobs
+
+
+@router.delete("/{job_id}")
+def delete_job(
+    job_id: int,
+    current_user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+):
+    """Delete a single job from history."""
+    job = db.query(ToolJob).filter(ToolJob.id == job_id, ToolJob.user_id == current_user.id).first()
+    if job:
+        db.delete(job)
+        db.commit()
+    return {"success": True}
+
+
+@router.delete("")
+def clear_jobs(
+    current_user: User = Depends(require_auth),
+    db: Session = Depends(get_db),
+):
+    """Clear all jobs for the authenticated user."""
+    db.query(ToolJob).filter(ToolJob.user_id == current_user.id).delete()
+    db.commit()
+    return {"success": True}
