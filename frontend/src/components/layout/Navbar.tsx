@@ -18,7 +18,7 @@ import { navPdfGroups } from '@/lib/nav';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, openAuthModal } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -240,12 +240,18 @@ export function Navbar() {
               </div>
             ) : (
               <div className="hidden items-center gap-2 md:flex">
-                <Link href="/login" className="lt-btn-secondary py-1.5 px-3 text-xs">
+                <button
+                  onClick={() => openAuthModal('login')}
+                  className="lt-btn-secondary py-1.5 px-3 text-xs cursor-pointer"
+                >
                   <UserIcon className="h-3.5 w-3.5" /> Login
-                </Link>
-                <Link href="/register" className="lt-btn-primary py-1.5 px-3 text-xs">
+                </button>
+                <button
+                  onClick={() => openAuthModal('register')}
+                  className="lt-btn-primary py-1.5 px-3 text-xs cursor-pointer font-bold shadow-xs"
+                >
                   Sign Up
-                </Link>
+                </button>
               </div>
             )}
 
@@ -424,12 +430,18 @@ export function Navbar() {
                 </>
               ) : (
                 <div className="mt-3 flex flex-col gap-2 pt-3 border-t lt-border-color">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="lt-btn-secondary w-full">
+                  <button
+                    onClick={() => { setMobileOpen(false); openAuthModal('login'); }}
+                    className="lt-btn-secondary w-full cursor-pointer justify-center"
+                  >
                     Login
-                  </Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="lt-btn-primary w-full">
+                  </button>
+                  <button
+                    onClick={() => { setMobileOpen(false); openAuthModal('register'); }}
+                    className="lt-btn-primary w-full cursor-pointer justify-center font-bold"
+                  >
                     Sign Up
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>

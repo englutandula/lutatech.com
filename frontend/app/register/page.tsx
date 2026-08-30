@@ -1,19 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, User as UserIcon, AlertCircle, ArrowRight } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Mail, Lock, User as UserIcon, AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
+import { getFriendlyAuthErrorMessage } from '@/lib/auth-errors';
+import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter';
 import { Logo } from '@/components/layout/Logo';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -22,10 +30,9 @@ export default function RegisterPage() {
       setLoading(true);
       setError(null);
       await signInWithPopup(auth, googleProvider);
-      router.push('/dashboard');
+      router.push(redirectUrl);
     } catch (err: any) {
-      console.error('Error signing in with Google', err);
-      setError(err.message || 'Failed to sign in with Google');
+      setError(getFriendlyAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -37,18 +44,21 @@ export default function RegisterPage() {
       setError('Passwords do not match');
       return;
     }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       if (userCredential.user && name.trim()) {
         await updateProfile(userCredential.user, { displayName: name.trim() });
       }
-      router.push('/dashboard');
+      router.push(redirectUrl);
     } catch (err: any) {
-      console.error('Error signing up', err);
-      setError(err.message || 'Failed to create account');
+      setError(getFriendlyAuthErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -57,6 +67,7 @@ export default function RegisterPage() {
   return (
     <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
       <div className="w-full max-w-md lt-fade-up">
+        <div className="text-center mb-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-2xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
@@ -66,17 +77,18 @@ export default function RegisterPage() {
               Luta<span className="text-[rgb(var(--lt-primary))]">Tech</span>
             </span>
           </Link>
+        </div>
 
-        <div className="lt-card p-8">
+        <div className="lt-card p-6 sm:p-8">
           <h1 className="text-2xl font-bold text-[rgb(var(--lt-text))]">Create your account</h1>
-          <p className="mt-2 text-sm lt-text-muted">Get started for free. No credit card required.</p>
+          <p className="mt-1.5 text-xs sm:text-sm lt-text-muted">Get started for free. No credit card required.</p>
 
           {/* Google Sign In */}
           <div className="mt-6">
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 lt-surface-2 border lt-border-color hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] rounded-xl py-2.5 px-4 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.5 px-4 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -90,11 +102,11 @@ export default function RegisterPage() {
 
           <div className="relative my-6 flex items-center justify-center">
             <div className="w-full border-t lt-border-color" />
-            <span className="absolute bg-[rgb(var(--lt-surface))] px-3 text-xs lt-text-muted">or email</span>
+            <span className="absolute bg-[rgb(var(--lt-surface))] px-3 text-xs lt-text-muted font-medium">or email</span>
           </div>
 
           {error && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-sm text-[rgb(var(--lt-error))]">
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -102,7 +114,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--lt-text))]">Full Name</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Full Name</label>
               <div className="relative">
                 <UserIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
                 <input
@@ -111,13 +123,13 @@ export default function RegisterPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Doe"
-                  className="lt-input pl-11"
+                  className="lt-input pl-10"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--lt-text))]">Email</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Email Address</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
                 <input
@@ -126,46 +138,61 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="lt-input pl-11"
+                  className="lt-input pl-10"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--lt-text))]">Password</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="lt-input pl-11"
+                  className="lt-input pl-10 pr-10"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+              <PasswordStrengthMeter password={password} />
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--lt-text))]">Confirm Password</label>
+              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Confirm Password</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
                 <input
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   required
                   minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="lt-input pl-11"
+                  className="lt-input pl-10 pr-10"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer">
+            <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold">
               {loading ? (
-                <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white lt-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
                   Create Account <ArrowRight className="h-4 w-4" />
@@ -174,14 +201,25 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm lt-text-muted">
+          <p className="mt-6 text-center text-xs sm:text-sm lt-text-muted">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[rgb(var(--lt-primary))] hover:underline">
+            <Link
+              href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
+              className="font-semibold text-[rgb(var(--lt-primary))] hover:underline"
+            >
               Sign in
             </Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <RegisterForm />
+    </Suspense>
   );
 }
