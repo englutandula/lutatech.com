@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import Cropper from 'react-easy-crop'
 import type { PhotoSpec } from '@/lib/types'
+import { X } from 'lucide-react'
 
 interface Area {
   x: number
@@ -92,21 +93,22 @@ export default function ManualCropModal({ imageSrc, spec, bgColor, onApply, onCl
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden flex flex-col w-full max-w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh]">
-        <div className="flex items-center justify-between px-3 sm:px-5 py-3 sm:py-3.5 border-b border-gray-100 dark:border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 lt-fade-in">
+      <div className="bg-[rgb(var(--lt-surface))] border lt-border-color rounded-2xl shadow-2xl overflow-hidden flex flex-col w-full max-w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b lt-border-color">
           <div>
-            <h3 className="text-gray-800 dark:text-gray-200 font-semibold text-sm">Manual Crop</h3>
-            <p className="text-gray-400 text-xs mt-0.5">Drag to move, scroll to zoom</p>
+            <h3 className="font-bold text-[rgb(var(--lt-text))] text-sm">Manual Crop</h3>
+            <p className="lt-text-muted text-xs mt-0.5">Drag to move, scroll or slide to zoom</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 active:bg-gray-200 dark:active:bg-slate-600 transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <button
+            onClick={onClose}
+            className="lt-text-muted hover:text-[rgb(var(--lt-text))] p-2 rounded-xl hover:bg-[rgb(var(--lt-surface-2))] transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="relative bg-gray-900" style={{ height: '50vh', minHeight: 220 }}>
+        <div className="relative bg-slate-950" style={{ height: '50vh', minHeight: 240 }}>
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -120,10 +122,10 @@ export default function ManualCropModal({ imageSrc, spec, bgColor, onApply, onCl
             maxZoom={4}
             showGrid={false}
             style={{
-              containerStyle: { background: '#1e293b' },
+              containerStyle: { background: '#090d16' },
               cropAreaStyle: {
-                border: '1.5px solid rgba(255,255,255,0.25)',
-                borderRadius: '6px',
+                border: '1.5px solid rgba(255,255,255,0.3)',
+                borderRadius: '8px',
                 backgroundImage: overlaySvg,
                 backgroundSize: '100% 100%',
                 backgroundRepeat: 'no-repeat',
@@ -132,9 +134,9 @@ export default function ManualCropModal({ imageSrc, spec, bgColor, onApply, onCl
           />
         </div>
 
-        <div className="px-3 sm:px-5 py-3 sm:py-4 border-t border-gray-100 dark:border-slate-700 space-y-3">
+        <div className="px-4 sm:px-6 py-4 border-t lt-border-color space-y-4">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">-</span>
+            <span className="text-xs font-bold text-[rgb(var(--lt-text-muted))]">-</span>
             <input
               type="range"
               min={0.3}
@@ -142,20 +144,20 @@ export default function ManualCropModal({ imageSrc, spec, bgColor, onApply, onCl
               step={0.01}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className="flex-1"
+              className="flex-1 accent-[rgb(var(--lt-primary))]"
             />
-            <span className="text-xs text-gray-400">+</span>
+            <span className="text-xs font-bold text-[rgb(var(--lt-text-muted))]">+</span>
           </div>
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              className="flex-1 py-2.5 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface-3))] text-[rgb(var(--lt-text))] text-xs font-bold transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleApply}
-              className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium transition-colors"
+              className="flex-1 py-2.5 rounded-xl bg-[rgb(var(--lt-primary))] hover:opacity-95 text-white text-xs font-extrabold shadow-md shadow-[rgb(var(--lt-primary)/0.25)] transition-all cursor-pointer"
             >
               Apply Crop
             </button>
