@@ -21,6 +21,10 @@ import {
   Wrench,
   Code2,
   Sparkles,
+  FileSymlink,
+  FileMinus,
+  ArrowDownUp,
+  LayoutGrid,
 } from 'lucide-react';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -44,6 +48,10 @@ const iconMap: Record<string, LucideIcon> = {
   Wrench,
   Code2,
   Sparkles,
+  FileSymlink,
+  FileMinus,
+  ArrowDownUp,
+  LayoutGrid,
 };
 
 export function ToolIcon({ name, className }: { name: string; className?: string }) {

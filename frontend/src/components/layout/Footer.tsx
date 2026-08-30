@@ -12,12 +12,9 @@ export function Footer() {
           <div className="col-span-2 lg:col-span-2">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
+              className="inline-flex items-center text-xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
             >
-              <Logo className="h-[1.05em] w-auto shrink-0" />
-              <span className="leading-none flex items-center">
-                Luta<span className="text-[rgb(var(--lt-primary))]">Tech</span>
-              </span>
+              <Logo className="h-[1.3em] w-auto shrink-0" />
             </Link>
             <p className="mt-4 max-w-xs text-sm lt-text-muted">
               A world-class digital tools platform. Fast, private, and built for everyone.

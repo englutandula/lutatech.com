@@ -167,7 +167,7 @@ export default function PdfSplitterTool() {
         const copied = await newDoc.copyPages(srcDoc, seg.pages);
         copied.forEach((p) => newDoc.addPage(p));
         const bytes = await newDoc.save();
-        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const blob = new Blob([bytes as any], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         newResults.push({ name: seg.name, url, size: bytes.byteLength, pages: seg.pages.length });
       }
