@@ -87,8 +87,8 @@ def process_photo(
     image = ImageOps.exif_transpose(image)
     image = image.convert("RGB")
 
-    # Preserve full photographic fidelity up to 3000px with high-precision Lanczos resampling
-    MAX_INPUT_DIM = 3000
+    # Optimize input dimension for speed while exceeding 300 DPI passport output specs
+    MAX_INPUT_DIM = 1600
     if max(image.size) > MAX_INPUT_DIM:
         image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
 

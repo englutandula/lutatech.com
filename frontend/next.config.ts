@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   // Desktop apps load from file:// so we need unoptimized images usually
   images: { unoptimized: true },
-
+  devIndicators: false,
 };
 
 export default nextConfig;

@@ -8,14 +8,12 @@ export function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   if (typeof window !== 'undefined') {
-    // In local dev mode, Next.js calls Laravel API Gateway on port 8000
     if (window.location.port === '3000') {
-      return 'http://127.0.0.1:8000/api/v1';
+      return 'http://127.0.0.1:8001/api';
     }
-    // Production (served from Laravel / Namecheap shared hosting)
-    return '/api/v1';
+    return '/api';
   }
-  return 'http://127.0.0.1:8000/api/v1';
+  return 'http://127.0.0.1:8001/api';
 }
 
 const client = axios.create({

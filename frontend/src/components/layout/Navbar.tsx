@@ -59,9 +59,9 @@ export function Navbar() {
     setToolsOpen(false);
   }, [pathname]);
 
-  // Prevent body scroll when menus are open
+  // Prevent body scroll only when mobile menu drawer is open
   useEffect(() => {
-    if (mobileOpen || toolsOpen) {
+    if (mobileOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -69,7 +69,7 @@ export function Navbar() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [mobileOpen, toolsOpen]);
+  }, [mobileOpen]);
 
   // Keyboard shortcuts
   useEffect(() => {

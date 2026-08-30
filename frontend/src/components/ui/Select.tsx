@@ -77,7 +77,7 @@ export default function Select({
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`w-full flex items-center justify-between rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-2xs transition-all duration-150 cursor-pointer text-left ${
+        className={`w-full flex items-center justify-between rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-2xs transition-colors duration-150 cursor-pointer text-left ${
           isOpen
             ? 'border-[rgb(var(--lt-primary))] ring-2 ring-[rgb(var(--lt-primary)/0.25)]'
             : 'hover:border-[rgb(var(--lt-primary)/0.5)] hover:bg-[rgb(var(--lt-surface-2))]'

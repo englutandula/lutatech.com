@@ -39,8 +39,18 @@ def get_all_specs() -> dict:
 
 
 def get_spec(country_code: str) -> dict | None:
-    return load_specs()["countries"].get(country_code)
+    specs = load_specs()["countries"]
+    code = country_code.upper()
+    if code in specs:
+        return specs[code]
+    if f"{code}_PASSPORT" in specs:
+        return specs[f"{code}_PASSPORT"]
+    for k, v in specs.items():
+        if k.upper() == code or k.upper().startswith(f"{code}_"):
+            return v
+    return None
 
 
 def list_country_codes() -> list[str]:
     return list(load_specs()["countries"].keys())
+

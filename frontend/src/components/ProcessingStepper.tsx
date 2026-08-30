@@ -42,42 +42,36 @@ export default function ProcessingStepper({ isProcessing }: ProcessingStepperPro
     setCompletedSteps([])
     setLineProgress([0, 0, 0])
 
-    // Stage 1: Detect Face (0ms -> 700ms)
+    // Stage 1: Detect Face (0ms -> 250ms)
     const t1 = setTimeout(() => {
-      // Step 0 completes & ticks
       setCompletedSteps([0])
-      // Line 0->1 starts filling
       setLineProgress([100, 0, 0])
-    }, 700)
+    }, 250)
 
-    // Stage 2: Line reaches Step 1 -> Remove BG starts loading (1050ms)
+    // Stage 2: Remove BG starts (400ms) and finishes (900ms)
     const t2 = setTimeout(() => {
       setCurrentStepIndex(1)
-    }, 1050)
+    }, 400)
 
-    // Remove BG completes & ticks (2200ms)
     const t3 = setTimeout(() => {
       setCompletedSteps([0, 1])
-      // Line 1->2 starts filling
       setLineProgress([100, 100, 0])
-    }, 2200)
+    }, 900)
 
-    // Stage 3: Line reaches Step 2 -> Auto Crop starts loading (2550ms)
+    // Stage 3: Auto Crop starts (1050ms) and finishes (1400ms)
     const t4 = setTimeout(() => {
       setCurrentStepIndex(2)
-    }, 2550)
+    }, 1050)
 
-    // Auto Crop completes & ticks (3200ms)
     const t5 = setTimeout(() => {
       setCompletedSteps([0, 1, 2])
-      // Line 2->3 starts filling
       setLineProgress([100, 100, 100])
-    }, 3200)
+    }, 1400)
 
-    // Stage 4: Line reaches Step 3 -> Enhance starts loading (3550ms)
+    // Stage 4: Enhance starts (1550ms)
     const t6 = setTimeout(() => {
       setCurrentStepIndex(3)
-    }, 3550)
+    }, 1550)
 
     timerRefs.current = [t1, t2, t3, t4, t5, t6]
 
