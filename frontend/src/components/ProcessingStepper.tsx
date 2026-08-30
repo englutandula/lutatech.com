@@ -87,14 +87,14 @@ export default function ProcessingStepper({ isProcessing }: ProcessingStepperPro
   }, [isProcessing])
 
   return (
-    <div className="w-full max-w-lg mx-auto rounded-2xl border border-gray-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-6 sm:p-8 shadow-sm animate-fade-in">
+    <div className="w-full max-w-lg mx-auto rounded-2xl border lt-border-color bg-[rgb(var(--lt-surface))] backdrop-blur-sm p-6 sm:p-8 shadow-xs animate-fade-in">
       {/* Header */}
       <div className="text-center mb-7">
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+        <h3 className="text-base sm:text-lg font-bold text-[rgb(var(--lt-text))] tracking-tight">
           Processing your photo...
         </h3>
-        <p className="text-xs text-gray-400 dark:text-slate-400 mt-1 font-medium">
-          This usually takes only 2–5 seconds
+        <p className="text-xs lt-text-muted mt-1 font-medium">
+          This usually takes only 2–4 seconds
         </p>
       </div>
 
@@ -115,8 +115,8 @@ export default function ProcessingStepper({ isProcessing }: ProcessingStepperPro
                     isDone
                       ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 scale-100 ring-4 ring-emerald-50 dark:ring-emerald-950/40'
                       : isActive
-                      ? 'bg-primary-600 text-white shadow-md shadow-primary-500/30 scale-105 ring-4 ring-primary-100 dark:ring-primary-950/60'
-                      : 'border-2 border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 text-gray-400 dark:text-slate-500'
+                      ? 'bg-[rgb(var(--lt-primary))] text-white shadow-md shadow-[rgb(var(--lt-primary)/0.35)] scale-105 ring-4 ring-[rgb(var(--lt-primary)/0.2)]'
+                      : 'border-2 lt-border-color bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text-muted))]'
                   }`}
                 >
                   {isDone ? (
@@ -143,14 +143,14 @@ export default function ProcessingStepper({ isProcessing }: ProcessingStepperPro
                   )}
                 </div>
 
-                {/* Minimal Step Title */}
+                {/* Step Title */}
                 <span
                   className={`text-[11px] sm:text-xs mt-2 transition-colors duration-200 leading-tight font-medium ${
                     isDone
-                      ? 'text-gray-900 dark:text-slate-200 font-semibold'
+                      ? 'text-[rgb(var(--lt-text))] font-semibold'
                       : isActive
-                      ? 'text-primary-600 dark:text-primary-400 font-bold'
-                      : 'text-gray-400 dark:text-slate-500'
+                      ? 'text-[rgb(var(--lt-primary))] font-bold'
+                      : 'lt-text-muted'
                   }`}
                 >
                   {step.title}
@@ -159,9 +159,9 @@ export default function ProcessingStepper({ isProcessing }: ProcessingStepperPro
 
               {/* Connecting Horizontal Moving Line */}
               {index < STEPS.length - 1 && (
-                <div className="flex-1 mt-4 sm:mt-5 mx-1 sm:mx-2 h-1 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden relative">
+                <div className="flex-1 mt-4 sm:mt-5 mx-1 sm:mx-2 h-1 bg-[rgb(var(--lt-surface-3))] rounded-full overflow-hidden relative">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-primary-500 rounded-full transition-all duration-350 ease-out"
+                    className="h-full bg-gradient-to-r from-emerald-500 to-[rgb(var(--lt-primary))] rounded-full transition-all duration-350 ease-out"
                     style={{ width: `${lineProgress[index]}%` }}
                   />
                 </div>
