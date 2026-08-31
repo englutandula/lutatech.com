@@ -24,9 +24,11 @@ services:
     container_name: luta-python-api
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
     environment:
       - PORT=8000
-      - REMBG_MODEL=u2netp
+
       - DATABASE_URL=postgresql://luta_user:luta_secret_production_2026@db:5432/luta_studio
       - CORS_ORIGINS=https://lutatech.com,https://www.lutatech.com,http://localhost:3000
     depends_on:
