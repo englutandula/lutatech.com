@@ -34,8 +34,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PassportToolPage() {
-  const tool = getTool('passport-photo-maker')!;
+export default function PassportPhotoMakerPage() {
+  const tool = getTool('passport')!;
 
   const faqItems = [
     {

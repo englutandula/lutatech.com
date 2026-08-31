@@ -19,7 +19,7 @@ const COLOR_PRESETS = [
 ];
 
 export default function BackgroundRemover() {
-  const tool = getTool('background-remover')!;
+  const tool = getTool('remove-bg')!;
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
@@ -71,7 +71,7 @@ export default function BackgroundRemover() {
       const result = await removeBackground(selectedImage, 'transparent');
       if (result) {
         setProcessedUrl(result.startsWith('data:') ? result : `data:image/png;base64,${result}`);
-        recordToolUsage('background-remover');
+        recordToolUsage('remove-bg');
       }
     } catch (error) {
       console.error(error);
