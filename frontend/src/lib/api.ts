@@ -39,6 +39,21 @@ client.interceptors.request.use(async (config) => {
   return config;
 });
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If 401 on auth verification routes, clear expired token
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      const url = error.config?.url || '';
+      if (url.includes('/auth/profile') || url.includes('/auth/logout')) {
+        localStorage.removeItem('auth_token');
+        window.dispatchEvent(new Event('luta_auth_changed'));
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ==========================================
 // AI Tools (Proxied via Laravel to AWS Python)
 // ==========================================

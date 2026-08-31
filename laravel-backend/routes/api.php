@@ -109,23 +109,20 @@ Route::prefix('v1')->group(function () {
     });
 
     // =========================================================================
-    // Tool Routes — Protected (must be active account)
+    // Tool Routes (Accessible for both guests and authenticated users)
     // =========================================================================
-    Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
+    // Passport Photo Requirements & Processing
+    Route::get('/requirements', [AiToolController::class, 'getRequirements']);
+    Route::post('/process',     [AiToolController::class, 'processPassport']);
 
-        // Passport Photo Requirements & Processing
-        Route::get('/requirements', [AiToolController::class, 'getRequirements']);
-        Route::post('/process',     [AiToolController::class, 'processPassport']);
+    // AI Tools (proxied to Python AI microservice on AWS)
+    Route::prefix('ai')->group(function () {
+        Route::post('/remove-background', [AiToolController::class, 'removeBackground']);
+        Route::post('/passport/process',  [AiToolController::class, 'processPassport']);
+    });
 
-        // AI Tools (proxied to Python AI microservice on AWS)
-        Route::prefix('ai')->group(function () {
-            Route::post('/remove-background', [AiToolController::class, 'removeBackground']);
-            Route::post('/passport/process',  [AiToolController::class, 'processPassport']);
-        });
-
-        // Normal Tools (executed 100% in PHP/Laravel)
-        Route::prefix('tools')->group(function () {
-            Route::post('/qr/generate', [NormalToolController::class, 'generateQr']);
-        });
+    // Normal Tools (executed 100% in PHP/Laravel)
+    Route::prefix('tools')->group(function () {
+        Route::post('/qr/generate', [NormalToolController::class, 'generateQr']);
     });
 });
