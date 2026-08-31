@@ -35,7 +35,7 @@ export const categories: { name: ToolCategory; description: string; icon: string
 
 export const tools: Tool[] = [
   {
-    slug: 'passport-photo-maker',
+    slug: 'passport',
     name: 'Passport Photo Maker',
     shortName: 'Passport Photo',
     description: 'Create compliant passport photos in seconds. Crop, align, and adjust for any country standard.',
@@ -49,7 +49,7 @@ export const tools: Tool[] = [
     href: '/tools/passport',
   },
   {
-    slug: 'background-remover',
+    slug: 'remove-bg',
     name: 'Background Remover',
     shortName: 'BG Remover',
     description: 'Remove image backgrounds instantly with AI. Get a clean transparent cutout in one click.',

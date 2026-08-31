@@ -45,6 +45,9 @@ export function PdfMergerTool() {
   } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
+  const addFileInputRef = useRef<HTMLInputElement>(null);
+  const addFolderInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = async (files: FileList | File[]) => {
     setError(null);
@@ -286,12 +289,22 @@ export function PdfMergerTool() {
             Combine PDFs in the order you want with the easiest PDF merger available.
           </p>
 
-          <button
-            type="button"
-            className="mt-8 lt-btn-primary py-3.5 px-8 text-base font-bold shadow-lg shadow-[rgb(var(--lt-primary)/0.3)] cursor-pointer"
-          >
-            Select PDF files
-          </button>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="lt-btn-primary py-3.5 px-8 text-base font-bold shadow-lg shadow-[rgb(var(--lt-primary)/0.3)] cursor-pointer"
+            >
+              Select PDF files
+            </button>
+            <button
+              type="button"
+              onClick={() => folderInputRef.current?.click()}
+              className="lt-btn-secondary py-3.5 px-8 text-base font-bold cursor-pointer"
+            >
+              Upload Folder
+            </button>
+          </div>
           <p className="mt-3 text-xs lt-text-muted">or drop PDFs here</p>
         </div>
       ) : (
@@ -396,17 +409,27 @@ export function PdfMergerTool() {
             {/* Floating Right Action Bubble (Add more & Sort) */}
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3">
               {/* Add More Button */}
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                title="Add more files"
-                className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--lt-primary))] text-white shadow-xl hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-              >
-                <Plus className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white border-2 border-[rgb(var(--lt-surface))]">
-                  {pdfFiles.length}
-                </span>
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => addFileInputRef.current?.click()}
+                  title="Add more files"
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[rgb(var(--lt-primary))] text-white shadow-xl hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+                >
+                  <Plus className="h-6 w-6" />
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white border-2 border-[rgb(var(--lt-surface))]">
+                    {pdfFiles.length}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addFolderInputRef.current?.click()}
+                  title="Add folder"
+                  className="flex h-12 w-12 items-center justify-center rounded-full border lt-border-color bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text))] shadow-md hover:bg-[rgb(var(--lt-surface-3))] hover:scale-105 transition-all cursor-pointer"
+                >
+                  <Upload className="h-5 w-5" />
+                </button>
+              </div>
 
               {/* Sort A-Z Button */}
               <button
@@ -512,11 +535,52 @@ export function PdfMergerTool() {
         </div>
       )}
 
-      {/* Hidden Multi-file input */}
+      {/* Hidden inputs */}
       <input
         ref={fileInputRef}
         type="file"
         multiple
+        accept=".pdf,application/pdf"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFiles(e.target.files);
+            e.target.value = '';
+          }
+        }}
+        className="hidden"
+      />
+      <input
+        ref={folderInputRef}
+        type="file"
+        multiple
+        webkitdirectory=""
+        accept=".pdf,application/pdf"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFiles(e.target.files);
+            e.target.value = '';
+          }
+        }}
+        className="hidden"
+      />
+      <input
+        ref={addFileInputRef}
+        type="file"
+        multiple
+        accept=".pdf,application/pdf"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFiles(e.target.files);
+            e.target.value = '';
+          }
+        }}
+        className="hidden"
+      />
+      <input
+        ref={addFolderInputRef}
+        type="file"
+        multiple
+        webkitdirectory=""
         accept=".pdf,application/pdf"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {

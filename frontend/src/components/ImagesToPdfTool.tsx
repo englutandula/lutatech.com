@@ -36,7 +36,9 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
   const [customFileName, setCustomFileName] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
   const addFileInputRef = useRef<HTMLInputElement>(null);
+  const addFolderInputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = (fileList: FileList | File[], append = false) => {
     const valid = Array.from(fileList).filter((f) => f.type.startsWith('image/'));
@@ -131,6 +133,7 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
     <div className="space-y-5">
       {/* Hidden inputs */}
       <input ref={addFileInputRef} type="file" multiple accept={accept} className="hidden" onChange={handleAddMoreInput} />
+      <input ref={addFolderInputRef} type="file" multiple webkitdirectory="" accept={accept} className="hidden" onChange={handleAddMoreInput} />
 
       {/* Drop Zone (empty state) */}
       {images.length === 0 && !result && (
@@ -138,24 +141,39 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={`relative flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 min-h-56 px-6 py-10 ${
+          className={`relative flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed transition-all duration-200 min-h-56 px-6 py-10 ${
             isDragging
               ? 'border-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.06)]'
               : 'lt-border-color bg-[rgb(var(--lt-surface))] hover:border-[rgb(var(--lt-primary)/0.5)] hover:bg-[rgb(var(--lt-surface-2))]'
           }`}
         >
           <input ref={fileInputRef} type="file" multiple accept={accept} className="hidden" onChange={handleInitialInput} />
+          <input ref={folderInputRef} type="file" multiple webkitdirectory="" accept={accept} className="hidden" onChange={handleInitialInput} />
+          
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgb(var(--lt-primary)/0.1)] text-[rgb(var(--lt-primary))]">
             <Upload className="h-7 w-7" />
           </div>
           <div className="text-center">
             <p className="text-base font-bold text-[rgb(var(--lt-text))]">
-              Drop {formatLabel} images here or <span className="text-[rgb(var(--lt-primary))]">browse</span>
+              Drop {formatLabel} images here
             </p>
-            <p className="text-xs lt-text-muted mt-1">
+            <p className="text-xs lt-text-muted mt-1 mb-4">
               All selected images will become pages in a single PDF document.
             </p>
+            <div className="flex items-center justify-center gap-3">
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="lt-btn-primary px-4 py-2 text-sm"
+              >
+                Select Files
+              </button>
+              <button 
+                onClick={() => folderInputRef.current?.click()}
+                className="lt-btn-secondary px-4 py-2 text-sm"
+              >
+                Upload Folder
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -185,6 +203,13 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
               >
                 <Plus className="h-3.5 w-3.5 text-[rgb(var(--lt-primary))]" />
                 Add Images
+              </button>
+              <button
+                onClick={() => addFolderInputRef.current?.click()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-xs font-bold text-[rgb(var(--lt-text))] transition-all cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5 text-[rgb(var(--lt-primary))]" />
+                Add Folder
               </button>
               <button
                 onClick={reset}
