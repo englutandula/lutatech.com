@@ -17,11 +17,32 @@ from app.api.deps import get_current_user
 from app.database import get_db
 from app.models.db_models import User, ToolJob
 
+# Register HEIF/HEIC image opener
 pillow_heif.register_heif_opener()
+
+# Pillow Decompression Bomb Protection (prevents malicious multi-gigapixel denial of service)
+Image.MAX_IMAGE_PIXELS = 50_000_000
 
 router = APIRouter()
 
-MAX_FILE_SIZE = 25 * 1024 * 1024
+MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 MB
+
+
+def validate_image_bytes(image_bytes: bytes) -> Image.Image:
+    """Validates file size and image integrity, returning a verified PIL Image."""
+    if len(image_bytes) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 25MB.")
+    if len(image_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Empty file uploaded.")
+    try:
+        img = Image.open(io.BytesIO(image_bytes))
+        img.verify()
+        # Re-open for actual processing as verify() damages image descriptor
+        return Image.open(io.BytesIO(image_bytes))
+    except Image.DecompressionBombError:
+        raise HTTPException(status_code=400, detail="Image pixel dimensions exceed safety limits.")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Unsupported, invalid, or corrupt image file.")
 
 
 @router.post("/process", response_model=ProcessResponse)
@@ -33,13 +54,7 @@ async def process_endpoint(
     db: Session = Depends(get_db),
 ):
     image_bytes = await file.read()
-    if len(image_bytes) > MAX_FILE_SIZE:
-        raise HTTPException(status_code=400, detail="File too large. Maximum size is 25MB.")
-
-    try:
-        Image.open(io.BytesIO(image_bytes)).verify()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Unsupported or corrupt image file.")
+    validate_image_bytes(image_bytes)
 
     try:
         opts = json.loads(options)
@@ -87,10 +102,7 @@ async def process_endpoint(
 @router.post("/detect-face", response_model=FaceDetectResponse)
 async def detect_face_endpoint(file: UploadFile = File(...)):
     image_bytes = await file.read()
-    try:
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    except Exception:
-        raise HTTPException(status_code=400, detail="Unsupported or corrupt image file.")
+    image = validate_image_bytes(image_bytes).convert("RGB")
     
     faces = await run_in_threadpool(detect_faces, image)
 
@@ -111,10 +123,7 @@ async def remove_bg_endpoint(
     db: Session = Depends(get_db),
 ):
     image_bytes = await file.read()
-    try:
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    except Exception:
-        raise HTTPException(status_code=400, detail="Unsupported or corrupt image file.")
+    image = validate_image_bytes(image_bytes).convert("RGB")
     
     effective_bg = bg_color or background_color or "transparent"
     result = await run_in_threadpool(remove_background, image, bg_color=effective_bg)
@@ -140,4 +149,3 @@ async def remove_bg_endpoint(
             db.rollback()
 
     return {"success": True, "processed_image": encoded}
-

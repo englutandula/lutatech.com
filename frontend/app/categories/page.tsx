@@ -1,17 +1,39 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { categories, getToolsByCategory } from '@/lib/tools';
 import { ToolIcon } from '@/components/ToolIcon';
+import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
-export const metadata = {
-  title: 'Categories | Luta Tech',
-  description: 'Explore Luta Tech digital tools organized by category.',
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
+
+export const metadata: Metadata = {
+  title: 'Tool Categories - Image, PDF, Document, AI & Developer Tools',
+  description:
+    'Browse Luta Tech collection of free online tools organized by category: Image editing, PDF management, document converters, developer utilities, and AI.',
+  alternates: {
+    canonical: '/categories/',
+  },
+  openGraph: {
+    title: 'Tool Categories - Image, PDF, Document, AI & Developer Tools | Luta Tech',
+    description:
+      'Browse Luta Tech digital tools organized by category. Fast, private, and free.',
+    url: `${SITE_URL}/categories/`,
+    type: 'website',
+  },
 };
+
 
 export default function CategoriesPage() {
   return (
     <div>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'Categories', url: '/categories/' },
+        ]}
+      />
       <section className="border-b lt-border-color lt-surface">
         <div className="lt-container py-12">
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[rgb(var(--lt-text))] lt-fade-up">Categories</h1>

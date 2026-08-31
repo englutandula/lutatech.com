@@ -20,8 +20,6 @@ async def lifespan(app: FastAPI):
     # Create all DB tables if they don't exist
     db_models.Base.metadata.create_all(bind=engine)
 
-
-
     # Pre-warm AI models so first user request is fast
     try:
         dummy = Image.new("RGB", (160, 160), (200, 200, 200))
@@ -31,14 +29,29 @@ async def lifespan(app: FastAPI):
         print(f"Pre-warm notice: {e}")
     yield
 
+
 app = FastAPI(title=settings.app_name, version=settings.version, lifespan=lifespan)
 
+# 1. Security Headers Middleware (OWASP recommended defense-in-depth)
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(self), microphone=(), geolocation=()"
+    if request.url.scheme == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    return response
+
+# 2. CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_origin_regex=r"https?://.*",
-    allow_credentials=False,
-    allow_methods=["*"],
+    allow_origins=settings.cors_origins if settings.cors_origins != ["*"] else ["*"],
+    allow_origin_regex=r"https?://.*" if settings.cors_origins == ["*"] else None,
+    allow_credentials=True if settings.cors_origins != ["*"] else False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 

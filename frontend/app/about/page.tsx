@@ -1,15 +1,37 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Target, Eye, Heart, Zap, ShieldCheck, Users, ArrowRight } from 'lucide-react';
+import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
-export const metadata = {
-  title: 'About Us | Luta Tech',
-  description: 'Learn more about Luta Tech - Your provider of simple, powerful AI tools.',
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
+
+export const metadata: Metadata = {
+  title: 'About Luta Tech - Our Mission for Fast, Private Digital Tools',
+  description:
+    'Learn about Luta Tech mission to build high-performance, private, and accessible browser-based tools for creators, developers, and businesses worldwide.',
+  alternates: {
+    canonical: '/about/',
+  },
+  openGraph: {
+    title: 'About Luta Tech - Our Mission for Fast, Private Digital Tools',
+    description:
+      'Discover the vision and technology behind Luta Tech private, browser-first digital studio.',
+    url: `${SITE_URL}/about/`,
+    type: 'website',
+  },
 };
 
 export default function AboutPage() {
   return (
     <div>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: 'About Us', url: '/about/' },
+        ]}
+      />
+
       <section className="border-b lt-border-color lt-surface">
         <div className="lt-container py-16 text-center">
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[rgb(var(--lt-text))] lt-fade-up">About Luta Tech</h1>

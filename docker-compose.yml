@@ -6,9 +6,9 @@ services:
     environment:
       POSTGRES_DB: luta_studio
       POSTGRES_USER: luta_user
-      POSTGRES_PASSWORD: luta_secret_local
+      POSTGRES_PASSWORD: luta_secret_production_2026
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -17,16 +17,18 @@ services:
       timeout: 5s
       retries: 5
 
-  luta-studio-web:
+  python-ai-api:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
+    container_name: luta-python-api
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     environment:
       - PORT=8000
       - REMBG_MODEL=u2netp
-      - DATABASE_URL=postgresql://luta_user:luta_secret_local@db:5432/luta_studio
+      - DATABASE_URL=postgresql://luta_user:luta_secret_production_2026@db:5432/luta_studio
+      - CORS_ORIGINS=https://lutatech.com,https://www.lutatech.com,http://localhost:3000
     depends_on:
       db:
         condition: service_healthy

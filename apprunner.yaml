@@ -1,0 +1,20 @@
+version: 1.0
+runtime: python311
+build:
+  commands:
+    pre-build:
+      - apt-get update && apt-get install -y libgl1 libglib2.0-0
+    build:
+      - pip install -r backend/requirements.txt
+      - python -c "from rembg import new_session; new_session('u2netp')"
+run:
+  runtime-version: 3.11
+  command: python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port 8000
+  network:
+    port: 8000
+    env: APP_NAME
+  env:
+    - name: REMBG_MODEL
+      value: u2netp
+    - name: CORS_ORIGINS
+      value: https://lutatech.com,https://www.lutatech.com,http://localhost:3000

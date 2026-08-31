@@ -73,42 +73,7 @@ export default function HomePage() {
             Instant, private, and running directly in your browser.
           </p>
 
-          {/* Quick Action Search & Jump Buttons */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row lt-fade-up">
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex w-full sm:w-auto items-center justify-center gap-3 lt-btn-primary cursor-pointer"
-            >
-              <Search className="h-4 w-4" />
-              <span>Explore All Tools</span>
-              <kbd className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
-            </button>
-            <Link href="/tools/passport" prefetch={true} className="flex w-full sm:w-auto items-center justify-center lt-btn-secondary">
-              Passport Photo Maker <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
 
-          {/* Popular Search Tags */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs lt-fade-up">
-            <span className="lt-text-muted font-medium">Quick jump:</span>
-            {[
-              { name: 'Passport Photo', href: '/tools/passport' },
-              { name: 'Background Remover', href: '/tools/remove-bg' },
-              { name: 'Compress PDF', href: '/tools/pdf-compressor' },
-              { name: 'Image Compressor', href: '/tools/image-compressor' },
-              { name: 'Image Resizer', href: '/tools/image-resizer' },
-              { name: 'PDF Merge', href: '/tools/pdf-merger' },
-            ].map((tag) => (
-              <Link
-                key={tag.name}
-                href={tag.href}
-                prefetch={true}
-                className="rounded-lg border lt-border-color bg-[rgb(var(--lt-surface-2))] px-2.5 py-1 font-medium text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-primary))] transition-colors"
-              >
-                {tag.name}
-              </Link>
-            ))}
-          </div>
 
           {/* 4 Stats Highlights (Dynamic & Animated) */}
           <AnimatedStats />

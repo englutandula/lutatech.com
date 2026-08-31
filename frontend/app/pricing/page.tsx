@@ -1,11 +1,27 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Check, ArrowRight, Sparkles, ShieldCheck, Zap, HelpCircle } from 'lucide-react';
+import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
-export const metadata = {
-  title: 'Pricing | Luta Tech',
-  description: 'Simple, transparent pricing. Start free, upgrade when you need more.',
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
+
+export const metadata: Metadata = {
+  title: 'Pricing Plans - Free & Pro Subscriptions | Luta Tech',
+  description:
+    'Simple, transparent pricing for Luta Tech digital tools. Enjoy free unlimited in-browser processing, or upgrade for enhanced cloud features.',
+  alternates: {
+    canonical: '/pricing/',
+  },
+  openGraph: {
+    title: 'Pricing Plans - Free & Pro Subscriptions | Luta Tech',
+    description:
+      'Simple, transparent pricing for Luta Tech digital tools. Start free forever.',
+    url: `${SITE_URL}/pricing/`,
+    type: 'website',
+  },
 };
+
 
 const plans = [
   {

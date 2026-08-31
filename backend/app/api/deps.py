@@ -13,11 +13,11 @@ def get_current_user(
     token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> Optional[User]:
-    """Returns current user if token is valid, else None (guest)."""
+    """Returns current user if token is cryptographically valid, else None (guest)."""
     if not token:
         return None
     
-    # 1. Try local FastAPI JWT decode first
+    # 1. Try local FastAPI JWT decode first (validated with secret_key & algorithm)
     local_payload = decode_token(token)
     if local_payload and "sub" in local_payload:
         try:
@@ -28,7 +28,7 @@ def get_current_user(
         except (ValueError, TypeError):
             pass
 
-    # 2. Try Firebase ID token verification
+    # 2. Try Firebase ID token verification (verified with Google public keys)
     from app.services.auth_service import get_user_by_email, create_user
     email = None
     name = None
@@ -41,24 +41,17 @@ def get_current_user(
         email = decoded_token.get("email")
         name = decoded_token.get("name")
     except Exception as e:
-        # Fallback: decode unverified JWT claims from Firebase token for resilience
-        try:
-            import jwt as pyjwt
-            unverified = pyjwt.decode(token, options={"verify_signature": False})
-            if unverified.get("iss", "").startswith("https://securetoken.google.com/lutatech") or unverified.get("aud") == "lutatech":
-                email = unverified.get("email")
-                name = unverified.get("name") or unverified.get("display_name")
-        except Exception as ex:
-            print(f"Token decode error: {ex}")
+        # Invalid or unverified token - do NOT accept unverified claims
+        return None
 
     if not email:
         return None
 
-    # Get or create user in DB
+    # Get or create verified user in DB
     user = get_user_by_email(db, email=email)
     if not user:
         user_name = name or email.split("@")[0]
-        user = create_user(db, email=email, name=user_name, password="firebase-user")
+        user = create_user(db, email=email, name=user_name, password="firebase-oauth-user")
     return user
 
 
@@ -67,7 +60,7 @@ def require_auth(current_user: Optional[User] = Depends(get_current_user)) -> Us
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
+            detail="Authentication required or token expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return current_user
