@@ -97,3 +97,4 @@ if os.path.exists(frontend_build_dir):
             return FileResponse(root_index)
 
         return Response(status_code=404)
+
