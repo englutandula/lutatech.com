@@ -37,7 +37,7 @@ jobs:
         working-directory: frontend
         env:
           NEXT_PUBLIC_SITE_URL: https://lutatech.com
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://lutatech.com/api' }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://lutatech.com/api/v1' }}
         run: npm run build
 
       - name: 🚀 Upload Frontend to cPanel (public_html)
