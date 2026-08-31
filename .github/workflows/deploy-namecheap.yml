@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.NAMECHEAP_FTP_USERNAME }}
           password: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
           local-dir: ./frontend/out/
-          server-dir: ./public_html/
+          server-dir: ./lutatech.com/
           dangerous-clean-slate: false
 
   # -------------------------------------------------------------
@@ -98,7 +98,7 @@ jobs:
           username: ${{ secrets.NAMECHEAP_FTP_USERNAME }}
           password: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
           local-dir: ./laravel-backend/public/
-          server-dir: ./public_html/api/
+          server-dir: ./lutatech.com/api/
           dangerous-clean-slate: false
 
       - name: ⚡ Execute Remote Migrations & Cache Clear (via SSH if available)
