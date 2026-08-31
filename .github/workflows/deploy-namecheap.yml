@@ -1,4 +1,4 @@
-name: Deploy Frontend to Namecheap Hosting
+name: Deploy Fullstack (Frontend & Laravel) to Namecheap
 
 on:
   push:
@@ -6,12 +6,16 @@ on:
       - main
     paths:
       - 'frontend/**'
+      - 'laravel-backend/**'
       - '.github/workflows/deploy-namecheap.yml'
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    name: Build Next.js & Deploy to cPanel
+  # -------------------------------------------------------------
+  # Job 1: Build & Deploy Frontend (Next.js) to public_html
+  # -------------------------------------------------------------
+  deploy-frontend:
+    name: 🌐 Deploy Frontend to Namecheap
     runs-on: ubuntu-latest
 
     steps:
@@ -33,15 +37,79 @@ jobs:
         working-directory: frontend
         env:
           NEXT_PUBLIC_SITE_URL: https://lutatech.com
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'https://lutatech.com/api' }}
         run: npm run build
 
-      - name: 🚀 Deploy to Namecheap via FTP / FTPS
+      - name: 🚀 Upload Frontend to cPanel (public_html)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          server: ${{ secrets.NAMECHEAP_FTP_SERVER }}
+          username: ${{ secrets.NAMECHEAP_FTP_USERNAME }}
+          password: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
           local-dir: ./frontend/out/
           server-dir: ./public_html/
           dangerous-clean-slate: false
+
+  # -------------------------------------------------------------
+  # Job 2: Build & Deploy Laravel Backend to Namecheap
+  # -------------------------------------------------------------
+  deploy-laravel:
+    name: 🐘 Deploy Laravel Backend to Namecheap
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🐘 Setup PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath, curl
+          tools: composer:v2
+
+      - name: 📦 Install Composer Dependencies
+        working-directory: laravel-backend
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+      - name: 🚀 Upload Laravel Core to cPanel (/home/user/laravel-backend)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.NAMECHEAP_FTP_SERVER }}
+          username: ${{ secrets.NAMECHEAP_FTP_USERNAME }}
+          password: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+          local-dir: ./laravel-backend/
+          server-dir: ./laravel-backend/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/storage/logs/*
+            .env.example
+          dangerous-clean-slate: false
+
+      - name: 🚀 Upload Laravel Public Assets to cPanel (public_html/api)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.NAMECHEAP_FTP_SERVER }}
+          username: ${{ secrets.NAMECHEAP_FTP_USERNAME }}
+          password: ${{ secrets.NAMECHEAP_FTP_PASSWORD }}
+          local-dir: ./laravel-backend/public/
+          server-dir: ./public_html/api/
+          dangerous-clean-slate: false
+
+      - name: ⚡ Execute Remote Migrations & Cache Clear (via SSH if available)
+        if: "${{ secrets.NAMECHEAP_SSH_HOST != '' }}"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.NAMECHEAP_SSH_HOST }}
+          username: ${{ secrets.NAMECHEAP_SSH_USER }}
+          password: ${{ secrets.NAMECHEAP_SSH_PASSWORD }}
+          key: ${{ secrets.NAMECHEAP_SSH_KEY }}
+          script: |
+            cd ~/laravel-backend
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache

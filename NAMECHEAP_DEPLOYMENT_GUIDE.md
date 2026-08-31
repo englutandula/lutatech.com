@@ -1,81 +1,65 @@
-# 🚀 Complete Namecheap cPanel Deployment Guide
+# 🚀 100% Automated GitHub Deployment Guide (Namecheap & AWS)
 
-This guide walks you through deploying the **Next.js Frontend**, **Laravel Backend**, and **MySQL Database** on Namecheap Shared Hosting, connecting to your live **Python AI Backend on AWS** (`http://51.20.42.164:8000`).
+This guide shows you how to set up **100% automated CI/CD deployment** so that whenever you run `git push origin main`, GitHub automatically deploys:
+1. **Next.js Static Frontend** ➔ Namecheap `public_html`
+2. **Laravel Backend & Database Migrations** ➔ Namecheap
+3. **Python AI Microservice** ➔ AWS EC2 (`51.20.42.164`)
 
 ---
 
-## 🏗️ Architecture Overview
+## ⚡ How the Automated Pipeline Works
 
 ```mermaid
 flowchart TD
-    User([User Browser]) -->|Visits lutatech.com| NC_Front[Namecheap: Next.js Static Frontend in public_html]
-    NC_Front -->|Auth / DB / Admin| NC_Laravel[Namecheap: Laravel Backend + MySQL]
-    NC_Front -->|Heavy AI / Background Removal| AWS_Python[AWS EC2: Python AI Microservice 51.20.42.164:8000]
-    NC_Laravel -->|Server-side AI Proxy| AWS_Python
+    Push[git push origin main] --> GH[GitHub Actions CI/CD]
+    
+    subgraph AWS_Pipeline [AWS Cloud Auto-Deploy]
+        GH -->|When backend/ changes| AWS_Deploy[deploy-aws.yml]
+        AWS_Deploy -->|SSH & Docker Compose| EC2[AWS Python AI: 51.20.42.164:8000]
+    end
+    
+    subgraph Namecheap_Pipeline [Namecheap Auto-Deploy]
+        GH -->|When frontend/ or laravel-backend/ changes| NC_Deploy[deploy-namecheap.yml]
+        NC_Deploy -->|Auto-Build Next.js| NC_Front[public_html: Static Tools & SEO]
+        NC_Deploy -->|Auto-Composer & Sync| NC_Laravel[~/laravel-backend: Auth & DB]
+    end
 ```
 
 ---
 
-## 📦 Step 1: Deploy Next.js Frontend to Namecheap
+## 🔑 One-Time Setup in GitHub (5 Minutes)
 
-We have created an all-in-one zip file:
-📁 **[`frontend-deploy.zip`](file:///Users/timothysanga/Herd/Lutas%203/frontend-deploy.zip)**
+You only need to add your credentials to GitHub Secrets once, and everything will be automated forever!
 
-1. Log in to your **Namecheap cPanel**.
-2. Open **File Manager** and navigate to your domain root (usually **`public_html/`** or **`lutatech.com/`**).
-3. Click **"Upload"** in the top menu and select **`frontend-deploy.zip`**.
-4. Right-click `frontend-deploy.zip` in File Manager and click **"Extract"**.
-5. Delete `frontend-deploy.zip` after extraction.
+### Step 1: Open GitHub Secrets
+Go to your repository settings:
+👉 **[github.com/englutandula/Luta-Studio-web-/settings/secrets/actions](https://github.com/englutandula/Luta-Studio-web-/settings/secrets/actions)**
 
----
+### Step 2: Add These 3 Secrets for Namecheap:
 
-## 🗄️ Step 2: Create MySQL Database on Namecheap
+| Secret Name | What to paste | Where to find it in Namecheap |
+| :--- | :--- | :--- |
+| **`NAMECHEAP_FTP_SERVER`** | Your Namecheap Hosting IP / Hostname (e.g. `162.0.229.236` or `ftp.lutatech.com`) | In your Namecheap cPanel or Welcome Email |
+| **`NAMECHEAP_FTP_USERNAME`** | Your cPanel Username (or FTP user) | In your cPanel dashboard |
+| **`NAMECHEAP_FTP_PASSWORD`** | Your cPanel Password (or FTP password) | In your cPanel credentials |
 
-1. In cPanel, go to **"MySQL Database Wizard"** (or *MySQL Databases*).
-2. **Step 1: Create Database**: e.g., `youruser_luta`
-3. **Step 2: Create Database User**: e.g., `youruser_dbuser` with a strong password.
-4. **Step 3: Add User to Database**: Check **"ALL PRIVILEGES"** and click *Make Changes*.
+### Step 3: Add AWS Secrets (If not already added):
 
----
-
-## ⚙️ Step 3: Deploy Laravel Backend to Namecheap
-
-1. In cPanel File Manager, create a folder outside `public_html`, e.g.:
-   ```text
-   /home/yourusername/laravel-backend/
-   ```
-2. Upload the files from [`laravel-backend/`](file:///Users/timothysanga/Herd/Lutas%203/laravel-backend/) into that folder.
-3. In `/home/yourusername/laravel-backend/`, copy `.env.example` to **`.env`** and fill in your database and AWS details:
-   ```env
-   APP_NAME="Luta Tech API"
-   APP_ENV=production
-   APP_KEY=base64:your_generated_app_key
-   APP_DEBUG=false
-   APP_URL=https://lutatech.com
-
-   # Namecheap MySQL
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=youruser_luta
-   DB_USERNAME=youruser_dbuser
-   DB_PASSWORD=your_database_password
-
-   # Live Python AI on AWS
-   PYTHON_AI_URL=http://51.20.42.164:8000
-   PYTHON_AI_SECRET=luta-tech-secure-jwt-key-2026-production-fallback
-   PYTHON_AI_TIMEOUT=60
-   ```
-4. Run migrations via cPanel Terminal (or SSH):
-   ```bash
-   cd ~/laravel-backend
-   php artisan migrate --force
-   ```
+| Secret Name | Value |
+| :--- | :--- |
+| **`AWS_EC2_HOST`** | `51.20.42.164` |
+| **`AWS_SSH_PRIVATE_KEY`** | Run `pbcopy < ~/.ssh/luta-studio-key.pem` in terminal and paste |
 
 ---
 
-## 🔒 Step 4: Enable Free SSL & Verification
+## 🚀 How to Deploy in the Future:
 
-1. In cPanel, search for **"SSL/TLS Status"**.
-2. Select `lutatech.com` and click **"Run AutoSSL"**.
-3. Head to **Google Search Console** and check that your `sitemap.xml` shows **🟢 Success**!
+Whenever you make any change to the Frontend, Laravel, or Python AI backend, simply run:
+
+```bash
+git add .
+git commit -m "Update website features"
+git push origin main
+```
+
+**That's it!** GitHub Actions will automatically build and deploy both to Namecheap and AWS within ~60 seconds with zero manual uploads! 🎉

@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/public_html
+    - export LARAVELPATH=/home/$USER/laravel-backend
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/mkdir -p $LARAVELPATH
+    - /bin/cp -R frontend/out/* $DEPLOYPATH/
+    - /bin/cp -R laravel-backend/* $LARAVELPATH/
+    - cd $LARAVELPATH && /usr/local/bin/php artisan migrate --force || true
+    - cd $LARAVELPATH && /usr/local/bin/php artisan config:cache || true
