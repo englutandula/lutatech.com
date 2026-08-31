@@ -124,13 +124,14 @@ export function Navbar() {
               </Link>
 
               {/* ── Categories mega-menu trigger ── */}
-              <button
+              <Link
+                href="/categories"
                 id="tools-menu-btn"
                 onMouseEnter={openTools}
                 onMouseLeave={scheduleClose}
-                onClick={() => setToolsOpen((v) => !v)}
+                onClick={() => setToolsOpen(false)}
                 className={`flex items-center gap-1 rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                  toolsOpen
+                  toolsOpen || pathname.startsWith('/categories')
                     ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
                     : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
                 }`}
@@ -141,7 +142,7 @@ export function Navbar() {
                 <ChevronDown
                   className={`h-3 w-3 lg:h-3.5 lg:w-3.5 transition-transform duration-200 ${toolsOpen ? 'rotate-180' : ''}`}
                 />
-              </button>
+              </Link>
 
               {/* All Tools */}
               <Link
