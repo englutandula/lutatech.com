@@ -25,10 +25,8 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { auth } from '@/lib/firebase';
-import { signOut, updateProfile } from 'firebase/auth';
 import { getHistory, deleteHistoryItem, clearHistory } from '@/lib/api';
-import { getLiveTools, tools } from '@/lib/tools';
+import { tools, getLiveTools } from '@/lib/tools';
 import { ToolIcon } from '@/components/ToolIcon';
 
 interface ToolRecord {
@@ -41,10 +39,10 @@ interface ToolRecord {
 }
 
 export default function DashboardPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
 
-  const [history, setHistory] = useState<ToolRecord[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'settings'>('overview');
 
@@ -58,7 +56,7 @@ export default function DashboardPage() {
     if (!authLoading && !user) {
       router.push('/login');
     } else if (user) {
-      setDisplayName(user.displayName || user.email?.split('@')[0] || 'User');
+      setDisplayName(user.name || user.email?.split('@')[0] || 'User');
     }
   }, [user, authLoading, router]);
 
@@ -84,23 +82,17 @@ export default function DashboardPage() {
   }, [user, fetchHistory]);
 
   const handleSaveName = async () => {
-    if (!auth.currentUser || !newName.trim()) return;
-    try {
-      setSavingName(true);
-      await updateProfile(auth.currentUser, { displayName: newName.trim() });
-      setDisplayName(newName.trim());
-      setEditingName(false);
-      setNameSaved(true);
-      setTimeout(() => setNameSaved(false), 2000);
-    } catch (err) {
-      console.error('Failed to update profile name:', err);
-    } finally {
-      setSavingName(false);
-    }
+    if (!newName.trim()) return;
+    setSavingName(true);
+    setDisplayName(newName.trim());
+    setEditingName(false);
+    setNameSaved(true);
+    setTimeout(() => setNameSaved(false), 2000);
+    setSavingName(false);
   };
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    await logout();
     router.push('/');
   };
 
@@ -125,8 +117,8 @@ export default function DashboardPage() {
   }
 
   const liveTools = getLiveTools();
-  const memberSince = user.metadata?.creationTime
-    ? new Date(user.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const memberSince = user.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : 'Recently';
 
   // Statistics
@@ -192,36 +184,36 @@ export default function DashboardPage() {
       {activeTab === 'overview' && (
         <div className="mt-8 space-y-8 lt-fade-in">
           {/* Stats grid */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <div className="lt-card p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-primary)/0.1)] text-[rgb(var(--lt-primary))]">
-                <TrendingUp className="h-5 w-5" />
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
+            <div className="lt-card p-3.5 sm:p-5">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-primary)/0.1)] text-[rgb(var(--lt-primary))]">
+                <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div className="mt-3 text-2xl font-extrabold text-[rgb(var(--lt-text))]">{totalUses}</div>
-              <div className="mt-0.5 text-xs lt-text-muted">Total tools used</div>
+              <div className="mt-2.5 sm:mt-3 text-xl sm:text-2xl font-extrabold text-[rgb(var(--lt-text))]">{totalUses}</div>
+              <div className="mt-0.5 text-[11px] sm:text-xs lt-text-muted">Total tools used</div>
             </div>
-            <div className="lt-card p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-accent)/0.1)] text-[rgb(var(--lt-accent))]">
-                <Sparkles className="h-5 w-5" />
+            <div className="lt-card p-3.5 sm:p-5">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-accent)/0.1)] text-[rgb(var(--lt-accent))]">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div className="mt-3 text-2xl font-extrabold text-[rgb(var(--lt-text))]">{uniqueTools}</div>
-              <div className="mt-0.5 text-xs lt-text-muted">Unique tools tried</div>
+              <div className="mt-2.5 sm:mt-3 text-xl sm:text-2xl font-extrabold text-[rgb(var(--lt-text))]">{uniqueTools}</div>
+              <div className="mt-0.5 text-[11px] sm:text-xs lt-text-muted">Unique tools tried</div>
             </div>
-            <div className="lt-card p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-warning)/0.1)] text-[rgb(var(--lt-warning))]">
-                <Clock className="h-5 w-5" />
+            <div className="lt-card p-3.5 sm:p-5">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-warning)/0.1)] text-[rgb(var(--lt-warning))]">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div className="mt-3 text-sm font-bold text-[rgb(var(--lt-text))]">
+              <div className="mt-2.5 sm:mt-3 text-xs sm:text-sm font-bold text-[rgb(var(--lt-text))] truncate">
                 {lastUsed ? new Date(lastUsed).toLocaleDateString() : '—'}
               </div>
-              <div className="mt-0.5 text-xs lt-text-muted">Last activity</div>
+              <div className="mt-0.5 text-[11px] sm:text-xs lt-text-muted">Last activity</div>
             </div>
-            <div className="lt-card p-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-success)/0.1)] text-[rgb(var(--lt-success))]">
-                <Wrench className="h-5 w-5" />
+            <div className="lt-card p-3.5 sm:p-5">
+              <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-[rgb(var(--lt-success)/0.1)] text-[rgb(var(--lt-success))]">
+                <Wrench className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div className="mt-3 text-2xl font-extrabold text-[rgb(var(--lt-text))]">{totalAvailable}</div>
-              <div className="mt-0.5 text-xs lt-text-muted">Tools on platform</div>
+              <div className="mt-2.5 sm:mt-3 text-xl sm:text-2xl font-extrabold text-[rgb(var(--lt-text))]">{totalAvailable}</div>
+              <div className="mt-0.5 text-[11px] sm:text-xs lt-text-muted">Tools on platform</div>
             </div>
           </div>
 

@@ -1,20 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  X, Mail, Lock, AlertCircle, CheckCircle2,
+  X, Mail, Lock, User as UserIcon, AlertCircle, CheckCircle2,
   Eye, EyeOff, ArrowRight, Loader2
 } from 'lucide-react';
-import {
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
-import { getFriendlyAuthErrorMessage } from '@/lib/auth-errors';
+import { useAuth } from '@/lib/auth-context';
+import { forgotPassword, getSocialiteAuthUrl } from '@/lib/api';
 import PasswordStrengthMeter from './PasswordStrengthMeter';
-import { Logo } from '@/components/layout/Logo';
 
 export type AuthMode = 'login' | 'register' | 'forgot-password';
 
@@ -31,7 +25,13 @@ export default function AuthModal({
   onClose,
   onSuccess,
 }: AuthModalProps) {
+  const router = useRouter();
+  const { login, register } = useAuth();
+
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  const [prevInitialMode, setPrevInitialMode] = useState(initialMode);
   const [mode, setMode] = useState<AuthMode>(initialMode);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -40,42 +40,68 @@ export default function AuthModal({
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userExists, setUserExists] = useState(false);
+  const [userNotFound, setUserNotFound] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
-  // Sync mode with initialMode prop when modal opens
-  useEffect(() => {
-    if (isOpen) {
+  // Sync mode and state immediately during render (no delayed size jumping/expanding)
+  if (isOpen !== prevIsOpen || initialMode !== prevInitialMode) {
+    setPrevIsOpen(isOpen);
+    setPrevInitialMode(initialMode);
+    if (isOpen && !prevIsOpen) {
       setMode(initialMode);
       setError(null);
+      setUserExists(false);
+      setUserNotFound(false);
       setResetSent(false);
+      setName('');
       setPassword('');
       setConfirmPassword('');
+      setIsClosing(false);
+    } else if (initialMode !== prevInitialMode) {
+      setMode(initialMode);
     }
-  }, [isOpen, initialMode]);
+  }
+
+  // Smooth close with macOS exit animation
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 180);
+  }, [onClose]);
+
+  // Lock background body scroll when modal is open (zero layout shift / no shaking)
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
 
   // Handle escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) onClose();
+      if (e.key === 'Escape' && isOpen && !isClosing) {
+        handleClose();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, isClosing, handleClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen && !isClosing) return null;
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      await signInWithPopup(auth, googleProvider);
-      if (onSuccess) onSuccess();
-      onClose();
-    } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    setLoading(true);
+    setError(null);
+    window.location.href = getSocialiteAuthUrl('google');
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -88,11 +114,29 @@ export default function AuthModal({
     try {
       setLoading(true);
       setError(null);
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      setUserExists(false);
+      setUserNotFound(false);
+      const res = await login({ email: email.trim(), password });
+      // If email is not verified, close modal and redirect to verify page
+      if (!res?.data?.user?.email_verified) {
+        handleClose();
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+        return;
+      }
       if (onSuccess) onSuccess();
-      onClose();
+      handleClose();
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const resp = err?.response?.data;
+      const msg = resp?.message || err?.message || 'Login failed. Please check your credentials.';
+      setError(msg);
+      if (resp?.requires_activation || msg.toLowerCase().includes('not been activated')) {
+        handleClose();
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+        return;
+      }
+      if (resp?.user_not_found || err?.response?.status === 404) {
+        setUserNotFound(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -100,27 +144,46 @@ export default function AuthModal({
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password || !confirmPassword) {
-      setError('Please fill in all fields.');
+    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
+      setError('Please fill in all required fields.');
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match. Please re-enter your password.');
+      setError('Passwords do not match. Please verify both passwords.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      await createUserWithEmailAndPassword(auth, email.trim(), password);
-      if (onSuccess) onSuccess();
-      onClose();
+      setUserExists(false);
+      setUserNotFound(false);
+      const res = await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        password_confirmation: confirmPassword,
+      });
+      // If email already verified (Google account that just set a password) → success as normal
+      if (res?.data?.user?.email_verified) {
+        if (onSuccess) onSuccess();
+        handleClose();
+      } else {
+        // New account → must verify email first
+        handleClose();
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+      }
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const resp = err?.response?.data;
+      const msg = resp?.message || err?.message || 'Registration failed. Please check your details.';
+      setError(msg);
+      if (resp?.user_exists || msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('already registered')) {
+        setUserExists(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -136,67 +199,105 @@ export default function AuthModal({
     try {
       setLoading(true);
       setError(null);
-      await sendPasswordResetEmail(auth, email.trim());
+      await forgotPassword({ email: email.trim() });
       setResetSent(true);
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const msg = err?.response?.data?.message || err?.message || 'Failed to send reset link.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto overscroll-none select-none">
+      {/* Blurred macOS-Style Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
+        className={`fixed inset-0 bg-slate-950/60 dark:bg-black/80 backdrop-blur-md transition-opacity duration-200 ${
+          isClosing ? 'opacity-0' : 'mac-backdrop-enter opacity-100'
+        }`}
+        onClick={handleClose}
       />
 
-      {/* Modal Card - Compact Height */}
-      <div className="relative w-full max-w-sm sm:max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border lt-border-color bg-[rgb(var(--lt-surface))] p-5 sm:p-6 shadow-2xl z-10 lt-scale-in">
+      {/* macOS Window Card with Smooth Scale Zoom Animation */}
+      <div
+        className={`relative w-full max-w-sm sm:max-w-md rounded-2xl sm:rounded-3xl border border-white/20 dark:border-white/10 bg-[rgb(var(--lt-surface))] p-4 sm:p-6 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.7)] z-10 my-auto max-h-[92vh] overflow-y-auto ${
+          isClosing ? 'mac-modal-exit' : 'mac-modal-enter'
+        }`}
+      >
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute right-3.5 top-3.5 rounded-xl p-1 text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))] transition-colors cursor-pointer"
+          onClick={handleClose}
+          className="absolute right-3.5 top-3.5 rounded-full p-1.5 text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))] transition-colors cursor-pointer"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
 
-        {/* Brand Header - ONLY Image Logo */}
-        <div className="flex justify-center mb-2">
-          <Logo className="h-8 w-auto" />
+        {/* Brand Header */}
+        <div className="text-center mb-2">
+          <span className="text-2xl sm:text-3xl tracking-tight leading-none font-['Century_Gothic',CenturyGothic,AppleGothic,Futura,sans-serif] select-none inline-block">
+            <span className="font-bold text-[rgb(var(--lt-text))]">Luta</span>
+            <span className="font-normal text-[#E53935]">Tech</span>
+          </span>
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-[rgb(var(--lt-text))]">
-            {mode === 'login' && 'Welcome back'}
-            {mode === 'register' && 'Create your account'}
-            {mode === 'forgot-password' && 'Reset password'}
-          </h2>
-          <p className="mt-0.5 text-xs lt-text-muted">
-            {mode === 'login' && 'Sign in to access your tools & history'}
-            {mode === 'register' && 'Get started for free in seconds'}
-            {mode === 'forgot-password' && "We'll send a password reset link to your email"}
-          </p>
-        </div>
+        {/* macOS-Style Segmented Control for Login / Sign Up */}
+        {mode !== 'forgot-password' ? (
+          <div className="flex rounded-xl bg-[rgb(var(--lt-surface-2))] p-1 mb-4 border border-[rgb(var(--lt-border)/0.6)]">
+            <button
+              type="button"
+              onClick={() => { setMode('login'); setError(null); setUserExists(false); setUserNotFound(false); }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                mode === 'login'
+                  ? 'bg-[rgb(var(--lt-surface))] text-[rgb(var(--lt-text))] shadow-xs'
+                  : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => { setMode('register'); setError(null); setUserExists(false); setUserNotFound(false); }}
+              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                mode === 'register'
+                  ? 'bg-[rgb(var(--lt-surface))] text-[rgb(var(--lt-text))] shadow-xs'
+                  : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]'
+              }`}
+            >
+              Create Account
+            </button>
+          </div>
+        ) : (
+          <div className="text-center mb-3.5">
+            <h2 className="text-lg font-bold text-[rgb(var(--lt-text))]">Reset your password</h2>
+            <p className="text-xs lt-text-muted mt-0.5">We&apos;ll send a password recovery link to your email</p>
+          </div>
+        )}
 
-        {/* Error Alert */}
+        {/* Error Alert with Smart Actions */}
         {error && (
-          <div className="mb-3 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))]">
+          <div className="mb-3 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))] animate-in fade-in duration-200">
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <div className="flex-1">
-                <span>{error}</span>
-                {mode === 'register' && error.toLowerCase().includes('already exists') && (
+              <div className="flex-1 space-y-1">
+                <span className="block font-medium leading-relaxed">{error}</span>
+                {userExists && mode === 'register' && (
                   <button
                     type="button"
-                    onClick={() => { setMode('login'); setError(null); }}
-                    className="mt-1.5 block font-bold text-[rgb(var(--lt-primary))] underline cursor-pointer"
+                    onClick={() => { setMode('login'); setError(null); setUserExists(false); }}
+                    className="inline-flex items-center gap-1 font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer pt-0.5"
                   >
-                    Click here to Sign In with this email →
+                    Switch to Sign in with this email <ArrowRight className="h-3 w-3" />
+                  </button>
+                )}
+                {userNotFound && mode === 'login' && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('register'); setError(null); setUserNotFound(false); }}
+                    className="inline-flex items-center gap-1 font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer pt-0.5"
+                  >
+                    Click here to create a new account <ArrowRight className="h-3 w-3" />
                   </button>
                 )}
               </div>
@@ -207,13 +308,13 @@ export default function AuthModal({
         {/* ── Mode: Forgot Password ── */}
         {mode === 'forgot-password' ? (
           resetSent ? (
-            <div className="text-center py-3 space-y-3">
+            <div className="text-center py-2 space-y-3">
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <h3 className="font-bold text-sm text-[rgb(var(--lt-text))]">Reset link sent!</h3>
               <p className="text-xs lt-text-muted">
-                Check <strong className="text-[rgb(var(--lt-text))]">{email}</strong> to reset your password.
+                Check <strong className="text-[rgb(var(--lt-text))]">{email}</strong> for instructions to reset your password.
               </p>
               <button
                 type="button"
@@ -250,7 +351,7 @@ export default function AuthModal({
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
               </button>
 
-              <div className="text-center pt-1">
+              <div className="text-center pt-0.5">
                 <button
                   type="button"
                   onClick={() => setMode('login')}
@@ -264,7 +365,7 @@ export default function AuthModal({
         ) : (
           /* ── Mode: Sign In or Register ── */
           <div className="space-y-3">
-            {/* Google OAuth Button */}
+            {/* Google OAuth Button with Explicit Sign Up vs Sign In Label */}
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
@@ -276,11 +377,11 @@ export default function AuthModal({
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              <span>Continue with Google</span>
+              <span>{mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}</span>
             </button>
 
             {/* Divider */}
-            <div className="relative flex items-center justify-center my-2">
+            <div className="relative flex items-center justify-center my-1.5">
               <div className="w-full border-t lt-border-color" />
               <span className="absolute bg-[rgb(var(--lt-surface))] px-2.5 text-[11px] lt-text-muted font-medium">
                 or email
@@ -289,6 +390,25 @@ export default function AuthModal({
 
             {/* Email Form */}
             <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-2.5">
+              {mode === 'register' && (
+                <div>
+                  <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--lt-text-muted))]" />
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Jane Doe"
+                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-3 py-1.5 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))] mb-1">
                   Email Address
@@ -301,7 +421,7 @@ export default function AuthModal({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-3 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-3 py-1.5 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                   />
                 </div>
               </div>
@@ -326,11 +446,11 @@ export default function AuthModal({
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    minLength={6}
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                    className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-1.5 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                   />
                   <button
                     type="button"
@@ -354,11 +474,11 @@ export default function AuthModal({
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-2 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
+                      className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] pl-9 pr-9 py-1.5 text-xs sm:text-sm text-[rgb(var(--lt-text))] focus:border-[rgb(var(--lt-primary))] focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] outline-none transition-all"
                     />
                     <button
                       type="button"
@@ -374,7 +494,7 @@ export default function AuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-1 flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary-dark))] text-white py-2 px-3 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary-dark))] text-white py-2 px-3 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -386,33 +506,6 @@ export default function AuthModal({
                 )}
               </button>
             </form>
-
-            {/* Toggle Footer */}
-            <div className="pt-1 text-center text-xs text-[rgb(var(--lt-text-muted))]">
-              {mode === 'login' ? (
-                <>
-                  Don't have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('register'); setError(null); }}
-                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
-                  >
-                    Sign up
-                  </button>
-                </>
-              ) : (
-                <>
-                  Already have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setMode('login'); setError(null); }}
-                    className="font-bold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
-                  >
-                    Sign in
-                  </button>
-                </>
-              )}
-            </div>
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { removeBackground } from '@/lib/api';
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
+import { recordToolUsage } from '@/lib/toolRanking';
 import { Upload, Download, Sparkles, Check, X, Scissors } from 'lucide-react';
 
 const COLOR_PRESETS = [
@@ -70,6 +71,7 @@ export default function BackgroundRemover() {
       const result = await removeBackground(selectedImage, 'transparent');
       if (result) {
         setProcessedUrl(result.startsWith('data:') ? result : `data:image/png;base64,${result}`);
+        recordToolUsage('background-remover');
       }
     } catch (error) {
       console.error(error);

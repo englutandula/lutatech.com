@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   // Desktop apps load from file:// so we need unoptimized images usually
   images: { unoptimized: true },
   devIndicators: false,
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

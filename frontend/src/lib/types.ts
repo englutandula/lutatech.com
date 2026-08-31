@@ -85,3 +85,21 @@ export interface FaceDetectResult {
 }
 
 export type ProcessingStatus = 'idle' | 'uploading' | 'processing' | 'done' | 'error'
+
+export interface SocialAccount {
+  id: number
+  provider: string
+  created_at: string
+}
+
+export interface AuthUser {
+  id: number
+  name: string
+  email: string
+  avatar?: string | null
+  email_verified: boolean
+  account_status?: 'pending' | 'active' | 'suspended' | 'disabled'
+  has_password?: boolean
+  social_accounts?: SocialAccount[]
+  created_at?: string
+}

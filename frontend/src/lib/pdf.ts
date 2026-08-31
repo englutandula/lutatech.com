@@ -465,3 +465,118 @@ export async function imagesToPdf(
 
   return { blob, fileName, size: blob.size };
 }
+
+// ---------------------------------------------------------------------------
+// PDF Compression
+// ---------------------------------------------------------------------------
+
+export interface PdfCompressionOptions {
+  preset: 'recommended' | 'extreme' | 'low' | 'custom';
+  quality?: number; // 0.1 to 1.0
+  scale?: number;   // 0.5 to 2.0
+}
+
+export async function compressPdfFile(
+  file: File,
+  options: PdfCompressionOptions = { preset: 'recommended' },
+  onProgress?: (progress: number, statusText?: string) => void
+): Promise<{
+  blob: Blob;
+  fileName: string;
+  originalSize: number;
+  compressedSize: number;
+  savingsPct: number;
+  pageCount: number;
+}> {
+  if (typeof window === 'undefined') throw new Error('Client-side only');
+
+  const pdfjs = await import('pdfjs-dist');
+  if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version || '4.10.38'}/pdf.worker.min.mjs`;
+  }
+
+  let scale = 1.25;
+  let quality = 0.72;
+
+  if (options.preset === 'extreme') {
+    scale = 0.95;
+    quality = 0.48;
+  } else if (options.preset === 'recommended') {
+    scale = 1.25;
+    quality = 0.72;
+  } else if (options.preset === 'low') {
+    scale = 1.75;
+    quality = 0.88;
+  } else if (options.preset === 'custom') {
+    scale = options.scale ?? 1.25;
+    quality = options.quality ?? 0.72;
+  }
+
+  onProgress?.(5, 'Reading PDF document...');
+  const arrayBuffer = await file.arrayBuffer();
+  const loadingTask = pdfjs.getDocument({ data: new Uint8Array(arrayBuffer) });
+  const pdfDoc = await loadingTask.promise;
+  const numPages = pdfDoc.numPages;
+
+  const newPdf = await PDFDocument.create();
+
+  for (let i = 1; i <= numPages; i++) {
+    onProgress?.(
+      Math.round(5 + ((i - 1) / numPages) * 85),
+      `Compressing page ${i} of ${numPages}...`
+    );
+
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale });
+    const originalViewport = page.getViewport({ scale: 1.0 });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) throw new Error('Could not create canvas context');
+
+    await (page.render as any)({
+      canvasContext: ctx,
+      viewport,
+      canvas,
+    }).promise;
+
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    const base64 = dataUrl.split(',')[1];
+    const imageBytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+
+    const embeddedImage = await newPdf.embedJpg(imageBytes);
+    const newPage = newPdf.addPage([originalViewport.width, originalViewport.height]);
+    newPage.drawImage(embeddedImage, {
+      x: 0,
+      y: 0,
+      width: originalViewport.width,
+      height: originalViewport.height,
+    });
+  }
+
+  onProgress?.(95, 'Finalizing optimized PDF...');
+  const pdfBytes = await newPdf.save({ useObjectStreams: true });
+  onProgress?.(100, 'Complete!');
+
+  const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+  const originalSize = file.size;
+  const compressedSize = blob.size;
+  const savingsPct = originalSize > 0
+    ? Math.max(0, Math.round(((originalSize - compressedSize) / originalSize) * 100))
+    : 0;
+
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  const fileName = `${baseName}-compressed.pdf`;
+
+  return {
+    blob,
+    fileName,
+    originalSize,
+    compressedSize,
+    savingsPct,
+    pageCount: numPages,
+  };
+}

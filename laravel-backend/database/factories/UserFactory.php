@@ -28,8 +28,9 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make('Password!123'),
             'remember_token' => Str::random(10),
+            'account_status' => User::STATUS_ACTIVE,
         ];
     }
 
@@ -40,6 +41,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+            'account_status' => User::STATUS_PENDING,
         ]);
     }
 }

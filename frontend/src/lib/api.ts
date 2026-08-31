@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { FaceDetectResult, PhotoRequirements, PhotoSpec, ProcessOptions, ProcessResult } from './types';
-import { auth } from './firebase';
+import type { FaceDetectResult, PhotoRequirements, PhotoSpec, ProcessOptions, ProcessResult, AuthUser } from './types';
 import { DEFAULT_SPECS } from '@/constants/photoRequirements';
+import { optimizeImageForUpload } from './utils';
 
 export function getApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) {
@@ -9,38 +9,26 @@ export function getApiBaseUrl(): string {
   }
   if (typeof window !== 'undefined') {
     if (window.location.port === '3000') {
-      return 'http://127.0.0.1:8001/api';
+      return 'http://localhost:8000/api/v1';
     }
-    return '/api';
+    return '/api/v1';
   }
-  return 'http://127.0.0.1:8001/api';
+  return 'http://localhost:8000/api/v1';
 }
 
-const client = axios.create({
+export const client = axios.create({
   baseURL: getApiBaseUrl(),
   timeout: 60000,
   headers: {
     'Accept': 'application/json',
+    'Content-Type': 'application/json',
   },
 });
 
 client.interceptors.request.use(async (config) => {
   config.baseURL = getApiBaseUrl();
 
-  // 1. Primary: If user is logged into Firebase, attach fresh Firebase ID token
-  if (auth?.currentUser) {
-    try {
-      const fbToken = await auth.currentUser.getIdToken();
-      if (fbToken) {
-        config.headers.Authorization = `Bearer ${fbToken}`;
-        return config;
-      }
-    } catch (e) {
-      console.warn('Failed to retrieve Firebase ID token:', e);
-    }
-  }
-
-  // 2. Fallback: Attach local auth token if present
+  // Attach token from localStorage if available in browser
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('auth_token');
     if (token) {
@@ -50,8 +38,6 @@ client.interceptors.request.use(async (config) => {
 
   return config;
 });
-
-import { optimizeImageForUpload } from './utils';
 
 // ==========================================
 // AI Tools (Proxied via Laravel to AWS Python)
@@ -167,12 +153,22 @@ export async function generateQrCode(params: {
 }
 
 // ==========================================
-// Laravel Authentication APIs
+// Laravel Full-Stack Authentication APIs
 // ==========================================
 
-export async function registerUser(payload: { name: string; email: string; password: string; password_confirmation: string }) {
+export function getSocialiteAuthUrl(provider: 'google' = 'google'): string {
+  const base = getApiBaseUrl();
+  return `${base}/auth/${provider}/redirect`;
+}
+
+export async function registerUser(payload: {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}) {
   const res = await client.post('/auth/register', payload);
-  if (res.data?.data?.token) {
+  if (res.data?.data?.token && typeof window !== 'undefined') {
     localStorage.setItem('auth_token', res.data.data.token);
   }
   return res.data;
@@ -180,21 +176,55 @@ export async function registerUser(payload: { name: string; email: string; passw
 
 export async function loginUser(payload: { email: string; password: string }) {
   const res = await client.post('/auth/login', payload);
-  if (res.data?.data?.token) {
+  if (res.data?.data?.token && typeof window !== 'undefined') {
     localStorage.setItem('auth_token', res.data.data.token);
   }
   return res.data;
 }
 
-export async function getUserProfile() {
+export async function getUserProfile(): Promise<{ success: boolean; data: { user: AuthUser } }> {
   const res = await client.get('/auth/profile');
   return res.data;
 }
 
-export async function logoutUser() {
+export async function logoutUser(): Promise<void> {
   try {
     await client.post('/auth/logout');
+  } catch (err) {
+    console.warn('Logout request warning:', err);
   } finally {
-    localStorage.removeItem('auth_token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+    }
   }
+}
+
+export async function forgotPassword(payload: { email: string }) {
+  const res = await client.post('/auth/password/forgot', payload);
+  return res.data;
+}
+
+export async function resetPassword(payload: {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}) {
+  const res = await client.post('/auth/password/reset', payload);
+  if (res.data?.data?.token && typeof window !== 'undefined') {
+    localStorage.setItem('auth_token', res.data.data.token);
+  }
+  return res.data;
+}
+
+export async function resendVerificationEmail(payload?: { email?: string }) {
+  const res = await client.post('/auth/email/resend', payload || {});
+  return res.data;
+}
+
+export async function verifyEmailBySignedUrl(signedUrl: string) {
+  const res = await axios.get(signedUrl, {
+    headers: { Accept: 'application/json' },
+  });
+  return res.data;
 }

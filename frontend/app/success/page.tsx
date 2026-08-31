@@ -39,7 +39,7 @@ export default function SuccessPage() {
         </h1>
         
         <p className="text-lg text-gray-600 dark:text-gray-400">
-          Welcome to Luta Tech, {user.displayName || user.email?.split('@')[0]}!
+          Welcome to Luta Tech, {user.name || user.email?.split('@')[0]}!
         </p>
 
         <div className="pt-4">

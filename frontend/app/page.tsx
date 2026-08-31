@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   Sparkles,
@@ -18,21 +18,29 @@ import {
   Compass,
   Cpu,
   Globe2,
+  Flame,
 } from 'lucide-react';
 import { tools, categories, ToolCategory, Tool } from '@/lib/tools';
 import { ToolCard } from '@/components/ToolCard';
 import { ToolIcon } from '@/components/ToolIcon';
 import { SearchDialog } from '@/components/SearchDialog';
 import { ShowcaseSlider } from '@/components/ShowcaseSlider';
+import { AnimatedStats } from '@/components/home/AnimatedStats';
+import { getRankedTools } from '@/lib/toolRanking';
 
 export default function HomePage() {
-  const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchOpen, setSearchOpen] = useState(false);
+  const [rankingVersion, setRankingVersion] = useState(0);
 
-  const filteredTools =
-    activeCategory === 'All'
-      ? tools
-      : tools.filter((t) => t.category.toLowerCase() === activeCategory.toLowerCase());
+  useEffect(() => {
+    const handleUsageUpdate = () => setRankingVersion((v) => v + 1);
+    window.addEventListener('luta_tool_usage_updated', handleUsageUpdate);
+    return () => window.removeEventListener('luta_tool_usage_updated', handleUsageUpdate);
+  }, []);
+
+  const allRankedTools = useMemo(() => {
+    return getRankedTools(tools);
+  }, [rankingVersion]);
 
   const featuredTools = tools.filter((t) => t.popular || t.status === 'live');
 
@@ -53,7 +61,7 @@ export default function HomePage() {
           </div>
 
           {/* Main Headline */}
-          <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-[rgb(var(--lt-text))] lt-fade-up leading-[1.12]">
+          <h1 className="mt-6 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[rgb(var(--lt-text))] lt-fade-up leading-[1.14]">
             Every tool you need,
             <br />
             in one platform
@@ -75,7 +83,7 @@ export default function HomePage() {
               <span>Explore All Tools</span>
               <kbd className="rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
             </button>
-            <Link href="/tools/passport" className="flex w-full sm:w-auto items-center justify-center lt-btn-secondary">
+            <Link href="/tools/passport" prefetch={true} className="flex w-full sm:w-auto items-center justify-center lt-btn-secondary">
               Passport Photo Maker <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -86,13 +94,15 @@ export default function HomePage() {
             {[
               { name: 'Passport Photo', href: '/tools/passport' },
               { name: 'Background Remover', href: '/tools/remove-bg' },
-              { name: 'PDF Merge', href: '/tools' },
-              { name: 'QR Code', href: '/tools' },
-              { name: 'JSON Formatter', href: '/tools' },
+              { name: 'Compress PDF', href: '/tools/pdf-compressor' },
+              { name: 'Image Compressor', href: '/tools/image-compressor' },
+              { name: 'Image Resizer', href: '/tools/image-resizer' },
+              { name: 'PDF Merge', href: '/tools/pdf-merger' },
             ].map((tag) => (
               <Link
                 key={tag.name}
                 href={tag.href}
+                prefetch={true}
                 className="rounded-lg border lt-border-color bg-[rgb(var(--lt-surface-2))] px-2.5 py-1 font-medium text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-primary))] transition-colors"
               >
                 {tag.name}
@@ -100,24 +110,8 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* 4 Stats Highlights */}
-          <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-5 lt-fade-up">
-            {[
-              { value: '12+', label: 'Digital Tools', sub: 'Growing weekly' },
-              { value: '100%', label: 'Browser-Based', sub: 'Client-side processing' },
-              { value: '0 sec', label: 'Server Storage', sub: 'Zero data retention' },
-              { value: '8', label: 'Categories', sub: 'Image, PDF, AI, Dev' },
-            ].map((stat, i) => (
-              <div
-                key={stat.label}
-                className="lt-card p-4 sm:p-5 text-center transition-all hover:border-[rgb(var(--lt-primary)/0.4)]"
-              >
-                <div className="lt-stat-value">{stat.value}</div>
-                <div className="mt-1 text-sm font-semibold text-[rgb(var(--lt-text))]">{stat.label}</div>
-                <div className="mt-0.5 text-xs lt-text-muted">{stat.sub}</div>
-              </div>
-            ))}
-          </div>
+          {/* 4 Stats Highlights (Dynamic & Animated) */}
+          <AnimatedStats />
         </div>
       </section>
 
@@ -149,7 +143,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/passport" className="lt-btn-primary">
+                <Link href="/tools/passport" prefetch={true} className="lt-btn-primary">
                   Launch Passport Photo Maker <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -191,7 +185,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/remove-bg" className="lt-btn-primary">
+                <Link href="/tools/remove-bg" prefetch={true} className="lt-btn-primary">
                   Launch Background Remover <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -214,53 +208,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TOOLS GRID WITH CATEGORY FILTER ── */}
+      {/* ── MOST POPULAR TOOLS (RANKED) ── */}
       <section className="py-20">
         <div className="lt-container">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <span className="lt-badge">Full Catalog</span>
-              <h2 className="mt-2 lt-section-title">Explore All Digital Tools</h2>
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 shadow-2xs">
+                <Flame className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                <span>Most Popular</span>
+              </div>
+              <h2 className="mt-2.5 lt-section-title">Most Popular Digital Tools</h2>
               <p className="mt-1 text-sm lt-text-muted">
-                Filter by category or click on any live tool to get started immediately.
+                Ranked in real time based on user interactions, speed, and daily usage.
               </p>
             </div>
-            <Link href="/tools" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
+            <Link href="/tools" prefetch={true} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
               View full catalog ({tools.length}) <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
 
-          {/* Category Tabs */}
-          <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-2 lt-scrollbar">
-            {['All', ...categories.map((c) => c.name)].map((cat) => {
-              const count = cat === 'All' ? tools.length : tools.filter((t) => t.category.toLowerCase() === cat.toLowerCase()).length;
-              const isActive = activeCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'bg-[rgb(var(--lt-primary))] text-white shadow-sm'
-                      : 'border lt-border-color bg-[rgb(var(--lt-surface))] text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-text))]'
-                  }`}
-                >
-                  <span>{cat}</span>
-                  <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text-muted))]'
-                    }`}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Tool Cards Grid */}
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredTools.map((tool, index) => (
+            {allRankedTools.map((tool, index) => (
               <ToolCard key={tool.slug} tool={tool} index={index} />
             ))}
           </div>

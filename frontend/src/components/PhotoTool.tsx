@@ -20,6 +20,7 @@ import Select from '@/components/ui/Select'
 import Spinner from '@/components/ui/Spinner'
 import PrintSheetSection from '@/components/PrintSheetSection'
 import ProcessingStepper from '@/components/ProcessingStepper'
+import { recordToolUsage } from '@/lib/toolRanking'
 
 export default function PhotoTool() {
   const [specs, setSpecs] = useState<Record<string, PhotoSpec>>(DEFAULT_SPECS)
@@ -76,7 +77,10 @@ export default function PhotoTool() {
   }, [documentType, specs])
 
   function handleProcess() {
-    if (file && documentType) process(file, documentType, options)
+    if (file && documentType) {
+      process(file, documentType, options)
+      recordToolUsage('passport-photo-maker')
+    }
   }
 
   function handleClear() {

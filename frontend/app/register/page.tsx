@@ -4,9 +4,8 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User as UserIcon, AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { signInWithPopup, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
-import { getFriendlyAuthErrorMessage } from '@/lib/auth-errors';
+import { useAuth } from '@/lib/auth-context';
+import { getSocialiteAuthUrl } from '@/lib/api';
 import PasswordStrengthMeter from '@/components/auth/PasswordStrengthMeter';
 import { Logo } from '@/components/layout/Logo';
 
@@ -14,6 +13,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect') || '/dashboard';
+  const { register } = useAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -21,44 +21,48 @@ function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      await signInWithPopup(auth, googleProvider);
-      router.push(redirectUrl);
-    } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    setLoading(true);
+    setError(null);
+    window.location.href = getSocialiteAuthUrl('google');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      if (userCredential.user && name.trim()) {
-        await updateProfile(userCredential.user, { displayName: name.trim() });
+      const res = await register({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        password_confirmation: confirmPassword,
+      });
+
+      // If email is already verified (e.g. Google user who just set a password) → dashboard
+      // If email needs verification (new normal account) → verify-email page
+      if (res?.data?.user?.email_verified) {
+        router.push(redirectUrl);
+      } else {
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
       }
-      router.push(redirectUrl);
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const resp = err?.response?.data;
+      const msg = resp?.message || err?.message || 'Registration failed. Please check your details.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -68,10 +72,7 @@ function RegisterForm() {
     <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
       <div className="w-full max-w-md lt-fade-up">
         <div className="text-center mb-4">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none"
-          >
+          <Link href="/" className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none">
             <Logo className="h-10 w-auto" />
           </Link>
         </div>
@@ -80,7 +81,7 @@ function RegisterForm() {
           <h1 className="text-2xl font-bold text-[rgb(var(--lt-text))]">Create your account</h1>
           <p className="mt-1.5 text-xs sm:text-sm lt-text-muted">Get started for free. No credit card required.</p>
 
-          {/* Google Sign In */}
+          {/* Google Sign Up */}
           <div className="mt-6">
             <button
               onClick={handleGoogleSignIn}
@@ -93,7 +94,7 @@ function RegisterForm() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              <span>Continue with Google</span>
+              <span>Sign up with Google</span>
             </button>
           </div>
 
@@ -103,9 +104,21 @@ function RegisterForm() {
           </div>
 
           {error && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{error}</span>
+            <div className="mb-4 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div className="flex-1 space-y-1">
+                  <span>{error}</span>
+                  {(error.toLowerCase().includes('already exists') || error.toLowerCase().includes('already registered')) && (
+                    <Link
+                      href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                    >
+                      Click here to sign in with this email →
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -147,7 +160,7 @@ function RegisterForm() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  minLength={6}
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -171,7 +184,7 @@ function RegisterForm() {
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   required
-                  minLength={6}
+                  minLength={8}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
@@ -191,9 +204,7 @@ function RegisterForm() {
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <>
-                  Create Account <ArrowRight className="h-4 w-4" />
-                </>
+                <>Create Account <ArrowRight className="h-4 w-4" /></>
               )}
             </button>
           </form>

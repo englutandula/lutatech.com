@@ -19,7 +19,7 @@ const accentColors: Record<string, string> = {
   lime: 'from-lime-500/15 to-lime-500/5 text-lime-600 dark:text-lime-400',
 };
 
-export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
+export function ToolCard({ tool, index = 0 }: { tool: Tool & { rankBadge?: { label: string; badgeStyle: string }; rank?: number }; index?: number }) {
   const accent = accentColors[tool.accent] ?? accentColors.emerald;
   const isLive = tool.status === 'live';
   const targetHref = tool.href || (isLive ? `/tools/${tool.slug}` : '/tools');
@@ -27,18 +27,23 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   return (
     <Link
       href={targetHref}
-      className="lt-card lt-card-hover group block p-5 lt-fade-up"
-      style={{ animationDelay: `${index * 50}ms` }}
+      prefetch={true}
+      className="lt-card lt-card-hover group block p-5 lt-fade-up relative overflow-hidden"
+      style={{ animationDelay: `${index * 40}ms` }}
     >
       <div className="flex items-start justify-between">
         <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${accent}`}>
           <ToolIcon name={tool.icon} className="h-6 w-6" />
         </div>
-        {!isLive && (
+        {tool.rankBadge ? (
+          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold ${tool.rankBadge.badgeStyle}`}>
+            {tool.rankBadge.label}
+          </span>
+        ) : !isLive ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--lt-surface-2))] px-2.5 py-1 text-xs font-medium lt-text-muted">
             <Clock className="h-3 w-3" /> Soon
           </span>
-        )}
+        ) : null}
       </div>
       <h3 className="mt-4 text-base font-semibold text-[rgb(var(--lt-text))]">{tool.name}</h3>
       <p className="mt-1.5 text-sm lt-text-muted line-clamp-2">{tool.description}</p>

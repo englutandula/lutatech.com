@@ -4,36 +4,32 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, AlertCircle, ArrowRight, Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
-import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
-import { getFriendlyAuthErrorMessage } from '@/lib/auth-errors';
+import { useAuth } from '@/lib/auth-context';
+import { forgotPassword, getSocialiteAuthUrl } from '@/lib/api';
 import { Logo } from '@/components/layout/Logo';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect') || '/dashboard';
+  const { login } = useAuth();
+
+  const statusParam = searchParams.get('status');
+  const emailParam = searchParams.get('email') || '';
 
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(emailParam);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      await signInWithPopup(auth, googleProvider);
-      router.push(redirectUrl);
-    } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    setLoading(true);
+    setError(null);
+    window.location.href = getSocialiteAuthUrl('google');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,10 +37,20 @@ function LoginForm() {
     setError(null);
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      router.push(redirectUrl);
+      const res = await login({ email: email.trim(), password });
+      // If email is not yet verified → send to verify-email page
+      if (!res?.data?.user?.email_verified) {
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+      } else {
+        router.push(redirectUrl);
+      }
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const resp = err?.response?.data;
+      const msg = resp?.message || err?.message || 'Login failed. Please check your credentials.';
+      setError(msg);
+      if (resp?.requires_activation || msg.toLowerCase().includes('not been activated')) {
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -56,14 +62,14 @@ function LoginForm() {
       setError('Please enter your email address to receive the password reset link.');
       return;
     }
-
     try {
       setLoading(true);
       setError(null);
-      await sendPasswordResetEmail(auth, email.trim());
+      await forgotPassword({ email: email.trim() });
       setResetSent(true);
     } catch (err: any) {
-      setError(getFriendlyAuthErrorMessage(err));
+      const msg = err?.response?.data?.message || err?.message || 'Failed to send password reset link.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -73,45 +79,98 @@ function LoginForm() {
     <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
       <div className="w-full max-w-md lt-fade-up">
         <div className="text-center mb-4">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none"
-          >
+          <Link href="/" className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none">
             <Logo className="h-10 w-auto" />
           </Link>
         </div>
 
         <div className="lt-card p-6 sm:p-8">
           <h1 className="text-2xl font-bold text-[rgb(var(--lt-text))]">
-            {isForgotPassword ? 'Reset your password' : 'Welcome back'}
+            {isForgotPassword ? 'Reset your password' : 'Sign in to your account'}
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm lt-text-muted">
             {isForgotPassword
               ? "Enter your email address and we'll send you a password reset link."
-              : 'Sign in to access your tools and saved history.'}
+              : 'Enter your details to access your account.'}
           </p>
 
-          {error && (
-            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{error}</span>
+          {/* Pending Activation Banner */}
+          {statusParam === 'pending_activation' && (
+            <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <strong className="block font-semibold">Account Activation Required</strong>
+                  <p className="leading-relaxed">
+                    We&apos;ve sent an activation link to{' '}
+                    <strong className="break-all">{emailParam || 'your email'}</strong>. Please check your inbox and click the button to activate your account.
+                  </p>
+                  <Link
+                    href={`/verify-email?email=${encodeURIComponent(emailParam)}`}
+                    className="inline-flex items-center gap-1 font-bold text-[rgb(var(--lt-primary))] hover:underline pt-0.5"
+                  >
+                    Go to Activation Page / Resend Link →
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
 
+          {/* Error Banner */}
+          {error && (
+            <div className="mt-4 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div className="flex-1 space-y-1">
+                  <span>{error}</span>
+                  {error.toLowerCase().includes('not been activated') && (
+                    <Link
+                      href={`/verify-email?email=${encodeURIComponent(email)}`}
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                    >
+                      Click here to activate your account or resend email →
+                    </Link>
+                  )}
+                  {error.toLowerCase().includes('no account found') && (
+                    <Link
+                      href={redirectUrl !== '/dashboard' ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                    >
+                      Click here to create a new account →
+                    </Link>
+                  )}
+                  {(error.toLowerCase().includes('sign in with google') || error.toLowerCase().includes('created using google')) && (
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1 text-left cursor-pointer"
+                    >
+                      Click here to sign in with Google →
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Forgot Password Flow */}
           {isForgotPassword ? (
             resetSent ? (
-              <div className="text-center py-6 space-y-4">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-6 w-6" />
+              <div className="text-center py-6 space-y-4 mt-4">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-7 w-7" />
                 </div>
-                <h3 className="font-bold text-[rgb(var(--lt-text))] text-base">Password reset link sent!</h3>
+                <h3 className="text-lg font-bold text-[rgb(var(--lt-text))]">Check your inbox</h3>
                 <p className="text-xs sm:text-sm lt-text-muted">
-                  Please check your inbox at <strong className="text-[rgb(var(--lt-text))]">{email}</strong> to reset your password.
+                  We&apos;ve sent password reset instructions to{' '}
+                  <strong className="text-[rgb(var(--lt-text))]">{email}</strong>.
+                  <br />
+                  <span className="text-amber-500 text-xs">Link expires in 60 minutes.</span>
                 </p>
                 <button
                   type="button"
                   onClick={() => { setIsForgotPassword(false); setResetSent(false); }}
-                  className="w-full rounded-xl bg-[rgb(var(--lt-primary))] py-2.5 text-sm font-bold text-white hover:bg-[rgb(var(--lt-primary-dark))] transition-colors cursor-pointer"
+                  className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold"
                 >
                   Back to Sign In
                 </button>
@@ -119,9 +178,7 @@ function LoginForm() {
             ) : (
               <form onSubmit={handlePasswordReset} className="space-y-4 mt-6">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">
-                    Email Address
-                  </label>
+                  <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
                     <input
@@ -134,22 +191,16 @@ function LoginForm() {
                     />
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold"
-                >
+                <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
                 </button>
-
-                <div className="text-center pt-2">
+                <div className="text-center pt-1">
                   <button
                     type="button"
-                    onClick={() => setIsForgotPassword(false)}
+                    onClick={() => { setIsForgotPassword(false); setError(null); }}
                     className="text-xs font-semibold text-[rgb(var(--lt-primary))] hover:underline cursor-pointer"
                   >
-                    Back to Sign In
+                    ← Back to Sign In
                   </button>
                 </div>
               </form>
@@ -169,7 +220,7 @@ function LoginForm() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
-                  <span>Continue with Google</span>
+                  <span>Sign in with Google</span>
                 </button>
               </div>
 
@@ -210,7 +261,7 @@ function LoginForm() {
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      minLength={6}
+                      minLength={8}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
@@ -230,9 +281,7 @@ function LoginForm() {
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <>
-                      Sign In <ArrowRight className="h-4 w-4" />
-                    </>
+                    <>Sign In <ArrowRight className="h-4 w-4" /></>
                   )}
                 </button>
               </form>

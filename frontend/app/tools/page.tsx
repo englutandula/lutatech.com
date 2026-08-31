@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, Filter, LayoutGrid, List, Sparkles, ArrowRight, Clock, CheckCircle2, X } from 'lucide-react';
+import { Search, Filter, LayoutGrid, List, Sparkles, ArrowRight, Clock, CheckCircle2, X, ChevronDown } from 'lucide-react';
 import { tools, categories, type ToolCategory, Tool } from '@/lib/tools';
 import { ToolCard } from '@/components/ToolCard';
 import { ToolIcon } from '@/components/ToolIcon';
@@ -30,7 +30,7 @@ export default function AllToolsPage() {
     <div>
       {/* Header */}
       <section className="border-b lt-border-color bg-[rgb(var(--lt-surface))]">
-        <div className="lt-container py-12 sm:py-16">
+        <div className="lt-container py-10 sm:py-14">
           <div className="max-w-2xl">
             <span className="lt-badge">Full Suite</span>
             <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl text-[rgb(var(--lt-text))] lt-fade-up">
@@ -40,96 +40,78 @@ export default function AllToolsPage() {
               Browse our growing catalog of browser-based utilities, image tools, document helpers, and AI models.
             </p>
           </div>
-
-          {/* Search bar */}
-          <div className="relative mt-8 max-w-xl lt-fade-up">
-            <Search className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search tools by name, description, or category..."
-              className="lt-input pl-12 pr-10 shadow-xs"
-            />
-            {query && (
-              <button
-                onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
         </div>
       </section>
 
       {/* Filters and View Controls */}
-      <section className="lt-container py-10">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b lt-border-color pb-6">
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto lt-scrollbar pb-1">
-            <button
-              onClick={() => setActiveCategory('all')}
-              className={`shrink-0 rounded-xl px-3.5 py-1.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeCategory === 'all'
-                  ? 'bg-[rgb(var(--lt-primary))] text-white shadow-xs'
-                  : 'border lt-border-color bg-[rgb(var(--lt-surface))] text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-text))]'
-              }`}
-            >
-              All Categories
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.name}
-                onClick={() => setActiveCategory(cat.name)}
-                className={`shrink-0 rounded-xl px-3.5 py-1.5 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                  activeCategory === cat.name
-                    ? 'bg-[rgb(var(--lt-primary))] text-white shadow-xs'
-                    : 'border lt-border-color bg-[rgb(var(--lt-surface))] text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-text))]'
-                }`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Right Controls: Status filter & View mode */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Status Selector */}
-            <div className="inline-flex rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] p-1">
-              <button
-                onClick={() => setStatusFilter('all')}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                  statusFilter === 'all'
-                    ? 'bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text))] shadow-xs'
-                    : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]'
-                }`}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setStatusFilter('live')}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                  statusFilter === 'live'
-                    ? 'bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-primary))] shadow-xs'
-                    : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]'
-                }`}
-              >
-                Live Ready
-              </button>
-              <button
-                onClick={() => setStatusFilter('soon')}
-                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                  statusFilter === 'soon'
-                    ? 'bg-[rgb(var(--lt-surface-2))] text-[rgb(var(--lt-text))] shadow-xs'
-                    : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))]'
-                }`}
-              >
-                Coming Soon
-              </button>
+      <section className="lt-container py-8">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between border-b lt-border-color pb-6">
+          {/* Left Controls: Search + Space-Saving Category & Status Dropdowns */}
+          <div className="flex flex-wrap items-center gap-2.5 flex-1">
+            {/* Inline Search Input */}
+            <div className="relative min-w-[220px] flex-1 sm:flex-initial sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search tools..."
+                className="w-full rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-9 pr-8 text-xs sm:text-sm font-medium text-[rgb(var(--lt-text))] placeholder-[rgb(var(--lt-text-muted))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)]"
+              />
+              {query && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
 
-            {/* View Mode Toggle */}
+            {/* Category Dropdown */}
+            <div className="relative min-w-[180px] flex-1 sm:flex-initial">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[rgb(var(--lt-text-muted))]">
+                <Filter className="h-4 w-4 text-[rgb(var(--lt-primary))]" />
+              </div>
+              <select
+                value={activeCategory}
+                onChange={(e) => setActiveCategory(e.target.value as ToolCategory | 'all')}
+                className="w-full appearance-none rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-9 pr-9 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
+              >
+                <option value="all">All Categories ({tools.length})</option>
+                {categories.map((cat) => {
+                  const count = tools.filter((t) => t.category === cat.name).length;
+                  return (
+                    <option key={cat.name} value={cat.name}>
+                      {cat.name} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))]">
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </div>
+
+            {/* Status Dropdown */}
+            <div className="relative min-w-[140px] flex-1 sm:flex-initial">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'live' | 'soon')}
+                className="w-full appearance-none rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-3.5 pr-9 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
+              >
+                <option value="all">All Status</option>
+                <option value="live">⚡ Live Ready ({tools.filter((t) => t.status === 'live').length})</option>
+                <option value="soon">⏳ Coming Soon ({tools.filter((t) => t.status === 'soon').length})</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))]">
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Controls: View Mode Toggle */}
+          <div className="flex items-center gap-3 shrink-0 ml-auto lg:ml-0">
             <div className="inline-flex rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] p-1">
               <button
                 onClick={() => setViewMode('grid')}
