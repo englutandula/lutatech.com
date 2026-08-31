@@ -20,15 +20,16 @@ jobs:
       - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🔐 Setup SSH Key
+      - name: 🔐 Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+
+      - name: 🔐 Add Known Hosts
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           EC2_HOST: ${{ secrets.AWS_EC2_HOST || secrets.AWS_EC2_H0ST }}
         run: |
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          echo "" >> ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
 
       - name: 🚀 Sync & Redeploy on AWS EC2
@@ -43,10 +44,9 @@ jobs:
             --exclude 'out' \
             --exclude 'laravel-backend' \
             --exclude 'frontend' \
-            -e "ssh -i ~/.ssh/id_rsa" \
             ./ ubuntu@$EC2_HOST:/home/ubuntu/luta-studio/
 
-          ssh -i ~/.ssh/id_rsa ubuntu@$EC2_HOST "cd /home/ubuntu/luta-studio && docker compose up -d --build"
+          ssh ubuntu@$EC2_HOST "cd /home/ubuntu/luta-studio && docker compose up -d --build"
 
       - name: 🩺 Run Health Check
         env:
