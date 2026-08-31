@@ -133,7 +133,7 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
     <div className="space-y-5">
       {/* Hidden inputs */}
       <input ref={addFileInputRef} type="file" multiple accept={accept} className="hidden" onChange={handleAddMoreInput} />
-      <input ref={addFolderInputRef} type="file" multiple webkitdirectory="" accept={accept} className="hidden" onChange={handleAddMoreInput} />
+      <input ref={addFolderInputRef} type="file" multiple {...({ webkitdirectory: '' } as any)} accept={accept} className="hidden" onChange={handleAddMoreInput} />
 
       {/* Drop Zone (empty state) */}
       {images.length === 0 && !result && (
@@ -148,7 +148,7 @@ export default function ImagesToPdfTool({ accept, formatLabel }: Props) {
           }`}
         >
           <input ref={fileInputRef} type="file" multiple accept={accept} className="hidden" onChange={handleInitialInput} />
-          <input ref={folderInputRef} type="file" multiple webkitdirectory="" accept={accept} className="hidden" onChange={handleInitialInput} />
+          <input ref={folderInputRef} type="file" multiple {...({ webkitdirectory: '' } as any)} accept={accept} className="hidden" onChange={handleInitialInput} />
           
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgb(var(--lt-primary)/0.1)] text-[rgb(var(--lt-primary))]">
             <Upload className="h-7 w-7" />

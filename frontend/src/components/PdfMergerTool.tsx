@@ -553,7 +553,7 @@ export function PdfMergerTool() {
         ref={folderInputRef}
         type="file"
         multiple
-        webkitdirectory=""
+        {...({ webkitdirectory: '' } as any)}
         accept=".pdf,application/pdf"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
@@ -580,7 +580,7 @@ export function PdfMergerTool() {
         ref={addFolderInputRef}
         type="file"
         multiple
-        webkitdirectory=""
+        {...({ webkitdirectory: '' } as any)}
         accept=".pdf,application/pdf"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
