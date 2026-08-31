@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/lib/auth-context';
 import { WebSiteJsonLd } from '@/components/seo/JsonLd';
 import NextTopLoader from 'nextjs-toploader';
+import { Suspense } from 'react';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -115,7 +116,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebSiteJsonLd />
       </head>
       <body className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] font-sans antialiased transition-colors">
-        <NextTopLoader color="rgb(var(--lt-primary))" showSpinner={false} />
+        <Suspense fallback={null}>
+          <NextTopLoader color="rgb(var(--lt-primary))" showSpinner={false} />
+        </Suspense>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">

@@ -59,7 +59,7 @@ export default function PdfSplitterTool() {
   const [mode, setMode] = useState<SplitMode>('individual');
   const [rangeInput, setRangeInput] = useState('');
   const [customRanges, setCustomRanges] = useState<PageRange[]>([
-    { id: crypto.randomUUID(), label: 'Part 1', from: '1', to: '' },
+    { id: 'initial-1', label: 'Part 1', from: '1', to: '' },
   ]);
   const [results, setResults] = useState<SplitResult[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,7 +97,7 @@ export default function PdfSplitterTool() {
   const addRange = () => {
     setCustomRanges((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), label: `Part ${prev.length + 1}`, from: '', to: '' },
+      { id: `range-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, label: `Part ${prev.length + 1}`, from: '', to: '' },
     ]);
   };
 
@@ -196,7 +196,7 @@ export default function PdfSplitterTool() {
     setResults([]);
     setError(null);
     setRangeInput('');
-    setCustomRanges([{ id: crypto.randomUUID(), label: 'Part 1', from: '1', to: '' }]);
+    setCustomRanges([{ id: 'initial-1', label: 'Part 1', from: '1', to: '' }]);
   };
 
   // ── UI ──────────────────────────────────────────────────────────
