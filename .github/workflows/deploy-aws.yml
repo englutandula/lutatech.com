@@ -1,0 +1,48 @@
+name: Deploy Python AI Backend to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'docker-compose.yml'
+      - 'shared/**'
+      - '.github/workflows/deploy-aws.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Backend to AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Sync & Redeploy on AWS EC2
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.next' \
+            --exclude 'venv' \
+            --exclude '__pycache__' \
+            --exclude 'out' \
+            --exclude 'laravel-backend' \
+            --exclude 'frontend' \
+            -e "ssh -i ~/.ssh/id_rsa" \
+            ./ ubuntu@${{ secrets.AWS_EC2_HOST }}:/home/ubuntu/luta-studio/
+
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.AWS_EC2_HOST }} "cd /home/ubuntu/luta-studio && docker compose up -d --build"
+
+      - name: 🩺 Run Health Check
+        run: |
+          sleep 10
+          curl --fail --retry 5 --retry-delay 3 http://${{ secrets.AWS_EC2_HOST }}:8000/api/health || exit 1
