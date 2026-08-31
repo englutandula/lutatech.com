@@ -88,6 +88,7 @@ jobs:
             **/node_modules/**
             **/tests/**
             **/storage/logs/*
+            **/database.sqlite
             .env.example
           dangerous-clean-slate: false
 
