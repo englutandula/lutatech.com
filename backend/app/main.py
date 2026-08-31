@@ -10,7 +10,7 @@ from app.database import engine
 import app.models.db_models as db_models  # noqa: F401 — registers all models
 
 from contextlib import asynccontextmanager
-from app.core.background_removal import _get_session, remove_background
+from app.core.background_removal import remove_background
 from app.core.face_detection import get_primary_face
 from PIL import Image
 

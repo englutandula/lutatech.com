@@ -9,11 +9,11 @@ export function getApiBaseUrl(): string {
   }
   if (typeof window !== 'undefined') {
     if (window.location.port === '3000') {
-      return 'http://localhost:8000/api/v1';
+      return 'http://localhost:8000/api';
     }
-    return '/api/v1';
+    return '/api';
   }
-  return 'http://localhost:8000/api/v1';
+  return 'http://localhost:8000/api';
 }
 
 export const client = axios.create({
@@ -64,7 +64,7 @@ export async function removeBackground(file: File, bgColor = 'transparent'): Pro
   form.append('file', optimizedFile);
   form.append('bg_color', bgColor);
 
-  const res = await client.post('/ai/remove-background', form, {
+  const res = await client.post('/ai/remove-background/', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
@@ -108,7 +108,7 @@ export async function processPhoto(
   form.append('document_type', documentType);
   form.append('options', JSON.stringify(options));
 
-  const res = await client.post('/process', form, {
+  const res = await client.post('/process/', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return res.data;
@@ -117,7 +117,7 @@ export async function processPhoto(
 export async function detectFaces(file: File): Promise<FaceDetectResult> {
   const form = new FormData();
   form.append('file', file);
-  const res = await client.post('/detect-face', form);
+  const res = await client.post('/detect-face/', form);
   return res.data;
 }
 

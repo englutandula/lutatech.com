@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Filter, LayoutGrid, List, Sparkles, ArrowRight, Clock, CheckCircle2, X, ChevronDown } from 'lucide-react';
 import { tools, categories, type ToolCategory, Tool } from '@/lib/tools';
@@ -12,6 +12,24 @@ export default function AllToolsPage() {
   const [activeCategory, setActiveCategory] = useState<ToolCategory | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'soon'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const statusDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryOpen(false);
+      }
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setIsStatusOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filtered = useMemo(() => {
     return tools.filter((t) => {
@@ -68,45 +86,123 @@ export default function AllToolsPage() {
               )}
             </div>
 
-            {/* Category Dropdown */}
-            <div className="relative min-w-[180px] flex-1 sm:flex-initial">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[rgb(var(--lt-text-muted))]">
-                <Filter className="h-4 w-4 text-[rgb(var(--lt-primary))]" />
-              </div>
-              <select
-                value={activeCategory}
-                onChange={(e) => setActiveCategory(e.target.value as ToolCategory | 'all')}
-                className="w-full appearance-none rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-9 pr-9 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
+            {/* Category Custom Dropdown */}
+            <div className="relative min-w-[180px] flex-1 sm:flex-initial" ref={categoryDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                className="w-full flex items-center justify-between rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-9 pr-3 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
               >
-                <option value="all">All Categories ({tools.length})</option>
-                {categories.map((cat) => {
-                  const count = tools.filter((t) => t.category === cat.name).length;
-                  return (
-                    <option key={cat.name} value={cat.name}>
-                      {cat.name} ({count})
-                    </option>
-                  );
-                })}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))]">
-                <ChevronDown className="h-4 w-4" />
-              </div>
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[rgb(var(--lt-text-muted))]">
+                  <Filter className="h-4 w-4 text-[rgb(var(--lt-primary))]" />
+                </div>
+                <span className="truncate pr-2">
+                  {activeCategory === 'all' 
+                    ? `All Categories (${tools.length})`
+                    : `${activeCategory} (${tools.filter((t) => t.category === activeCategory).length})`
+                  }
+                </span>
+                <ChevronDown className={`h-4 w-4 text-[rgb(var(--lt-text-muted))] transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isCategoryOpen && (
+                <div className="absolute left-0 top-full z-50 mt-1.5 w-full md:w-56 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] p-1.5 shadow-xl lt-fade-in max-h-64 overflow-y-auto lt-scrollbar">
+                  <button
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setIsCategoryOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                      activeCategory === 'all'
+                        ? 'bg-[rgb(var(--lt-primary)/0.08)] text-[rgb(var(--lt-primary))]'
+                        : 'text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
+                    }`}
+                  >
+                    <span>All Categories</span>
+                    <span className="text-[10px] text-[rgb(var(--lt-text-muted))]">({tools.length})</span>
+                  </button>
+                  {categories.map((cat) => {
+                    const count = tools.filter((t) => t.category === cat.name).length;
+                    return (
+                      <button
+                        key={cat.name}
+                        onClick={() => {
+                          setActiveCategory(cat.name as ToolCategory);
+                          setIsCategoryOpen(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors cursor-pointer mt-0.5 ${
+                          activeCategory === cat.name
+                            ? 'bg-[rgb(var(--lt-primary)/0.08)] text-[rgb(var(--lt-primary))]'
+                            : 'text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        <span className="text-[10px] text-[rgb(var(--lt-text-muted))]">({count})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Status Dropdown */}
-            <div className="relative min-w-[140px] flex-1 sm:flex-initial">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'live' | 'soon')}
-                className="w-full appearance-none rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-3.5 pr-9 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
+            {/* Status Custom Dropdown */}
+            <div className="relative min-w-[140px] flex-1 sm:flex-initial" ref={statusDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsStatusOpen(!isStatusOpen)}
+                className="w-full flex items-center justify-between rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] py-2.5 pl-3.5 pr-3 text-xs sm:text-sm font-semibold text-[rgb(var(--lt-text))] shadow-xs transition-all hover:border-[rgb(var(--lt-primary)/0.5)] focus:border-[rgb(var(--lt-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--lt-primary)/0.2)] cursor-pointer"
               >
-                <option value="all">All Status</option>
-                <option value="live">⚡ Live Ready ({tools.filter((t) => t.status === 'live').length})</option>
-                <option value="soon">⏳ Coming Soon ({tools.filter((t) => t.status === 'soon').length})</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))]">
-                <ChevronDown className="h-4 w-4" />
-              </div>
+                <span className="truncate pr-2">
+                  {statusFilter === 'all' ? 'All Status' : statusFilter === 'live' ? '⚡ Live Ready' : '⏳ Coming Soon'}
+                </span>
+                <ChevronDown className={`h-4 w-4 text-[rgb(var(--lt-text-muted))] transition-transform ${isStatusOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isStatusOpen && (
+                <div className="absolute right-0 top-full z-50 mt-1.5 w-full md:w-48 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface))] p-1.5 shadow-xl lt-fade-in">
+                  <button
+                    onClick={() => {
+                      setStatusFilter('all');
+                      setIsStatusOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors cursor-pointer ${
+                      statusFilter === 'all'
+                        ? 'bg-[rgb(var(--lt-primary)/0.08)] text-[rgb(var(--lt-primary))]'
+                        : 'text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
+                    }`}
+                  >
+                    <span>All Status</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setStatusFilter('live');
+                      setIsStatusOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors cursor-pointer mt-0.5 ${
+                      statusFilter === 'live'
+                        ? 'bg-[rgb(var(--lt-primary)/0.08)] text-[rgb(var(--lt-primary))]'
+                        : 'text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
+                    }`}
+                  >
+                    <span>⚡ Live Ready</span>
+                    <span className="text-[10px] text-[rgb(var(--lt-text-muted))]">({tools.filter((t) => t.status === 'live').length})</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setStatusFilter('soon');
+                      setIsStatusOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-colors cursor-pointer mt-0.5 ${
+                      statusFilter === 'soon'
+                        ? 'bg-[rgb(var(--lt-primary)/0.08)] text-[rgb(var(--lt-primary))]'
+                        : 'text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
+                    }`}
+                  >
+                    <span>⏳ Coming Soon</span>
+                    <span className="text-[10px] text-[rgb(var(--lt-text-muted))]">({tools.filter((t) => t.status === 'soon').length})</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

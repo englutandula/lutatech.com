@@ -17,7 +17,7 @@ class Settings(BaseSettings):
         "https://www.lutatech.com",
     ]
     temp_dir: str = "/tmp/lutatech"
-    rembg_model: str = "u2netp"
+    rembg_model: str = "u2net_human_seg"
 
     # Database (MySQL via PyMySQL)
     database_url: str = "mysql+pymysql://root:@127.0.0.1:3306/luta_studio"

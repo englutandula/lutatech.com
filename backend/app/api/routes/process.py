@@ -46,6 +46,7 @@ def validate_image_bytes(image_bytes: bytes) -> Image.Image:
 
 
 @router.post("/process", response_model=ProcessResponse)
+@router.post("/process/", response_model=ProcessResponse, include_in_schema=False)
 async def process_endpoint(
     file: UploadFile = File(...),
     document_type: str = Form(...),
@@ -100,6 +101,7 @@ async def process_endpoint(
 
 
 @router.post("/detect-face", response_model=FaceDetectResponse)
+@router.post("/detect-face/", response_model=FaceDetectResponse, include_in_schema=False)
 async def detect_face_endpoint(file: UploadFile = File(...)):
     image_bytes = await file.read()
     image = validate_image_bytes(image_bytes).convert("RGB")
@@ -114,7 +116,9 @@ async def detect_face_endpoint(file: UploadFile = File(...)):
 
 
 @router.post("/remove-background", response_model=BackgroundRemoveResponse)
+@router.post("/remove-background/", response_model=BackgroundRemoveResponse, include_in_schema=False)
 @router.post("/ai/remove-background", response_model=BackgroundRemoveResponse)
+@router.post("/ai/remove-background/", response_model=BackgroundRemoveResponse, include_in_schema=False)
 async def remove_bg_endpoint(
     file: UploadFile = File(...),
     bg_color: Optional[str] = Form(default=None),

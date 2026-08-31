@@ -24,7 +24,6 @@ pillow-heif>=0.15.0
 # ML / CV (mediapipe requires numpy<2, so we pin numpy accordingly)
 numpy>=1.23.0,<2.0.0
 opencv-python-headless>=4.8.0,<4.13.0
-opencv-contrib-python-headless>=4.8.0,<4.13.0
 mediapipe>=0.10.9,<0.10.22
 
 # Pre-built binary wheels for numba/llvmlite

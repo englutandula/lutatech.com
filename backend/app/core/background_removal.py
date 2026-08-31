@@ -1,6 +1,9 @@
 import io
 from PIL import Image
-from rembg import remove
+from rembg import remove, new_session
+
+# Pre-load the human segmentation model session
+human_session = new_session("u2net_human_seg")
 
 def _parse_bg_color(bg_color: str) -> tuple:
     aliases = {
@@ -31,8 +34,16 @@ def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Im
     """
     Remove the background using the standard, fresh rembg installation defaults.
     """
-    # 1. Remove background (returns an RGBA image with transparent background)
-    output = remove(image)
+    # 1. Remove background with alpha matting enabled for fine hair details
+    output = remove(
+        image,
+        session=human_session,
+        alpha_matting=True,
+        alpha_matting_foreground_threshold=240,
+        alpha_matting_background_threshold=10,
+        alpha_matting_erode_size=5, # Reduced to prevent cutting into solid body parts
+        post_process_mask=False
+    )
     
     # 2. Return transparent if requested
     if bg_color.strip().lower() == "transparent":
