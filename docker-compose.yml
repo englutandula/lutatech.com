@@ -29,7 +29,8 @@ services:
       - ./backend/app:/app/app
     environment:
       - PORT=8000
-
+      - REMBG_MODEL=u2netp
+      - OMP_NUM_THREADS=2
       - DATABASE_URL=postgresql://luta_user:luta_secret_production_2026@db:5432/luta_studio
       - CORS_ORIGINS=https://lutatech.com,https://www.lutatech.com,http://localhost:3000
     depends_on:

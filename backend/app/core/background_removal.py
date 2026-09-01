@@ -1,9 +1,10 @@
 import io
+import os
 from PIL import Image
 from rembg import remove, new_session
 
-# Pre-load the human segmentation model session
-human_session = new_session("u2net_human_seg")
+# Pre-load the ultra-fast lightweight model session (u2netp: 4.7MB, 0.3-0.5s CPU inference)
+human_session = new_session(os.getenv("REMBG_MODEL", "u2netp"))
 
 def _parse_bg_color(bg_color: str) -> tuple:
     aliases = {
