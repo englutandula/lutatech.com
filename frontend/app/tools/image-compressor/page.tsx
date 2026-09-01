@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Download, Sparkles, X, Check, ArrowRight, FileArchive, Sliders, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
-import JSZip from 'jszip';
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
@@ -177,6 +176,7 @@ export default function ImageCompressorPage() {
 
     setIsZipping(true);
     try {
+      const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
 
       for (const item of doneItems) {

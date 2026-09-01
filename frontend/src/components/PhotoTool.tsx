@@ -13,8 +13,10 @@ import CountrySelector from '@/components/CountrySelector'
 import ImageEditor from '@/components/ImageEditor'
 import BeforeAfter from '@/components/BeforeAfter'
 import DownloadButton from '@/components/DownloadButton'
+import dynamic from 'next/dynamic'
 import RequirementsInfo from '@/components/RequirementsInfo'
-import ManualCropModal from '@/components/ManualCropModal'
+
+const ManualCropModal = dynamic(() => import('@/components/ManualCropModal'), { ssr: false })
 import Card from '@/components/ui/Card'
 import Select from '@/components/ui/Select'
 import Spinner from '@/components/ui/Spinner'
