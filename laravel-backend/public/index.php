@@ -45,9 +45,13 @@ if (file_exists($configCache)) {
 }
 
 // When served from a subfolder like /api/, normalize SCRIPT_NAME to prevent
-// Symfony Request from stripping /api from getPathInfo()
+// Symfony Request from stripping /api from getPathInfo() for API routes,
+// but preserve SCRIPT_NAME for Filament admin routes so they receive /admin
 if (isset($_SERVER['SCRIPT_NAME']) && str_starts_with($_SERVER['SCRIPT_NAME'], '/api/')) {
-    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+    if (!str_contains($uri, '/admin') && !str_contains($uri, '/filament') && !str_contains($uri, '/livewire')) {
+        $_SERVER['SCRIPT_NAME'] = '/index.php';
+    }
 }
 
 // Determine if the application is in maintenance mode...
