@@ -16,7 +16,7 @@ import { navPdfGroups } from '@/lib/nav';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
-  const { user, openAuthModal, logout } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -263,21 +263,19 @@ export function Navbar() {
               </div>
             ) : (
               <div className="hidden items-center gap-1.5 md:flex shrink-0">
-                <button
-                  type="button"
-                  onClick={() => openAuthModal('login')}
+                <Link
+                  href="/login"
                   className="inline-flex items-center justify-center gap-1 rounded-xl border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface-3))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-1.5 px-2 md:px-2.5 lg:px-3 text-[11px] md:text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer shadow-xs active:scale-95"
                 >
                   <UserIcon className="h-3 w-3 md:h-3.5 md:w-3.5" />
                   <span>Login</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openAuthModal('register')}
+                </Link>
+                <Link
+                  href="/register"
                   className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] hover:opacity-95 text-white py-1.5 px-2.5 md:px-3 lg:px-3.5 text-[11px] md:text-xs font-bold whitespace-nowrap shrink-0 transition-all cursor-pointer shadow-xs active:scale-95"
                 >
                   <span>Sign Up</span>
-                </button>
+                </Link>
               </div>
             )}
 
@@ -456,21 +454,21 @@ export function Navbar() {
                 </>
               ) : (
                 <div className="mt-3 flex flex-col gap-2 pt-3 border-t lt-border-color">
-                  <button
-                    type="button"
-                    onClick={() => { setMobileOpen(false); openAuthModal('login'); }}
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface-2))] py-2.5 px-4 text-sm font-semibold text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-3))] cursor-pointer transition-colors"
                   >
                     <UserIcon className="h-4 w-4" />
                     <span>Login</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMobileOpen(false); openAuthModal('register'); }}
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileOpen(false)}
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] py-2.5 px-4 text-sm font-bold text-white shadow-xs hover:opacity-95 cursor-pointer transition-opacity"
                   >
                     <span>Sign Up</span>
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>

@@ -69,24 +69,25 @@ function RegisterForm() {
   };
 
   return (
-    <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
-      <div className="w-full max-w-md lt-fade-up">
-        <div className="text-center mb-4">
+    <div className="lt-container flex min-h-[calc(100vh-4.5rem)] items-center justify-center py-5 px-4">
+      <div className="w-full max-w-[440px] lt-fade-up">
+        <div className="text-center mb-3">
           <Link href="/" className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none">
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-8 sm:h-9 w-auto" />
           </Link>
         </div>
 
-        <div className="lt-card p-6 sm:p-8">
-          <h1 className="text-2xl font-bold text-[rgb(var(--lt-text))]">Create your account</h1>
-          <p className="mt-1.5 text-xs sm:text-sm lt-text-muted">Get started for free. No credit card required.</p>
+        <div className="lt-card rounded-3xl p-5 sm:p-6 shadow-xl shadow-black/[0.03] dark:shadow-black/20 border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface))]">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[rgb(var(--lt-text))] text-center">Create your account</h1>
+          <p className="mt-0.5 text-xs text-[rgb(var(--lt-text-muted))] text-center">Get started for free. No credit card required.</p>
 
           {/* Google Sign Up */}
-          <div className="mt-6">
+          <div className="mt-3.5">
             <button
+              type="button"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.5 px-4 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              className="w-full flex items-center justify-center gap-2.5 rounded-xl border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.25 px-4 text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs active:scale-[0.99]"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -98,21 +99,21 @@ function RegisterForm() {
             </button>
           </div>
 
-          <div className="relative my-6 flex items-center justify-center">
-            <div className="w-full border-t lt-border-color" />
-            <span className="absolute bg-[rgb(var(--lt-surface))] px-3 text-xs lt-text-muted font-medium">or email</span>
+          <div className="relative my-3 flex items-center justify-center">
+            <div className="w-full border-t border-[rgb(var(--lt-border))]" />
+            <span className="absolute bg-[rgb(var(--lt-surface))] px-2.5 text-[11px] text-[rgb(var(--lt-text-muted))] font-medium">or email</span>
           </div>
 
           {error && (
-            <div className="mb-4 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
-              <div className="flex items-start gap-2.5">
+            <div className="mb-3 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-2.5 text-xs text-[rgb(var(--lt-error))]">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <div className="flex-1 space-y-1">
                   <span>{error}</span>
                   {(error.toLowerCase().includes('already exists') || error.toLowerCase().includes('already registered')) && (
                     <Link
                       href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
-                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-0.5"
                     >
                       Click here to sign in with this email →
                     </Link>
@@ -122,85 +123,104 @@ function RegisterForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-2.5">
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Full Name</label>
+              <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Full Name</label>
               <div className="relative">
-                <UserIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                  <UserIcon className="h-4 w-4" />
+                </span>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Doe"
-                  className="lt-input pl-10"
+                  className="lt-input has-left-icon !pl-11"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Email Address</label>
+              <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+                <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                  <Mail className="h-4 w-4" />
+                </span>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="lt-input pl-10"
+                  className="lt-input has-left-icon !pl-11"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  minLength={8}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="lt-input pl-10 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Password</label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                    <Lock className="h-4 w-4" />
+                  </span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="lt-input has-both-icons !pl-11 !pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] cursor-pointer transition-colors"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
-              <PasswordStrengthMeter password={password} />
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Confirm Password</label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                    <Lock className="h-4 w-4" />
+                  </span>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="lt-input has-both-icons !pl-11 !pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] cursor-pointer transition-colors"
+                    tabIndex={-1}
+                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Confirm Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  required
-                  minLength={8}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="lt-input pl-10 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-            </div>
+            {password && <PasswordStrengthMeter password={password} />}
 
-            <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-1.5 py-2.5 rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] hover:opacity-95 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+            >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -209,7 +229,7 @@ function RegisterForm() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs sm:text-sm lt-text-muted">
+          <p className="mt-3.5 text-center text-xs text-[rgb(var(--lt-text-muted))]">
             Already have an account?{' '}
             <Link
               href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}

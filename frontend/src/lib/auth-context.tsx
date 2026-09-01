@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { AuthUser } from './types';
 import { getUserProfile, loginUser, logoutUser, registerUser } from './api';
-import AuthModal, { AuthMode } from '@/components/auth/AuthModal';
+export type AuthMode = 'login' | 'register';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -47,20 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return !localStorage.getItem(USER_CACHE_KEY);
   });
 
-  // Modal State
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<AuthMode>('login');
-  const [modalSuccessCallback, setModalSuccessCallback] = useState<(() => void) | undefined>(undefined);
-
   const openAuthModal = useCallback((mode: AuthMode = 'login', onSuccess?: () => void) => {
-    setModalMode(mode);
-    setModalSuccessCallback(() => onSuccess);
-    setModalOpen(true);
+    if (typeof window !== 'undefined') {
+      window.location.href = mode === 'register' ? '/register' : '/login';
+    }
   }, []);
 
   const closeAuthModal = useCallback(() => {
-    setModalOpen(false);
-    setModalSuccessCallback(undefined);
+    // Dedicated pages used instead of popup modal
   }, []);
 
   const cacheUser = useCallback((u: AuthUser | null) => {
@@ -143,13 +137,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-      <AuthModal
-        key={modalOpen ? `modal-${modalMode}` : 'modal-closed'}
-        isOpen={modalOpen}
-        initialMode={modalMode}
-        onClose={closeAuthModal}
-        onSuccess={modalSuccessCallback}
-      />
     </AuthContext.Provider>
   );
 }

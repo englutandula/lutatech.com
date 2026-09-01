@@ -76,34 +76,34 @@ function LoginForm() {
   };
 
   return (
-    <div className="lt-container flex min-h-[calc(100vh-4rem)] items-center justify-center py-12">
-      <div className="w-full max-w-md lt-fade-up">
-        <div className="text-center mb-4">
+    <div className="lt-container flex min-h-[calc(100vh-4.5rem)] items-center justify-center py-6 px-4">
+      <div className="w-full max-w-[420px] lt-fade-up">
+        <div className="text-center mb-3 sm:mb-4">
           <Link href="/" className="inline-flex items-center justify-center transition-transform hover:opacity-90 select-none">
-            <Logo className="h-10 w-auto" />
+            <Logo className="h-9 sm:h-10 w-auto" />
           </Link>
         </div>
 
-        <div className="lt-card p-6 sm:p-8">
-          <h1 className="text-2xl font-bold text-[rgb(var(--lt-text))]">
+        <div className="lt-card rounded-3xl p-6 sm:p-7 shadow-xl shadow-black/[0.03] dark:shadow-black/20 border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface))]">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[rgb(var(--lt-text))] text-center">
             {isForgotPassword ? 'Reset your password' : 'Sign in to your account'}
           </h1>
-          <p className="mt-1.5 text-xs sm:text-sm lt-text-muted">
+          <p className="mt-1 text-xs text-[rgb(var(--lt-text-muted))] text-center">
             {isForgotPassword
-              ? "Enter your email address and we'll send you a password reset link."
+              ? "Enter your email and we'll send a password reset link."
               : 'Enter your details to access your account.'}
           </p>
 
           {/* Pending Activation Banner */}
           {statusParam === 'pending_activation' && (
-            <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-              <div className="flex items-start gap-2.5">
+            <div className="mt-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                <div className="flex-1 space-y-1.5">
+                <div className="flex-1 space-y-1">
                   <strong className="block font-semibold">Account Activation Required</strong>
                   <p className="leading-relaxed">
                     We&apos;ve sent an activation link to{' '}
-                    <strong className="break-all">{emailParam || 'your email'}</strong>. Please check your inbox and click the button to activate your account.
+                    <strong className="break-all">{emailParam || 'your email'}</strong>. Please check your inbox and click the button to activate.
                   </p>
                   <Link
                     href={`/verify-email?email=${encodeURIComponent(emailParam)}`}
@@ -118,15 +118,15 @@ function LoginForm() {
 
           {/* Error Banner */}
           {error && (
-            <div className="mt-4 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs sm:text-sm text-[rgb(var(--lt-error))]">
-              <div className="flex items-start gap-2.5">
+            <div className="mt-3.5 rounded-xl border border-[rgb(var(--lt-error)/0.3)] bg-[rgb(var(--lt-error)/0.08)] p-3 text-xs text-[rgb(var(--lt-error))]">
+              <div className="flex items-start gap-2">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <div className="flex-1 space-y-1">
                   <span>{error}</span>
                   {error.toLowerCase().includes('not been activated') && (
                     <Link
                       href={`/verify-email?email=${encodeURIComponent(email)}`}
-                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-0.5"
                     >
                       Click here to activate your account or resend email →
                     </Link>
@@ -134,7 +134,7 @@ function LoginForm() {
                   {error.toLowerCase().includes('no account found') && (
                     <Link
                       href={redirectUrl !== '/dashboard' ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
-                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1"
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-0.5"
                     >
                       Click here to create a new account →
                     </Link>
@@ -143,7 +143,7 @@ function LoginForm() {
                     <button
                       type="button"
                       onClick={handleGoogleSignIn}
-                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-1 text-left cursor-pointer"
+                      className="block font-bold text-[rgb(var(--lt-primary))] hover:underline pt-0.5 text-left cursor-pointer"
                     >
                       Click here to sign in with Google →
                     </button>
@@ -156,12 +156,12 @@ function LoginForm() {
           {/* Forgot Password Flow */}
           {isForgotPassword ? (
             resetSent ? (
-              <div className="text-center py-6 space-y-4 mt-4">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-                  <CheckCircle2 className="h-7 w-7" />
+              <div className="text-center py-5 space-y-3 mt-2">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-bold text-[rgb(var(--lt-text))]">Check your inbox</h3>
-                <p className="text-xs sm:text-sm lt-text-muted">
+                <h3 className="text-base font-bold text-[rgb(var(--lt-text))]">Check your inbox</h3>
+                <p className="text-xs text-[rgb(var(--lt-text-muted))]">
                   We&apos;ve sent password reset instructions to{' '}
                   <strong className="text-[rgb(var(--lt-text))]">{email}</strong>.
                   <br />
@@ -170,28 +170,34 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => { setIsForgotPassword(false); setResetSent(false); }}
-                  className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] hover:opacity-95 text-white font-bold text-sm shadow-md transition-all cursor-pointer"
                 >
                   Back to Sign In
                 </button>
               </div>
             ) : (
-              <form onSubmit={handlePasswordReset} className="space-y-4 mt-6">
+              <form onSubmit={handlePasswordReset} className="space-y-3 mt-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Email Address</label>
+                  <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                      <Mail className="h-4 w-4" />
+                    </span>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className="lt-input pl-10"
+                      className="lt-input has-left-icon !pl-11"
                     />
                   </div>
                 </div>
-                <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] hover:opacity-95 text-white font-bold text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Reset Link'}
                 </button>
                 <div className="text-center pt-1">
@@ -208,11 +214,12 @@ function LoginForm() {
           ) : (
             <>
               {/* Google Sign In */}
-              <div className="mt-6">
+              <div className="mt-4">
                 <button
+                  type="button"
                   onClick={handleGoogleSignIn}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.5 px-4 text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                  className="w-full flex items-center justify-center gap-2.5 rounded-xl border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface))] hover:border-[rgb(var(--lt-primary)/0.4)] text-[rgb(var(--lt-text))] py-2.25 px-4 text-xs sm:text-sm font-semibold transition-all disabled:opacity-50 cursor-pointer shadow-xs active:scale-[0.99]"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -224,30 +231,32 @@ function LoginForm() {
                 </button>
               </div>
 
-              <div className="relative my-6 flex items-center justify-center">
-                <div className="w-full border-t lt-border-color" />
-                <span className="absolute bg-[rgb(var(--lt-surface))] px-3 text-xs lt-text-muted font-medium">or email</span>
+              <div className="relative my-3.5 flex items-center justify-center">
+                <div className="w-full border-t border-[rgb(var(--lt-border))]" />
+                <span className="absolute bg-[rgb(var(--lt-surface))] px-2.5 text-[11px] text-[rgb(var(--lt-text-muted))] font-medium">or email</span>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Email Address</label>
+                  <label className="mb-1 block text-xs font-semibold text-[rgb(var(--lt-text))]">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                      <Mail className="h-4 w-4" />
+                    </span>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className="lt-input pl-10"
+                      className="lt-input has-left-icon !pl-11"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-semibold text-[rgb(var(--lt-text-muted))]">Password</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-[rgb(var(--lt-text))]">Password</label>
                     <button
                       type="button"
                       onClick={() => { setIsForgotPassword(true); setError(null); }}
@@ -257,7 +266,9 @@ function LoginForm() {
                     </button>
                   </div>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--lt-text-muted))]" />
+                    <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[rgb(var(--lt-text-muted))]">
+                      <Lock className="h-4 w-4" />
+                    </span>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
@@ -265,19 +276,25 @@ function LoginForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="lt-input pl-10 pr-10"
+                      className="lt-input has-both-icons !pl-11 !pr-11"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] p-1 cursor-pointer"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] cursor-pointer transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
 
-                <button type="submit" disabled={loading} className="lt-btn-primary w-full cursor-pointer py-2.5 font-bold">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full mt-1 py-2.5 rounded-xl bg-gradient-to-r from-[rgb(var(--lt-primary))] to-[rgb(var(--lt-primary-dark))] hover:opacity-95 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -286,7 +303,7 @@ function LoginForm() {
                 </button>
               </form>
 
-              <p className="mt-6 text-center text-xs sm:text-sm lt-text-muted">
+              <p className="mt-4 text-center text-xs text-[rgb(var(--lt-text-muted))]">
                 Don&apos;t have an account?{' '}
                 <Link
                   href={redirectUrl !== '/dashboard' ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}

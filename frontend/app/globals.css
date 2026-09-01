@@ -268,8 +268,12 @@ body {
   border-width: 1px;
   border-color: rgb(var(--lt-border));
   background-color: rgb(var(--lt-surface));
-  padding: 0.6875rem 1rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 0.875rem;
+  padding-right: 0.875rem;
   font-size: 0.875rem;
+  line-height: 1.25rem;
   color: rgb(var(--lt-text));
   outline: none;
   transition: all 0.15s ease;
@@ -282,6 +286,22 @@ body {
 
 .lt-input::placeholder {
   color: rgb(var(--lt-text-muted) / 0.65);
+}
+
+/* Explicit padding classes when icons are present to strictly prevent any overlapping */
+.lt-input.has-left-icon,
+.lt-input-icon-left {
+  padding-left: 2.75rem !important;
+}
+
+.lt-input.has-right-icon,
+.lt-input-icon-right {
+  padding-right: 2.75rem !important;
+}
+
+.lt-input.has-both-icons {
+  padding-left: 2.75rem !important;
+  padding-right: 2.75rem !important;
 }
 
 /* ── Badges & Tags ── */
