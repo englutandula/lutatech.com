@@ -15,7 +15,10 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 RewriteCond %{HTTP_HOST} ^www\.lutatech\.com [NC]
 RewriteRule ^(.*)$ https://lutatech.com/$1 [R=301,L]
 
-# ── 2. Livewire & Filament Internal Routing to Laravel ───────
+# ── 2. Redirect /admin to Home Page ──────────────────────────
+RewriteRule ^admin(/.*)?$ / [R=302,L]
+
+# ── 3. Livewire & Filament Internal Routing to Laravel ───────
 RewriteRule ^livewire(/.*)?$ api/index.php [L,QSA]
 RewriteRule ^filament(/.*)?$ api/index.php [L,QSA]
 
