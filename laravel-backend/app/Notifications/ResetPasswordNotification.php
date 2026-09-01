@@ -30,16 +30,16 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $frontendUrl = rtrim(env('FRONTEND_URL', 'https://lutatech.com'), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
         $resetUrl = $frontendUrl . '/reset-password?token=' . $this->token . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
 
         return (new MailMessage)
-            ->subject('Reset Your Password - ' . config('app.name', 'Luta Tech'))
+            ->subject('Reset Your Password — LutaTech')
             ->greeting('Hello ' . ($notifiable->name ?? 'there') . '!')
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password', $resetUrl)
             ->line('This password reset link will expire in 60 minutes.')
             ->line('If you did not request a password reset, no further action is required.')
-            ->salutation('Best regards, The Luta Tech Team');
+            ->salutation('Best regards, The LutaTech Team');
     }
 }

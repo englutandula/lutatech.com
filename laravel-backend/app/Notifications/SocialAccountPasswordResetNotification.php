@@ -32,13 +32,13 @@ class SocialAccountPasswordResetNotification extends Notification
         $providerName = ucfirst($this->provider);
 
         return (new MailMessage)
-            ->subject('Password Reset Request — ' . config('app.name', 'Luta Tech'))
+            ->subject('Password Reset Request — LutaTech')
             ->greeting('Hello ' . ($notifiable->name ?? 'there') . '!')
-            ->line('We received a request to reset the password for your ' . config('app.name', 'Luta Tech') . ' account.')
+            ->line('We received a request to reset the password for your LutaTech account.')
             ->line('Your account was created using **' . $providerName . ' Sign-In** and does not currently have a separate password.')
             ->line('You can sign in securely at any time using your ' . $providerName . ' account:')
             ->action('Sign In with ' . $providerName, $frontendUrl . '/login')
             ->line('If you did not request a password reset, you can safely ignore this email — your account remains secure.')
-            ->salutation('Best regards, The ' . config('app.name', 'Luta Tech') . ' Team');
+            ->salutation('Best regards, The LutaTech Team');
     }
 }

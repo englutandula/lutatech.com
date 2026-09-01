@@ -38,14 +38,14 @@ class VerificationActivationNotification extends Notification
         $verificationUrl = $this->buildVerificationUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Verify Your Email & Activate Your Account — ' . config('app.name', 'Luta Tech'))
+            ->subject('Verify Your Email & Activate Your Account — LutaTech')
             ->greeting('Hello ' . ($notifiable->name ?? 'there') . '!')
-            ->line('Thank you for signing up with ' . config('app.name', 'Luta Tech') . '.')
+            ->line('Thank you for signing up with LutaTech.')
             ->line('Please click the button below to verify your email address and activate your account in one step.')
             ->action('Verify & Activate Account', $verificationUrl)
             ->line('This link will expire in ' . Config::get('auth.verification.expire', 60) . ' minutes.')
             ->line('If you did not create an account, no further action is required.')
-            ->salutation('Best regards, The ' . config('app.name', 'Luta Tech') . ' Team');
+            ->salutation('Best regards, The LutaTech Team');
     }
 
     /**

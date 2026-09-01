@@ -58,6 +58,6 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
             $mail->action($this->actionText, $this->actionUrl);
         }
 
-        return $mail->salutation('Best regards, The Luta Tech Team');
+        return $mail->salutation('Best regards, The LutaTech Team');
     }
 }

@@ -36,14 +36,14 @@ class AccountActivationNotification extends Notification
         $activationUrl = $this->buildActivationUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Activate Your Account — ' . config('app.name', 'Luta Tech'))
+            ->subject('Activate Your LutaTech Account')
             ->greeting('Hello ' . ($notifiable->name ?? 'there') . '!')
-            ->line('Welcome to ' . config('app.name', 'Luta Tech') . '! Your Google account has been linked.')
+            ->line('Welcome to LutaTech! Your Google account has been linked.')
             ->line('Please click the button below to activate your account and get started.')
             ->action('Activate My Account', $activationUrl)
             ->line('This activation link will expire in 24 hours.')
-            ->line('If you did not sign up for ' . config('app.name', 'Luta Tech') . ', please ignore this email.')
-            ->salutation('Best regards, The ' . config('app.name', 'Luta Tech') . ' Team');
+            ->line('If you did not sign up for LutaTech, please ignore this email.')
+            ->salutation('Best regards, The LutaTech Team');
     }
 
     /**
