@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && (test -f public/.htaccess && cp public/.htaccess out/.htaccess || true)",
     "start": "next start",
     "lint": "eslint"
   },
