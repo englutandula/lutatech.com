@@ -118,21 +118,30 @@ class AccountActivationController extends Controller
         Log::info("Account activated: user [{$user->id}] ({$user->email}) via social activation link.");
 
         // ------------------------------------------------------------------
-        // 7. Fire AccountActivated event → SendWelcomeEmailListener (queued).
+        // 7. Fire AccountActivated event → SendWelcomeEmailListener.
         // ------------------------------------------------------------------
         event(new AccountActivated($user->fresh()));
 
         // ------------------------------------------------------------------
-        // 8. Redirect to frontend with success status. No token issued here —
-        //    the user must log in through the normal login flow.
+        // 8. Issue token so user is automatically logged in upon activation!
         // ------------------------------------------------------------------
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Your account has been activated! You can now log in.',
+                'message' => 'Your account has been activated! You are now logged in.',
+                'data'    => [
+                    'token' => $token,
+                    'user'  => [
+                        'id'    => $user->id,
+                        'name'  => $user->name,
+                        'email' => $user->email,
+                    ],
+                ],
             ]);
         }
 
-        return redirect($frontendUrl . '/verify-email?status=activated');
+        return redirect($frontendUrl . '/verify-email?status=activated&token=' . urlencode($token));
     }
 }

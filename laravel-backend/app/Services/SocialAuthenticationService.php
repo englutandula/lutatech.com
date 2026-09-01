@@ -80,40 +80,38 @@ class SocialAuthenticationService
             }
 
             // Trusted verification: Google has verified ownership of this email address.
-            // Signing in with Google immediately verifies and activates the account!
-            $user->forceFill([
-                'email_verified_at' => $user->email_verified_at ?? now(),
-                'account_status'    => User::STATUS_ACTIVE,
-            ])->save();
+            if ($user->email_verified_at === null) {
+                $user->forceFill(['email_verified_at' => now()])->save();
+            }
 
-            Log::info("Social login: linked [{$provider}:{$providerId}] to existing user [{$user->id}] and activated account.");
+            Log::info("Social login: linked [{$provider}:{$providerId}] to existing user [{$user->id}] (status: {$user->account_status}).");
             return ['user' => $user->fresh(), 'isNewUser' => false];
         }
 
         // -----------------------------------------------------------------------
         // STEP 3: Completely new user — create account.
-        // Google has verified their identity & email address.
-        // New Google users are active immediately (instant 1-click access).
+        // Google has verified their email address.
+        // The user must activate their website account via the activation email.
         // -----------------------------------------------------------------------
         $user = User::create([
             'name'              => $name,
             'email'             => $email,
             'avatar'            => $avatar,
             'password'          => null,
-            'email_verified_at' => now(),        // Trusted: Google verified their email
-            'account_status'    => User::STATUS_ACTIVE, // Instant active status
+            'email_verified_at' => now(), // Google verified email
+            'account_status'    => User::STATUS_PENDING, // Awaiting activation
         ]);
 
         $this->linkSocialAccount($user, $provider, $providerId, $socialUser);
 
-        // Send a warm Welcome email (NOT a blocking activation link)
+        // Send the website activation email to this new user!
         try {
-            $user->notify(new \App\Notifications\WelcomeNotification());
+            $user->notify(new AccountActivationNotification());
+            Log::info("Sent AccountActivationNotification to new Google user [{$user->id}] ({$user->email}).");
         } catch (Throwable $e) {
-            Log::error("Failed to send welcome email to new social user [{$user->id}]: " . $e->getMessage());
+            Log::error("Failed to send activation email to new social user [{$user->id}]: " . $e->getMessage());
         }
 
-        Log::info("Social login: created active user [{$user->id}] via [{$provider}].");
         return ['user' => $user->fresh(), 'isNewUser' => true];
     }
 

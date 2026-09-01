@@ -143,12 +143,14 @@ class SocialAuthController extends Controller
         }
 
         if ($user->isPending()) {
-            $user->activate(true);
-            Log::info("Pending user [{$user->id}] activated upon successful [{$provider}] authentication.");
+            // New user or pending user who has not activated their account yet:
+            // Redirect to verify-email page where they can see the activation notice or click resend.
+            Log::info("Pending user [{$user->id}] redirected after social login.");
+            return redirect($frontendUrl . '/verify-email?status=pending_activation&email=' . urlencode($user->email));
         }
 
         // ------------------------------------------------------------------
-        // 5. Account is active — issue Sanctum token and log in.
+        // 5. Account is active — issue Sanctum token and log in immediately!
         // ------------------------------------------------------------------
         $token = $user->createToken('auth_token')->plainTextToken;
         $user->recordLogin();
