@@ -127,6 +127,34 @@ class ListUsers extends ListRecords
                 }),
 
             Actions\CreateAction::make()->label('New Client'),
+
+            Actions\Action::make('clear_all_clients')
+                ->label('Clear All Clients')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Clear All Registered Clients?')
+                ->modalDescription('This will permanently delete all registered clients, their linked Google social accounts, and login tokens so you can start completely fresh. The administrator account will NOT be touched.')
+                ->modalSubmitActionLabel('Yes, Delete All Clients')
+                ->action(function () {
+                    $clients = User::where(function ($q) {
+                        $q->where('is_admin', false)->orWhereNull('is_admin');
+                    })->get();
+
+                    $count = 0;
+                    foreach ($clients as $client) {
+                        $client->socialAccounts()->delete();
+                        $client->tokens()->delete();
+                        $client->delete();
+                        $count++;
+                    }
+
+                    Notification::make()
+                        ->title('Database Cleared')
+                        ->body("Successfully deleted {$count} registered clients. Ready for fresh registrations!")
+                        ->success()
+                        ->send();
+                }),
         ];
     }
 

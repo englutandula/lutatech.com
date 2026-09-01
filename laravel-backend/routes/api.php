@@ -37,6 +37,35 @@ $registerV1Routes = function () {
     });
 
     // =========================================================================
+    // Maintenance: Fresh Start (Clear Non-Admin Registered Clients)
+    // =========================================================================
+    Route::get('/maintenance/reset-clients', function (\Illuminate\Http\Request $request) {
+        if ($request->query('secret') !== 'luta-reset-2026-fresh-start') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $deletedUsers = [];
+        $clients = \App\Models\User::where(function ($q) {
+            $q->where('is_admin', false)->orWhereNull('is_admin');
+        })->get();
+
+        foreach ($clients as $client) {
+            $deletedUsers[] = $client->email;
+            $client->socialAccounts()->delete();
+            $client->tokens()->delete();
+            $client->delete();
+        }
+
+        return response()->json([
+            'success'         => true,
+            'message'         => 'All registered clients cleared successfully. Ready for fresh testing!',
+            'deleted_count'   => count($deletedUsers),
+            'deleted_clients' => $deletedUsers,
+            'remaining_users' => \App\Models\User::pluck('email'),
+        ]);
+    });
+
+    // =========================================================================
     // Authentication Endpoints
     // =========================================================================
     Route::prefix('auth')->group(function () {
