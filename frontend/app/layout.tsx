@@ -114,6 +114,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <WebSiteJsonLd />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6772678386645395"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] font-sans antialiased transition-colors">
         <Suspense fallback={null}>
