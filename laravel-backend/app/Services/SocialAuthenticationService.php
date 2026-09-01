@@ -79,6 +79,20 @@ class SocialAuthenticationService
                 $user->update(['avatar' => $avatar]);
             }
 
+            // Trusted verification: Google has verified ownership of this email address.
+            if ($user->email_verified_at === null) {
+                $user->forceFill(['email_verified_at' => now()])->save();
+            }
+
+            // If the account is still pending activation, send an activation email.
+            if ($user->isPending()) {
+                try {
+                    $user->notify(new AccountActivationNotification());
+                } catch (Throwable $e) {
+                    Log::error("Failed to send activation email to existing pending user [{$user->id}]: " . $e->getMessage());
+                }
+            }
+
             Log::info("Social login: linked [{$provider}:{$providerId}] to existing user [{$user->id}] by email.");
             return ['user' => $user, 'isNewUser' => false];
         }

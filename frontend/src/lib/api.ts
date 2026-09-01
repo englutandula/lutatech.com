@@ -233,7 +233,7 @@ export async function resetPassword(payload: {
 }
 
 export async function resendVerificationEmail(payload?: { email?: string }) {
-  const res = await client.post('/auth/email/resend', payload || {});
+  const res = await client.post('/auth/activation/resend', payload || {});
   return res.data;
 }
 

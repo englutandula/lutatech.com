@@ -43,10 +43,15 @@ class SocialAccount extends Model
     // -------------------------------------------------------------------------
 
     /**
-     * Convenience accessor so callers can use ->provider as well as ->provider_name.
+     * Convenience accessor and mutator so callers can use ->provider as well as ->provider_name.
      */
     public function getProviderAttribute(): string
     {
-        return $this->provider_name;
+        return $this->provider_name ?? '';
+    }
+
+    public function setProviderAttribute(string $value): void
+    {
+        $this->attributes['provider_name'] = $value;
     }
 }

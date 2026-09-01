@@ -576,10 +576,16 @@ class AuthController extends Controller
             ]);
         }
 
-        // Google-only users have no local password — inform them without
-        // revealing whether the email exists in our system.
+        // Google-only users have no local password — send a helpful notification
+        // explaining they use social login, while returning generic success on API.
         if ($user->isSocialOnlyUser()) {
-            // Still return generic success — no enumeration.
+            $provider = $user->socialAccounts->pluck('provider_name')->first() ?? 'Google';
+            try {
+                $user->notify(new \App\Notifications\SocialAccountPasswordResetNotification($provider));
+            } catch (Throwable $e) {
+                Log::error("Failed to send social reset email to [{$user->id}]: " . $e->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'If an account exists with that email, we have sent a password reset link.',
