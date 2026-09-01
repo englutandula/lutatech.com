@@ -1,0 +1,36 @@
+# ============================================================
+# lutatech.com — Complete Static Next.js Routing & Caching
+# ============================================================
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ── 1. Force HTTPS & Canonical Domain ────────────────────────
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+RewriteCond %{HTTP_HOST} ^www\.lutatech\.com [NC]
+RewriteRule ^(.*)$ https://lutatech.com/$1 [R=301,L]
+
+# ── 2. Admin, Livewire & Filament Routing to Laravel ─────────
+RewriteRule ^admin(/.*)?$ api/index.php [L,QSA]
+RewriteRule ^livewire(/.*)?$ api/index.php [L,QSA]
+RewriteRule ^filament(/.*)?$ api/index.php [L,QSA]
+
+# ── 3. Next.js Static Subfolder & Clean URL Routing ──────────
+# If request is a directory, serve its index.html
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*)$ $1/index.html [L]
+
+# If request matches .html file directly
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# ── 4. Fallback: If file doesn't exist, send to 404.html ──────
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^ 404.html [L]
