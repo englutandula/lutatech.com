@@ -14,7 +14,7 @@ import {
   Layers,
   SplitSquareHorizontal,
 } from 'lucide-react';
-import { PDFDocument } from 'pdf-lib';
+
 import { formatBytes, inspectPdfFile, type PdfFileInfo } from '@/lib/pdf';
 
 type SplitMode = 'individual' | 'range';
@@ -119,6 +119,7 @@ export default function PdfSplitterTool() {
 
     try {
       const arrayBuffer = await pdfFile.file.arrayBuffer();
+      const { PDFDocument } = await import('pdf-lib');
       const srcDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const totalPages = srcDoc.getPageCount();
 
