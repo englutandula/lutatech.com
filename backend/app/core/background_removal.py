@@ -34,15 +34,12 @@ def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Im
     """
     Remove the background using the standard, fresh rembg installation defaults.
     """
-    # 1. Remove background with alpha matting enabled for fine hair details
+    # 1. Remove background with optimized neural network inference (no heavy CPU Laplacian matting)
     output = remove(
         image,
         session=human_session,
-        alpha_matting=True,
-        alpha_matting_foreground_threshold=240,
-        alpha_matting_background_threshold=10,
-        alpha_matting_erode_size=5, # Reduced to prevent cutting into solid body parts
-        post_process_mask=False
+        alpha_matting=False,
+        post_process_mask=True
     )
     
     # 2. Return transparent if requested

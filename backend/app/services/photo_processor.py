@@ -88,7 +88,7 @@ def process_photo(
     image = image.convert("RGB")
 
     # Optimize input dimension for speed while exceeding 300 DPI passport output specs
-    MAX_INPUT_DIM = 1600
+    MAX_INPUT_DIM = 1000
     if max(image.size) > MAX_INPUT_DIM:
         image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
 
@@ -99,35 +99,47 @@ def process_photo(
     if not (brightness == 50 and contrast == 50 and saturation == 50):
         image = enhance_image(image, brightness=brightness, contrast=contrast, saturation=saturation)
 
-    # 1. Run face detection first (takes ~0.05s, uses <20MB RAM)
+    # 1. Run face detection first (takes ~0.04s)
     face = get_primary_face(image)
     face_detected = face is not None
     face_confidence = face["confidence"] if face else 0.0
 
-    # 2. Run background removal sequentially (avoids concurrent model RAM collision)
-    bg_image: Image.Image | None = None
-    if remove_bg:
-        bg_image = remove_background(image, bg_color=bg_color)
-
-    bg_removed_encoded = None
-    if remove_bg and bg_image is not None:
-        image = bg_image
-        buf = io.BytesIO()
-        image.save(buf, format="JPEG", quality=92)
-        bg_removed_encoded = base64.b64encode(buf.getvalue()).decode("utf-8")
+    # 2. Crop to passport framing first at 1.5x resolution for crystal clear supersampling
+    supersample = 1.5
+    crop_w = max(target_w, int(target_w * supersample))
+    crop_h = max(target_h, int(target_h * supersample))
 
     if face:
         image = auto_crop_passport(
             image,
             face=face,
-            target_width=target_w,
-            target_height=target_h,
+            target_width=crop_w,
+            target_height=crop_h,
             head_height_percent=face_req["head_height_percent"],
             eye_level_percent=face_req["eye_level_percent"],
             bg_color=bg_color,
         )
     else:
-        image = center_crop(image, target_w, target_h, bg_color=bg_color)
+        image = center_crop(image, crop_w, crop_h, bg_color=bg_color)
+
+    # 3. Run background removal on the framed portrait (ultra fast on framed portrait size)
+    bg_removed_encoded = None
+    if remove_bg:
+        transparent_bg = remove_background(image, bg_color="transparent")
+        
+        buf = io.BytesIO()
+        transparent_bg.save(buf, format="PNG")
+        bg_removed_encoded = base64.b64encode(buf.getvalue()).decode("utf-8")
+
+        from app.core.background_removal import _parse_bg_color
+        r, g, b = _parse_bg_color(bg_color)
+        canvas = Image.new("RGBA", transparent_bg.size, (r, g, b, 255))
+        canvas.paste(transparent_bg, mask=transparent_bg.split()[3])
+        image = canvas.convert("RGB")
+
+    # 4. Final resize to exact target dimensions
+    if image.size != (target_w, target_h):
+        image = image.resize((target_w, target_h), Image.LANCZOS)
 
     compliance = validate_compliance(image, spec)
     image_bytes_out, _ = compress_to_limit(image, file_req.get("max_size_kb", 500))
@@ -142,8 +154,8 @@ def process_photo(
         warnings.insert(0, "Low face detection confidence. Results may be less accurate.")
 
     del image, image_bytes_out
-    if bg_image is not None:
-        del bg_image
+    if 'transparent_bg' in locals() and transparent_bg is not None:
+        del transparent_bg
     import gc
     gc.collect()
 

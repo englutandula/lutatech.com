@@ -131,6 +131,11 @@ async def remove_bg_endpoint(
     image_bytes = await file.read()
     image = validate_image_bytes(image_bytes).convert("RGB")
     
+    # Constrain max dimension for fast CPU inference while preserving crisp HD quality
+    MAX_DIM = 1200
+    if max(image.size) > MAX_DIM:
+        image.thumbnail((MAX_DIM, MAX_DIM), Image.LANCZOS)
+    
     effective_bg = bg_color or background_color or "transparent"
     result = await run_in_threadpool(remove_background, image, bg_color=effective_bg)
 
