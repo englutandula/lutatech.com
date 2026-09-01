@@ -23,8 +23,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')->group(function () {
-
+$registerV1Routes = function () {
     // =========================================================================
     // Health Check
     // =========================================================================
@@ -125,4 +124,10 @@ Route::prefix('v1')->group(function () {
     Route::prefix('tools')->group(function () {
         Route::post('/qr/generate', [NormalToolController::class, 'generateQr']);
     });
-});
+};
+
+// Register under 'v1' (for production when base URL is /api)
+Route::prefix('v1')->group($registerV1Routes);
+
+// Register under 'api/v1' (for local dev or direct host access)
+Route::prefix('api/v1')->group($registerV1Routes);
