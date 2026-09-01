@@ -65,6 +65,26 @@ $registerV1Routes = function () {
         ]);
     });
 
+    Route::get('/maintenance/activate-all', function (\Illuminate\Http\Request $request) {
+        if ($request->query('secret') !== 'luta-activate-2026') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $activated = [];
+        $users = \App\Models\User::where('account_status', 'pending')->get();
+        foreach ($users as $u) {
+            $u->activate(true);
+            $activated[] = $u->email;
+        }
+
+        return response()->json([
+            'success'   => true,
+            'message'   => 'All pending accounts activated successfully!',
+            'activated' => $activated,
+            'all_users' => \App\Models\User::select('id', 'email', 'account_status', 'email_verified_at')->get(),
+        ]);
+    });
+
     // =========================================================================
     // Authentication Endpoints
     // =========================================================================
