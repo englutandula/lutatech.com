@@ -1,10 +1,9 @@
 import io
-import os
 from PIL import Image
 from rembg import remove, new_session
 
-# Pre-load the ultra-fast lightweight model session (u2netp: 4.7MB, 0.3-0.5s CPU inference)
-human_session = new_session(os.getenv("REMBG_MODEL", "u2netp"))
+# Pre-load the human segmentation model session
+human_session = new_session("u2net_human_seg")
 
 def _parse_bg_color(bg_color: str) -> tuple:
     aliases = {
@@ -35,12 +34,15 @@ def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Im
     """
     Remove the background using the standard, fresh rembg installation defaults.
     """
-    # 1. Remove background with optimized neural network inference (no heavy CPU Laplacian matting)
+    # 1. Remove background with alpha matting enabled for fine hair details
     output = remove(
         image,
         session=human_session,
-        alpha_matting=False,
-        post_process_mask=True
+        alpha_matting=True,
+        alpha_matting_foreground_threshold=240,
+        alpha_matting_background_threshold=10,
+        alpha_matting_erode_size=5, # Reduced to prevent cutting into solid body parts
+        post_process_mask=False
     )
     
     # 2. Return transparent if requested
