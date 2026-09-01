@@ -27,9 +27,25 @@ const AuthContext = createContext<AuthContextType>({
   closeAuthModal: () => {},
 });
 
+// Cache key for storing user in localStorage
+const USER_CACHE_KEY = 'luta_user_cache';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Load user instantly from localStorage cache (no API wait = instant UI)
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const cached = localStorage.getItem(USER_CACHE_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+  // If we have a cached user, don't show loading state — feel instant
+  const [loading, setLoading] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return !localStorage.getItem(USER_CACHE_KEY);
+  });
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -47,10 +63,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setModalSuccessCallback(undefined);
   }, []);
 
+  const cacheUser = useCallback((u: AuthUser | null) => {
+    if (typeof window === 'undefined') return;
+    if (u) {
+      localStorage.setItem(USER_CACHE_KEY, JSON.stringify(u));
+    } else {
+      localStorage.removeItem(USER_CACHE_KEY);
+    }
+    setUser(u);
+  }, []);
+
   const refreshUser = useCallback(async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     if (!token) {
-      setUser(null);
+      cacheUser(null);
       setLoading(false);
       return;
     }
@@ -58,20 +84,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await getUserProfile();
       if (res?.data?.user) {
-        setUser(res.data.user);
+        cacheUser(res.data.user); // Save to cache for instant next load
       } else {
-        setUser(null);
+        cacheUser(null);
       }
     } catch (err) {
       console.warn('Failed to load user profile, token may be expired:', err);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
       }
-      setUser(null);
+      cacheUser(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [cacheUser]);
 
   useEffect(() => {
     refreshUser();
@@ -80,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleLogin = async (payload: { email: string; password: string }) => {
     const res = await loginUser(payload);
     if (res?.data?.user) {
-      setUser(res.data.user);
+      cacheUser(res.data.user);
     }
     return res;
   };
@@ -93,14 +119,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }) => {
     const res = await registerUser(payload);
     if (res?.data?.user) {
-      setUser(res.data.user);
+      cacheUser(res.data.user);
     }
     return res;
   };
 
   const handleLogout = async () => {
     await logoutUser();
-    setUser(null);
+    cacheUser(null); // Clear cache on logout
   };
 
   return (
