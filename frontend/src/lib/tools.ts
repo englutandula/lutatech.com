@@ -257,7 +257,9 @@ export const tools: Tool[] = [
     category: 'Utility',
     icon: 'QrCode',
     accent: 'violet',
-    status: 'soon',
+    status: 'live',
+    popular: true,
+    href: '/tools/qr-code-generator/',
   },
   {
     slug: 'word-counter',
@@ -268,7 +270,9 @@ export const tools: Tool[] = [
     category: 'Productivity',
     icon: 'Type',
     accent: 'teal',
-    status: 'soon',
+    status: 'live',
+    popular: true,
+    href: '/tools/word-counter/',
   },
   {
     slug: 'json-formatter',
@@ -279,7 +283,9 @@ export const tools: Tool[] = [
     category: 'Developer',
     icon: 'Braces',
     accent: 'orange',
-    status: 'soon',
+    status: 'live',
+    popular: true,
+    href: '/tools/json-formatter/',
   },
   {
     slug: 'color-picker',
@@ -290,7 +296,9 @@ export const tools: Tool[] = [
     category: 'Utility',
     icon: 'Palette',
     accent: 'pink',
-    status: 'soon',
+    status: 'live',
+    popular: true,
+    href: '/tools/color-picker/',
   },
   {
     slug: 'image-resizer',
@@ -325,7 +333,9 @@ export const tools: Tool[] = [
     category: 'Developer',
     icon: 'Binary',
     accent: 'lime',
-    status: 'soon',
+    status: 'live',
+    popular: true,
+    href: '/tools/base64-converter/',
   },
 ];
 
