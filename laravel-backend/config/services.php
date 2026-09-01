@@ -42,9 +42,9 @@ return [
     ],
 
     'google' => [
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL', 'http://localhost:8000') . '/api/v1/auth/google/callback'),
+        'client_id' => env('GOOGLE_CLIENT_ID', '769106523466-me4lp4e1mpheplhmmsp75t4pdsunmd1k.apps.googleusercontent.com'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET', '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'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', 'https://lutatech.com/api/v1/auth/google/callback'),
     ],
 
     'github' => [
