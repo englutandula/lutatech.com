@@ -58,6 +58,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'nlS3X7Gv7B4seJoBBt-7zIbRJV',
+    other: {
+      'google-adsense-account': 'ca-pub-6772678386645395',
+    },
   },
   openGraph: {
     title: 'Luta Tech - Fast, Private, Modern Digital Tools Platform',
@@ -114,6 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <WebSiteJsonLd />
+        <meta name="google-adsense-account" content="ca-pub-6772678386645395" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6772678386645395"
