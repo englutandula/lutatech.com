@@ -222,7 +222,7 @@ export async function exportOrganizedPdf(
   const newPdf = await PDFDocument.create();
 
   // Cache loaded source documents by File reference to avoid re-parsing
-  const fileDocCache = new Map<File, InstanceType<typeof PDFDocument>>();
+  const fileDocCache = new Map<File, any>();
 
   for (let i = 0; i < pages.length; i++) {
     const item = pages[i];

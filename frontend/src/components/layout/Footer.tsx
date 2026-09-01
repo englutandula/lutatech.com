@@ -58,20 +58,17 @@ export function Footer() {
               <li><Link href="/tools" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Tools</Link></li>
               <li><Link href="/categories" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Categories</Link></li>
               <li><Link href="/pricing" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Pricing</Link></li>
-              <li><Link href="/about" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">About</Link></li>
+              <li><Link href="/about" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">About Us</Link></li>
+              <li><Link href="/contact" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Contact</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Categories</h4>
+            <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Legal & Privacy</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {categories.slice(0, 5).map((c) => (
-                <li key={c.name}>
-                  <Link href={`/categories#${c.name.toLowerCase()}`} className="lt-text-muted hover:text-[rgb(var(--lt-text))]">
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
+              <li><Link href="/privacy" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Terms of Service</Link></li>
+              <li><Link href="/contact" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Help & Support</Link></li>
             </ul>
           </div>
 
@@ -87,7 +84,11 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t lt-border-color pt-6 sm:flex-row">
           <p className="text-xs lt-text-muted">© 2026 Luta Tech. All rights reserved.</p>
-          <p className="text-xs lt-text-muted">Built with privacy and speed in mind.</p>
+          <div className="flex items-center gap-6 text-xs lt-text-muted">
+            <Link href="/privacy" className="hover:text-[rgb(var(--lt-text))]">Privacy</Link>
+            <Link href="/terms" className="hover:text-[rgb(var(--lt-text))]">Terms</Link>
+            <Link href="/contact" className="hover:text-[rgb(var(--lt-text))]">Contact</Link>
+          </div>
         </div>
       </div>
     </footer>
