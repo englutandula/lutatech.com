@@ -34,6 +34,22 @@ if (!$basePath) {
     exit(1);
 }
 
+// Remove stale route and config cache files to ensure new routes and configs take effect
+$routeCache = $basePath . '/bootstrap/cache/routes-v7.php';
+if (file_exists($routeCache)) {
+    @unlink($routeCache);
+}
+$configCache = $basePath . '/bootstrap/cache/config.php';
+if (file_exists($configCache)) {
+    @unlink($configCache);
+}
+
+// When served from a subfolder like /api/, normalize SCRIPT_NAME to prevent
+// Symfony Request from stripping /api from getPathInfo()
+if (isset($_SERVER['SCRIPT_NAME']) && str_starts_with($_SERVER['SCRIPT_NAME'], '/api/')) {
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+}
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = $basePath . '/storage/framework/maintenance.php')) {
     require $maintenance;
