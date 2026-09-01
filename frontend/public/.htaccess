@@ -1,11 +1,44 @@
 # ============================================================
-# lutatech.com — Complete Static Next.js Routing & Caching
+# lutatech.com — Complete Static Next.js Routing, Security & Caching
 # ============================================================
 
 Options -Indexes
 DirectoryIndex index.html
 
-# ── 1. Force HTTPS & Canonical Domain ────────────────────────
+# ── 1. Security Headers ───────────────────────────────────────
+<IfModule mod_headers.c>
+    # Prevent clickjacking attacks by disabling iframe embedding from other origins
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Prevent MIME-type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Strict Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Legacy XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Enforce HTTPS strictly (HSTS: 1 year, subdomains, preload)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Restrict device sensor and microphone/camera APIs unless explicitly requested
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ── 2. Block Hidden & Sensitive Files ─────────────────────────
+# Deny access to .env, .git, .log, .sql, package.json, composer.json, etc.
+<FilesMatch "(^\..*|composer\.(json|lock)|package(-lock)?\.json|\.(env|git|log|sql|sqlite|bak|sh|yml|yaml|md))$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ── 3. Force HTTPS & Canonical Domain ─────────────────────────
 RewriteEngine On
 RewriteBase /
 
@@ -15,14 +48,14 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 RewriteCond %{HTTP_HOST} ^www\.lutatech\.com [NC]
 RewriteRule ^(.*)$ https://lutatech.com/$1 [R=301,L]
 
-# ── 2. Redirect /admin to Home Page ──────────────────────────
+# ── 4. Redirect /admin to Home Page ───────────────────────────
 RewriteRule ^admin(/.*)?$ / [R=302,L]
 
-# ── 3. Livewire & Filament Internal Routing to Laravel ───────
+# ── 5. Livewire & Filament Internal Routing to Laravel ────────
 RewriteRule ^livewire(/.*)?$ api/index.php [L,QSA]
 RewriteRule ^filament(/.*)?$ api/index.php [L,QSA]
 
-# ── 3. Next.js Static Subfolder & Clean URL Routing ──────────
+# ── 6. Next.js Static Subfolder & Clean URL Routing ───────────
 # If request is a directory, serve its index.html
 RewriteCond %{REQUEST_FILENAME}/index.html -f
 RewriteRule ^(.*)$ $1/index.html [L]
@@ -31,7 +64,7 @@ RewriteRule ^(.*)$ $1/index.html [L]
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 
-# ── 4. Fallback: If file doesn't exist, send to 404.html ──────
+# ── 7. Fallback: If file doesn't exist, send to 404.html ───────
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
