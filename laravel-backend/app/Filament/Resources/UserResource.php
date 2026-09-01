@@ -35,10 +35,65 @@ class UserResource extends Resource
 
     /**
      * Only show registered website clients in this resource (excludes admin).
+     * Uses where(is_admin = false OR is_admin IS NULL) so all clients always appear.
      */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('is_admin', false);
+        return parent::getEloquentQuery()->where(function ($query) {
+            $query->where('is_admin', false)->orWhereNull('is_admin');
+        });
+    }
+
+    /**
+     * Pre-built message form schema with 10 templates.
+     */
+    public static function getMessageFormSchema(): array
+    {
+        $defaultTemplate = \App\Services\MessageTemplateService::getTemplates()['ai_system_update'];
+
+        return [
+            Forms\Components\Select::make('template')
+                ->label('Choose Pre-built Message Template (10 Options Available)')
+                ->options(\App\Services\MessageTemplateService::getSelectOptions())
+                ->default('ai_system_update')
+                ->live()
+                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    $templates = \App\Services\MessageTemplateService::getTemplates();
+                    if (isset($templates[$state])) {
+                        $set('subject', $templates[$state]['subject']);
+                        $set('message', $templates[$state]['message']);
+                        $set('action_text', $templates[$state]['action_text']);
+                        $set('action_url', $templates[$state]['action_url']);
+                    }
+                })
+                ->helperText('Selecting a template auto-populates the fields below. You can freely edit them before sending.'),
+
+            Forms\Components\TextInput::make('subject')
+                ->label('Email Subject')
+                ->required()
+                ->default($defaultTemplate['subject'])
+                ->maxLength(255),
+
+            Forms\Components\Textarea::make('message')
+                ->label('Email Message Body')
+                ->required()
+                ->rows(7)
+                ->default($defaultTemplate['message']),
+
+            Forms\Components\Grid::make(2)
+                ->schema([
+                    Forms\Components\TextInput::make('action_text')
+                        ->label('Optional Button Label')
+                        ->default($defaultTemplate['action_text'])
+                        ->placeholder('e.g. Check Tools Status'),
+
+                    Forms\Components\TextInput::make('action_url')
+                        ->label('Optional Button URL')
+                        ->url()
+                        ->default($defaultTemplate['action_url'])
+                        ->placeholder('https://lutatech.com/tools'),
+                ]),
+        ];
     }
 
     public static function form(Form $form): Form
@@ -69,13 +124,24 @@ class UserResource extends Resource
                             ->directory('avatars'),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Account Status')
+                Forms\Components\Section::make('Account Status & Controls')
                     ->schema([
+                        Forms\Components\Select::make('account_status')
+                            ->label('Account Status')
+                            ->options([
+                                'active' => 'Active',
+                                'pending' => 'Pending Activation',
+                                'suspended' => 'Suspended',
+                                'disabled' => 'Disabled',
+                            ])
+                            ->default('pending')
+                            ->required(),
+
                         Forms\Components\DateTimePicker::make('email_verified_at')
                             ->label('Email Verified At')
-                            ->helperText('Select a date to manually verify this client.')
+                            ->helperText('Select a date to manually mark email as verified.')
                             ->nullable(),
-                    ]),
+                    ])->columns(2),
             ]);
     }
 
@@ -104,6 +170,20 @@ class UserResource extends Resource
                     ->icon('heroicon-m-envelope')
                     ->wrap(),
 
+                Tables\Columns\TextColumn::make('account_status')
+                    ->label('Status')
+                    ->badge()
+                    ->state(fn (User $record): string => ucfirst($record->account_status ?? 'pending'))
+                    ->color(fn (string $state): string => match (strtolower($state)) {
+                        'active' => 'success',
+                        'pending' => 'warning',
+                        'suspended' => 'danger',
+                        'disabled' => 'gray',
+                        default => 'secondary',
+                    })
+                    ->alignCenter()
+                    ->sortable(),
+
                 Tables\Columns\IconColumn::make('email_verified_at')
                     ->label('Verified')
                     ->boolean()
@@ -111,33 +191,41 @@ class UserResource extends Resource
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger')
-                    ->tooltip(fn ($record) => $record->email_verified_at ? 'Verified on ' . $record->email_verified_at->format('M d, Y H:i') : 'Unverified client')
+                    ->tooltip(fn ($record) => $record->email_verified_at ? 'Verified on ' . $record->email_verified_at->format('M d, Y H:i') : 'Unverified email')
                     ->alignCenter()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('auth_type')
-                    ->label('Signed up with')
+                    ->label('Method')
                     ->badge()
                     ->state(function (User $record): string {
                         $social = $record->socialAccounts->pluck('provider_name')->first();
-                        return $social ? ucfirst($social) : 'Website Form';
+                        return $social ? ucfirst($social) : 'Email';
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'Google' => 'info',
-                        'Github' => 'gray',
                         default => 'primary',
                     })
                     ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Registered')
-                    ->dateTime('M d, Y')
+                    ->dateTime('M d, Y H:i')
                     ->since()
                     ->sortable()
                     ->alignEnd(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('account_status')
+                    ->label('Account Status')
+                    ->options([
+                        'active' => 'Active Clients',
+                        'pending' => 'Pending Activation',
+                        'suspended' => 'Suspended Clients',
+                        'disabled' => 'Disabled Clients',
+                    ]),
+
                 Tables\Filters\SelectFilter::make('verification_status')
                     ->label('Email Verification')
                     ->options([
@@ -156,36 +244,25 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    // 1. Manually Verify
-                    Tables\Actions\Action::make('verify_email')
-                        ->label('Verify Email')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->visible(fn (User $record) => is_null($record->email_verified_at))
-                        ->requiresConfirmation()
-                        ->modalHeading('Verify Client Email')
-                        ->modalDescription(fn (User $record) => "Mark client {$record->email} as verified immediately?")
-                        ->action(function (User $record) {
-                            $record->markEmailAsVerified();
-                            Notification::make()
-                                ->title('Client Email Verified')
-                                ->body("{$record->email} is now marked as verified.")
-                                ->success()
-                                ->send();
-                        }),
-
-                    // 2. Resend Link
-                    Tables\Actions\Action::make('resend_verification')
-                        ->label('Resend Verification Link')
+                    // 1. Send Message / Alert with 10 Templates
+                    Tables\Actions\Action::make('send_message')
+                        ->label('Send Message / Alert')
                         ->icon('heroicon-o-paper-airplane')
-                        ->color('warning')
-                        ->visible(fn (User $record) => is_null($record->email_verified_at))
-                        ->action(function (User $record) {
+                        ->color('info')
+                        ->modalHeading(fn (User $record) => "Send Message to {$record->name} ({$record->email})")
+                        ->form(self::getMessageFormSchema())
+                        ->action(function (User $record, array $data) {
                             try {
-                                $record->sendEmailVerificationNotification();
+                                $record->notify(new AdminBroadcastNotification(
+                                    $data['subject'],
+                                    $data['message'],
+                                    $data['action_text'] ?? null,
+                                    $data['action_url'] ?? null
+                                ));
+
                                 Notification::make()
-                                    ->title('Verification Email Sent')
-                                    ->body("Sent fresh verification link to {$record->email}.")
+                                    ->title('Message Delivered')
+                                    ->body("Successfully sent email to {$record->email}.")
                                     ->success()
                                     ->send();
                             } catch (Throwable $e) {
@@ -197,40 +274,60 @@ class UserResource extends Resource
                             }
                         }),
 
-                    // 3. Send Message
-                    Tables\Actions\Action::make('send_message')
-                        ->label('Send Message / Alert')
-                        ->icon('heroicon-o-chat-bubble-left-ellipsis')
-                        ->color('info')
-                        ->form([
-                            Forms\Components\TextInput::make('subject')
-                                ->label('Subject')
-                                ->required()
-                                ->default('Notice regarding your Luta Tech account'),
-                            Forms\Components\Textarea::make('message')
-                                ->label('Message Body')
-                                ->required()
-                                ->rows(5),
-                            Forms\Components\TextInput::make('action_text')
-                                ->label('Optional Button Label')
-                                ->placeholder('e.g. Open Luta Tech'),
-                            Forms\Components\TextInput::make('action_url')
-                                ->label('Optional Button URL')
-                                ->url()
-                                ->placeholder('http://localhost:3000/dashboard'),
-                        ])
-                        ->action(function (User $record, array $data) {
+                    // 2. Activate Account
+                    Tables\Actions\Action::make('activate_account')
+                        ->label('Activate Client Account')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn (User $record) => $record->account_status !== 'active' || is_null($record->email_verified_at))
+                        ->requiresConfirmation()
+                        ->modalHeading('Activate Client Account')
+                        ->modalDescription(fn (User $record) => "Immediately activate account for {$record->email} and mark their email as verified?")
+                        ->action(function (User $record) {
+                            $record->activate(true);
+                            event(new \App\Events\AccountActivated($record));
+
+                            Notification::make()
+                                ->title('Client Account Activated')
+                                ->body("{$record->email} is now fully active.")
+                                ->success()
+                                ->send();
+                        }),
+
+                    // 3. Suspend / Unsuspend
+                    Tables\Actions\Action::make('toggle_suspend')
+                        ->label(fn (User $record) => $record->account_status === 'suspended' ? 'Reactivate Account' : 'Suspend Account')
+                        ->icon('heroicon-o-no-symbol')
+                        ->color(fn (User $record) => $record->account_status === 'suspended' ? 'success' : 'danger')
+                        ->requiresConfirmation()
+                        ->action(function (User $record) {
+                            $newStatus = $record->account_status === 'suspended' ? 'active' : 'suspended';
+                            $record->update(['account_status' => $newStatus]);
+
+                            Notification::make()
+                                ->title('Account Status Updated')
+                                ->body("Client {$record->email} is now {$newStatus}.")
+                                ->success()
+                                ->send();
+                        }),
+
+                    // 4. Resend Activation Link
+                    Tables\Actions\Action::make('resend_activation')
+                        ->label('Resend Activation Email')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->visible(fn (User $record) => $record->account_status === 'pending')
+                        ->action(function (User $record) {
                             try {
-                                $record->notify(new AdminBroadcastNotification(
-                                    $data['subject'],
-                                    $data['message'],
-                                    $data['action_text'] ?? null,
-                                    $data['action_url'] ?? null
-                                ));
+                                if ($record->isSocialOnlyUser()) {
+                                    $record->notify(new \App\Notifications\AccountActivationNotification());
+                                } else {
+                                    $record->notify(new \App\Notifications\VerificationActivationNotification());
+                                }
 
                                 Notification::make()
-                                    ->title('Email Sent')
-                                    ->body("Delivered to {$record->email}.")
+                                    ->title('Activation Email Sent')
+                                    ->body("Sent activation link to {$record->email}.")
                                     ->success()
                                     ->send();
                             } catch (Throwable $e) {
@@ -254,23 +351,7 @@ class UserResource extends Resource
                         ->label('Broadcast Message to Selected Clients')
                         ->icon('heroicon-o-megaphone')
                         ->color('primary')
-                        ->form([
-                            Forms\Components\TextInput::make('subject')
-                                ->label('Subject')
-                                ->required()
-                                ->default('Important Announcement from Luta Tech'),
-                            Forms\Components\Textarea::make('message')
-                                ->label('Message')
-                                ->required()
-                                ->rows(6),
-                            Forms\Components\TextInput::make('action_text')
-                                ->label('Button Text')
-                                ->placeholder('e.g. Go to Dashboard'),
-                            Forms\Components\TextInput::make('action_url')
-                                ->label('Button URL')
-                                ->url()
-                                ->placeholder('http://localhost:3000/dashboard'),
-                        ])
+                        ->form(self::getMessageFormSchema())
                         ->action(function (Collection $records, array $data) {
                             $count = 0;
                             foreach ($records as $user) {
@@ -289,29 +370,28 @@ class UserResource extends Resource
 
                             Notification::make()
                                 ->title('Broadcast Dispatched')
-                                ->body("Sent announcement to {$count} clients.")
+                                ->body("Sent announcement to {$count} selected clients.")
                                 ->success()
                                 ->send();
                         })
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('bulk_verify')
-                        ->label('Mark Selected as Verified')
-                        ->icon('heroicon-o-check-badge')
+                    Tables\Actions\BulkAction::make('bulk_activate')
+                        ->label('Activate Selected Clients')
+                        ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(function (Collection $records) {
                             $count = 0;
                             foreach ($records as $user) {
-                                if (is_null($user->email_verified_at)) {
-                                    $user->markEmailAsVerified();
-                                    $count++;
-                                }
+                                $user->activate(true);
+                                event(new \App\Events\AccountActivated($user));
+                                $count++;
                             }
 
                             Notification::make()
-                                ->title('Clients Verified')
-                                ->body("{$count} clients marked as verified.")
+                                ->title('Clients Activated')
+                                ->body("{$count} clients activated and verified.")
                                 ->success()
                                 ->send();
                         })

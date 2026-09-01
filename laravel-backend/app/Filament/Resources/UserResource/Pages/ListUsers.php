@@ -22,43 +22,81 @@ class ListUsers extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        $defaultTemplate = \App\Services\MessageTemplateService::getTemplates()['ai_system_update'];
+
         return [
             // Global Broadcast Action
             Actions\Action::make('global_broadcast')
-                ->label('Send Broadcast Announcement')
+                ->label('Broadcast Message to Clients')
                 ->icon('heroicon-o-megaphone')
                 ->color('primary')
+                ->modalHeading('Broadcast Announcement / Update to Clients')
+                ->modalDescription('Choose a pre-built template or compose a custom message. Emails will be dispatched immediately.')
                 ->form([
                     Forms\Components\Select::make('target_audience')
                         ->label('Target Audience')
                         ->options([
-                            'all' => 'All Registered Clients',
-                            'verified' => 'Verified Clients Only',
-                            'unverified' => 'Unverified Clients Only (e.g. Verification Reminders)',
+                            'all' => '📢 All Registered Clients',
+                            'active' => '✅ Active Clients Only',
+                            'pending' => '⏳ Pending Activation Clients Only',
+                            'verified' => '🛡️ Verified Clients Only',
+                            'unverified' => '✉️ Unverified Clients Only',
                         ])
                         ->default('all')
                         ->required(),
+
+                    Forms\Components\Select::make('template')
+                        ->label('Choose Pre-built Message Template (10 Options Available)')
+                        ->options(\App\Services\MessageTemplateService::getSelectOptions())
+                        ->default('ai_system_update')
+                        ->live()
+                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                            $templates = \App\Services\MessageTemplateService::getTemplates();
+                            if (isset($templates[$state])) {
+                                $set('subject', $templates[$state]['subject']);
+                                $set('message', $templates[$state]['message']);
+                                $set('action_text', $templates[$state]['action_text']);
+                                $set('action_url', $templates[$state]['action_url']);
+                            }
+                        })
+                        ->helperText('Selecting a template auto-populates the fields below. You can edit before sending.'),
+
                     Forms\Components\TextInput::make('subject')
                         ->label('Email Subject')
                         ->required()
-                        ->default('Important Announcement from Luta Tech'),
+                        ->default($defaultTemplate['subject'])
+                        ->maxLength(255),
+
                     Forms\Components\Textarea::make('message')
-                        ->label('Email Body')
+                        ->label('Email Message Body')
                         ->required()
-                        ->rows(6)
-                        ->placeholder('Type your announcement, maintenance notice, or update here...'),
-                    Forms\Components\TextInput::make('action_text')
-                        ->label('Optional Button Text')
-                        ->placeholder('e.g. Visit Luta Tech Dashboard'),
-                    Forms\Components\TextInput::make('action_url')
-                        ->label('Optional Button URL')
-                        ->url()
-                        ->placeholder('http://localhost:3000/dashboard'),
+                        ->rows(7)
+                        ->default($defaultTemplate['message']),
+
+                    Forms\Components\Grid::make(2)
+                        ->schema([
+                            Forms\Components\TextInput::make('action_text')
+                                ->label('Optional Button Label')
+                                ->default($defaultTemplate['action_text'])
+                                ->placeholder('e.g. Check Tools Status'),
+
+                            Forms\Components\TextInput::make('action_url')
+                                ->label('Optional Button URL')
+                                ->url()
+                                ->default($defaultTemplate['action_url'])
+                                ->placeholder('https://lutatech.com/tools'),
+                        ]),
                 ])
                 ->action(function (array $data) {
-                    $query = User::query()->where('is_admin', false);
+                    $query = User::query()->where(function ($q) {
+                        $q->where('is_admin', false)->orWhereNull('is_admin');
+                    });
 
-                    if ($data['target_audience'] === 'verified') {
+                    if ($data['target_audience'] === 'active') {
+                        $query->where('account_status', 'active');
+                    } elseif ($data['target_audience'] === 'pending') {
+                        $query->where('account_status', 'pending');
+                    } elseif ($data['target_audience'] === 'verified') {
                         $query->whereNotNull('email_verified_at');
                     } elseif ($data['target_audience'] === 'unverified') {
                         $query->whereNull('email_verified_at');
@@ -83,7 +121,7 @@ class ListUsers extends ListRecords
 
                     Notification::make()
                         ->title('Broadcast Dispatched')
-                        ->body("Successfully sent email announcement to {$count} registered clients.")
+                        ->body("Successfully delivered message to {$count} registered clients.")
                         ->success()
                         ->send();
                 }),
@@ -94,19 +132,33 @@ class ListUsers extends ListRecords
 
     public function getTabs(): array
     {
+        $baseQuery = fn () => User::where(function ($q) {
+            $q->where('is_admin', false)->orWhereNull('is_admin');
+        });
+
         return [
             'all' => Tab::make('All Clients')
-                ->badge(User::where('is_admin', false)->count()),
+                ->badge($baseQuery()->count()),
+
+            'active' => Tab::make('Active')
+                ->badge($baseQuery()->where('account_status', 'active')->count())
+                ->badgeColor('success')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('account_status', 'active')),
+
+            'pending' => Tab::make('Pending Activation')
+                ->badge($baseQuery()->where('account_status', 'pending')->count())
+                ->badgeColor('warning')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('account_status', 'pending')),
 
             'verified' => Tab::make('Verified')
-                ->badge(User::where('is_admin', false)->whereNotNull('email_verified_at')->count())
-                ->badgeColor('success')
+                ->badge($baseQuery()->whereNotNull('email_verified_at')->count())
+                ->badgeColor('info')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('email_verified_at')),
 
-            'unverified' => Tab::make('Pending Verification')
-                ->badge(User::where('is_admin', false)->whereNull('email_verified_at')->count())
+            'suspended' => Tab::make('Suspended')
+                ->badge($baseQuery()->where('account_status', 'suspended')->count())
                 ->badgeColor('danger')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('email_verified_at')),
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('account_status', 'suspended')),
         ];
     }
 }

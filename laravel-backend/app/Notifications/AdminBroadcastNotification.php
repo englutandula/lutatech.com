@@ -7,10 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AdminBroadcastNotification extends Notification implements ShouldQueue
+class AdminBroadcastNotification extends Notification
 {
-    use Queueable;
-
     public string $subject;
     public string $messageContent;
     public ?string $actionText;
@@ -41,9 +39,13 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $mail = (new MailMessage)
-            ->subject($this->subject)
-            ->greeting('Hello ' . ($notifiable->name ?? 'there') . ',');
+        $mail = (new MailMessage)->subject($this->subject);
+
+        // If the message body doesn't already begin with a greeting, add a friendly one
+        $hasGreeting = preg_match('/^(hello|hi|dear|greetings)/i', trim($this->messageContent));
+        if (! $hasGreeting) {
+            $mail->greeting('Hello ' . ($notifiable->name ?? 'there') . ',');
+        }
 
         // Split paragraphs by newline
         $lines = explode("\n", $this->messageContent);
@@ -58,6 +60,15 @@ class AdminBroadcastNotification extends Notification implements ShouldQueue
             $mail->action($this->actionText, $this->actionUrl);
         }
 
-        return $mail->salutation('Best regards, The LutaTech Team');
+        // Only append default salutation if the message does not already contain one
+        $hasSalutation = str_contains($this->messageContent, 'LutaTech Team')
+            || str_contains($this->messageContent, 'Warm regards')
+            || str_contains($this->messageContent, 'Best regards');
+
+        if (! $hasSalutation) {
+            $mail->salutation('Best regards, The LutaTech Team');
+        }
+
+        return $mail;
     }
 }
