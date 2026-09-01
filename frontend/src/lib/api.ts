@@ -238,8 +238,16 @@ export async function resendVerificationEmail(payload?: { email?: string }) {
 }
 
 export async function verifyEmailBySignedUrl(signedUrl: string) {
-  const res = await axios.get(signedUrl, {
+  let url = signedUrl;
+  // Automatically fix url if missing /api prefix on lutatech.com
+  if (url.startsWith('https://lutatech.com/v1/') || url.startsWith('http://lutatech.com/v1/')) {
+    url = url.replace('lutatech.com/v1/', 'lutatech.com/api/v1/');
+  }
+  const res = await axios.get(url, {
     headers: { Accept: 'application/json' },
   });
+  if (res.data?.data?.token && typeof window !== 'undefined') {
+    localStorage.setItem('auth_token', res.data.data.token);
+  }
   return res.data;
 }

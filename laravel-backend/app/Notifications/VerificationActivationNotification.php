@@ -59,6 +59,11 @@ class VerificationActivationNotification extends Notification
     {
         $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
+        if (app()->environment('production') || str_contains((string) config('app.url'), 'lutatech.com')) {
+            URL::forceRootUrl('https://lutatech.com/api');
+            URL::forceScheme('https');
+        }
+
         $signedBackendUrl = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),

@@ -25,8 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        // Force HTTPS in production or when APP_URL is configured with https
-        if (config('app.env') === 'production' || str_starts_with((string) config('app.url'), 'https://')) {
+        // Force HTTPS and correct API root URL on Namecheap production
+        if (config('app.env') === 'production' || str_contains((string) config('app.url'), 'lutatech.com')) {
+            \Illuminate\Support\Facades\URL::forceRootUrl('https://lutatech.com/api');
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 

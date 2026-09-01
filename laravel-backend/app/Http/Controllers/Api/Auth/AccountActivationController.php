@@ -80,18 +80,27 @@ class AccountActivationController extends Controller
         }
 
         // ------------------------------------------------------------------
-        // 4. Check if already active (idempotent — show success if re-clicked).
+        // 4. Check if already active (idempotent — issue token & log in).
         // ------------------------------------------------------------------
         if ($user->isActive()) {
             Log::info("Account activation: user [{$user->id}] is already active.");
+            $token = $user->createToken('auth_token')->plainTextToken;
 
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Your account is already active. You can log in.',
+                    'message' => 'Your account is already active. You are now logged in.',
+                    'data'    => [
+                        'token' => $token,
+                        'user'  => [
+                            'id'    => $user->id,
+                            'name'  => $user->name,
+                            'email' => $user->email,
+                        ],
+                    ],
                 ]);
             }
-            return redirect($frontendUrl . '/verify-email?status=already_active');
+            return redirect($frontendUrl . '/verify-email?status=already_active&token=' . urlencode($token));
         }
 
         // ------------------------------------------------------------------

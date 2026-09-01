@@ -376,10 +376,22 @@ class AuthController extends Controller
         // 4. Already active — idempotent success.
         // ------------------------------------------------------------------
         if ($user->isActive()) {
+            $token = $user->createToken('auth_token')->plainTextToken;
             if ($request->wantsJson()) {
-                return response()->json(['success' => true, 'message' => 'Your account is already active.']);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Your account is already active.',
+                    'data'    => [
+                        'token' => $token,
+                        'user'  => [
+                            'id'    => $user->id,
+                            'name'  => $user->name,
+                            'email' => $user->email,
+                        ],
+                    ],
+                ]);
             }
-            return redirect($frontendUrl . '/verify-email?status=already_verified');
+            return redirect($frontendUrl . '/verify-email?status=already_verified&token=' . urlencode($token));
         }
 
         // ------------------------------------------------------------------
@@ -408,14 +420,24 @@ class AuthController extends Controller
         // ------------------------------------------------------------------
         event(new AccountActivated($user->fresh()));
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Email verified and account activated! You can now log in.',
+                'message' => 'Email verified and account activated! You are now logged in.',
+                'data'    => [
+                    'token' => $token,
+                    'user'  => [
+                        'id'    => $user->id,
+                        'name'  => $user->name,
+                        'email' => $user->email,
+                    ],
+                ],
             ]);
         }
 
-        return redirect($frontendUrl . '/verify-email?status=activated');
+        return redirect($frontendUrl . '/verify-email?status=activated&token=' . urlencode($token));
     }
 
     // =========================================================================

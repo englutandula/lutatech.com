@@ -53,6 +53,11 @@ class AccountActivationNotification extends Notification
     {
         $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
+        if (app()->environment('production') || str_contains((string) config('app.url'), 'lutatech.com')) {
+            URL::forceRootUrl('https://lutatech.com/api');
+            URL::forceScheme('https');
+        }
+
         $signedBackendUrl = URL::temporarySignedRoute(
             'activation.activate',
             Carbon::now()->addHours(24),

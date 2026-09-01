@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://lutatech.com'),
+    'url' => env('APP_URL', 'https://lutatech.com/api'),
     'frontend_url' => env('FRONTEND_URL', 'https://lutatech.com'),
 
     /*

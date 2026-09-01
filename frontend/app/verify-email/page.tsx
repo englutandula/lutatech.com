@@ -30,6 +30,11 @@ function VerifyEmailContent() {
   }, [user, targetEmail]);
 
   useEffect(() => {
+    const token = searchParams.get('token');
+    if (token && typeof window !== 'undefined') {
+      localStorage.setItem('auth_token', token);
+    }
+
     const verifyUrl = searchParams.get('verify_url');
     const activateUrl = searchParams.get('activate_url');
     const status = searchParams.get('status');
@@ -49,9 +54,17 @@ function VerifyEmailContent() {
     const actionUrl = activateUrl || verifyUrl;
 
     if (actionUrl) {
+      let targetUrl = decodeURIComponent(actionUrl);
+      if (targetUrl.startsWith('https://lutatech.com/v1/') || targetUrl.startsWith('http://lutatech.com/v1/')) {
+        targetUrl = targetUrl.replace('lutatech.com/v1/', 'lutatech.com/api/v1/');
+      }
+
       setState('verifying');
-      verifyEmailBySignedUrl(decodeURIComponent(actionUrl))
-        .then(() => {
+      verifyEmailBySignedUrl(targetUrl)
+        .then((res: any) => {
+          if (res?.data?.token && typeof window !== 'undefined') {
+            localStorage.setItem('auth_token', res.data.token);
+          }
           setState('success');
           refreshUser();
         })
@@ -140,10 +153,10 @@ function VerifyEmailContent() {
                 Your <strong className="text-[rgb(var(--lt-text))]">Luta Tech</strong> account is now fully active. You can sign in and start using all tools.
               </p>
               <Link
-                href="/login"
+                href={user || (typeof window !== 'undefined' && localStorage.getItem('auth_token')) ? '/dashboard' : '/login'}
                 className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-[rgb(var(--lt-primary))] px-6 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 cursor-pointer shadow-md"
               >
-                <span>Sign In to Continue</span>
+                <span>{user || (typeof window !== 'undefined' && localStorage.getItem('auth_token')) ? 'Proceed to Dashboard' : 'Sign In to Continue'}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
