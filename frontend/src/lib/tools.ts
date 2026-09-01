@@ -46,7 +46,7 @@ export const tools: Tool[] = [
     accent: 'rose',
     status: 'live',
     popular: true,
-    href: '/tools/passport',
+    href: '/tools/passport/',
   },
   {
     slug: 'remove-bg',
@@ -60,7 +60,7 @@ export const tools: Tool[] = [
     accent: 'sky',
     status: 'live',
     popular: true,
-    href: '/tools/remove-bg',
+    href: '/tools/remove-bg/',
   },
   {
     slug: 'pdf-compressor',
@@ -73,7 +73,7 @@ export const tools: Tool[] = [
     accent: 'emerald',
     status: 'live',
     popular: true,
-    href: '/tools/pdf-compressor',
+    href: '/tools/pdf-compressor/',
   },
   {
     slug: 'pdf-merger',
@@ -86,7 +86,7 @@ export const tools: Tool[] = [
     accent: 'rose',
     status: 'live',
     popular: true,
-    href: '/tools/pdf-merger',
+    href: '/tools/pdf-merger/',
   },
   {
     slug: 'pdf-splitter',
@@ -99,7 +99,7 @@ export const tools: Tool[] = [
     accent: 'violet',
     status: 'live',
     popular: true,
-    href: '/tools/pdf-splitter',
+    href: '/tools/pdf-splitter/',
   },
   {
     slug: 'pdf-extract-pages',
@@ -111,7 +111,7 @@ export const tools: Tool[] = [
     icon: 'FileSymlink',
     accent: 'emerald',
     status: 'live',
-    href: '/tools/pdf-extract-pages',
+    href: '/tools/pdf-extract-pages/',
   },
   {
     slug: 'pdf-delete-pages',
@@ -123,7 +123,7 @@ export const tools: Tool[] = [
     icon: 'FileMinus',
     accent: 'red',
     status: 'live',
-    href: '/tools/pdf-delete-pages',
+    href: '/tools/pdf-delete-pages/',
   },
   {
     slug: 'pdf-reorder-pages',
@@ -135,7 +135,7 @@ export const tools: Tool[] = [
     icon: 'ArrowDownUp',
     accent: 'blue',
     status: 'live',
-    href: '/tools/pdf-reorder-pages',
+    href: '/tools/pdf-reorder-pages/',
   },
   {
     slug: 'pdf-organizer',
@@ -148,7 +148,7 @@ export const tools: Tool[] = [
     accent: 'indigo',
     status: 'live',
     popular: true,
-    href: '/tools/pdf-organizer',
+    href: '/tools/pdf-organizer/',
   },
   {
     slug: 'pdf-to-jpg',
@@ -161,7 +161,7 @@ export const tools: Tool[] = [
     accent: 'orange',
     status: 'live',
     popular: true,
-    href: '/tools/pdf-to-jpg',
+    href: '/tools/pdf-to-jpg/',
   },
   {
     slug: 'pdf-to-png',
@@ -173,7 +173,7 @@ export const tools: Tool[] = [
     icon: 'FileImage',
     accent: 'sky',
     status: 'live',
-    href: '/tools/pdf-to-png',
+    href: '/tools/pdf-to-png/',
   },
   {
     slug: 'pdf-to-webp',
@@ -185,7 +185,7 @@ export const tools: Tool[] = [
     icon: 'FileImage',
     accent: 'violet',
     status: 'live',
-    href: '/tools/pdf-to-webp',
+    href: '/tools/pdf-to-webp/',
   },
   {
     slug: 'jpg-to-pdf',
@@ -197,7 +197,7 @@ export const tools: Tool[] = [
     icon: 'FilePlus2',
     accent: 'rose',
     status: 'live',
-    href: '/tools/jpg-to-pdf',
+    href: '/tools/jpg-to-pdf/',
   },
   {
     slug: 'png-to-pdf',
@@ -209,7 +209,7 @@ export const tools: Tool[] = [
     icon: 'FilePlus2',
     accent: 'teal',
     status: 'live',
-    href: '/tools/png-to-pdf',
+    href: '/tools/png-to-pdf/',
   },
   {
     slug: 'images-to-pdf',
@@ -222,7 +222,7 @@ export const tools: Tool[] = [
     accent: 'emerald',
     status: 'live',
     popular: true,
-    href: '/tools/images-to-pdf',
+    href: '/tools/images-to-pdf/',
   },
   {
     slug: 'image-compressor',
@@ -235,7 +235,7 @@ export const tools: Tool[] = [
     accent: 'amber',
     status: 'live',
     popular: true,
-    href: '/tools/image-compressor',
+    href: '/tools/image-compressor/',
   },
   {
     slug: 'pdf-to-word',
@@ -303,7 +303,7 @@ export const tools: Tool[] = [
     accent: 'cyan',
     status: 'live',
     popular: true,
-    href: '/tools/image-resizer',
+    href: '/tools/image-resizer/',
   },
   {
     slug: 'text-to-speech',

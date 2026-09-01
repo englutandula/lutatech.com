@@ -22,7 +22,8 @@ const accentColors: Record<string, string> = {
 export function ToolCard({ tool, index = 0 }: { tool: Tool & { rankBadge?: { label: string; badgeStyle: string }; rank?: number }; index?: number }) {
   const accent = accentColors[tool.accent] ?? accentColors.emerald;
   const isLive = tool.status === 'live';
-  const targetHref = tool.href || (isLive ? `/tools/${tool.slug}` : '/tools');
+  const rawHref = tool.href || (isLive ? `/tools/${tool.slug}` : '/tools');
+  const targetHref = rawHref.endsWith('/') ? rawHref : `${rawHref}/`;
 
   return (
     <Link
