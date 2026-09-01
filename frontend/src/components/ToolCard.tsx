@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Clock } from 'lucide-react';
 import type { Tool } from '@/lib/tools';
 import { ToolIcon } from './ToolIcon';
@@ -20,6 +23,7 @@ const accentColors: Record<string, string> = {
 };
 
 export function ToolCard({ tool, index = 0 }: { tool: Tool & { rankBadge?: { label: string; badgeStyle: string }; rank?: number }; index?: number }) {
+  const router = useRouter();
   const accent = accentColors[tool.accent] ?? accentColors.emerald;
   const isLive = tool.status === 'live';
   const rawHref = tool.href || (isLive ? `/tools/${tool.slug}` : '/tools');
@@ -28,7 +32,13 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool & { rankBadge?: { lab
   return (
     <Link
       href={targetHref}
-      prefetch={true}
+      prefetch={false}
+      onMouseEnter={() => {
+        if (isLive) router.prefetch(targetHref);
+      }}
+      onTouchStart={() => {
+        if (isLive) router.prefetch(targetHref);
+      }}
       className="lt-card lt-card-hover group block p-5 lt-fade-up relative overflow-hidden"
       style={{ animationDelay: `${index * 40}ms` }}
     >

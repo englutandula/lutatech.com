@@ -1,9 +1,10 @@
-import React from 'react';
+import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
-import PhotoTool from '@/components/PhotoTool';
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { SoftwareAppJsonLd, BreadcrumbJsonLd, FaqJsonLd } from '@/components/seo/JsonLd';
+
+const PhotoTool = dynamic(() => import('@/components/PhotoTool'));
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
 

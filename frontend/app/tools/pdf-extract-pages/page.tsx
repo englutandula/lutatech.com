@@ -1,9 +1,10 @@
-import React from 'react';
+import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
-import PdfExtractPagesTool from '@/components/PdfExtractPagesTool';
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { SoftwareAppJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+
+const PdfExtractPagesTool = dynamic(() => import('@/components/PdfExtractPagesTool'));
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
 

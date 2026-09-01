@@ -113,7 +113,7 @@ export function Navbar() {
               {/* Home */}
               <Link
                 href="/"
-                prefetch={true}
+                prefetch={false}
                 className={`rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
                   pathname === '/'
                     ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
@@ -147,7 +147,7 @@ export function Navbar() {
               {/* All Tools */}
               <Link
                 href="/tools"
-                prefetch={true}
+                prefetch={false}
                 className={`rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
                   isToolsActive
                     ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
@@ -165,7 +165,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  prefetch={true}
+                  prefetch={false}
                   className={`rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
                     pathname === link.href
                       ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'

@@ -108,7 +108,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/passport" prefetch={true} className="lt-btn-primary">
+                <Link href="/tools/passport" prefetch={false} className="lt-btn-primary">
                   Launch Passport Photo Maker <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/remove-bg" prefetch={true} className="lt-btn-primary">
+                <Link href="/tools/remove-bg" prefetch={false} className="lt-btn-primary">
                   Launch Background Remover <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -187,7 +187,7 @@ export default function HomePage() {
                 Ranked in real time based on user interactions, speed, and daily usage.
               </p>
             </div>
-            <Link href="/tools" prefetch={true} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
+            <Link href="/tools" prefetch={false} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
               View full catalog ({tools.length}) <ChevronRight className="h-4 w-4" />
             </Link>
           </div>

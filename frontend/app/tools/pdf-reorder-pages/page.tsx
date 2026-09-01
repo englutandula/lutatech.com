@@ -1,9 +1,10 @@
-import React from 'react';
+import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
-import PdfReorderPagesTool from '@/components/PdfReorderPagesTool';
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { SoftwareAppJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd';
+
+const PdfReorderPagesTool = dynamic(() => import('@/components/PdfReorderPagesTool'));
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://lutatech.com';
 
