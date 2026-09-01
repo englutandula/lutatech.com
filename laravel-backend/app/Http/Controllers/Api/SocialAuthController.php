@@ -143,10 +143,8 @@ class SocialAuthController extends Controller
         }
 
         if ($user->isPending()) {
-            // New OR existing user who hasn't activated yet.
-            // Redirect to frontend verify-email page so the activation card is displayed.
-            Log::info("Pending user [{$user->id}] redirected after social login. isNew: " . ($isNewUser ? 'yes' : 'no'));
-            return redirect($frontendUrl . '/verify-email?status=pending_activation&email=' . urlencode($user->email));
+            $user->activate(true);
+            Log::info("Pending user [{$user->id}] activated upon successful [{$provider}] authentication.");
         }
 
         // ------------------------------------------------------------------
