@@ -17,9 +17,8 @@ use Illuminate\Support\Facades\URL;
  *
  * Route: activation.activate (signed, expires 24 hours)
  */
-class AccountActivationNotification extends Notification implements ShouldQueue
+class AccountActivationNotification extends Notification
 {
-    use Queueable;
 
     /**
      * The notification's delivery channels.

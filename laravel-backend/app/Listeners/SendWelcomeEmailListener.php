@@ -15,14 +15,8 @@ use Throwable;
  * Idempotency guard: checks welcome_email_sent_at IS NULL before sending.
  * This means re-clicking the activation link never triggers a duplicate email.
  */
-class SendWelcomeEmailListener implements ShouldQueue
+class SendWelcomeEmailListener
 {
-    use InteractsWithQueue;
-
-    /**
-     * The queue to use for this listener job.
-     */
-    public string $queue = 'default';
 
     /**
      * Number of times to retry if the job fails.

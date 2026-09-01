@@ -12,9 +12,8 @@ use Illuminate\Notifications\Notification;
  *
  * Guard: welcome_email_sent_at must be NULL — enforced in SendWelcomeEmailListener.
  */
-class WelcomeNotification extends Notification implements ShouldQueue
+class WelcomeNotification extends Notification
 {
-    use Queueable;
 
     public function via(object $notifiable): array
     {

@@ -14,9 +14,8 @@ use Illuminate\Notifications\Notification;
  * Explains that their account uses social sign-in and provides a direct link to sign in,
  * without exposing sensitive security details or allowing arbitrary password creation.
  */
-class SocialAccountPasswordResetNotification extends Notification implements ShouldQueue
+class SocialAccountPasswordResetNotification extends Notification
 {
-    use Queueable;
 
     public function __construct(
         protected string $provider = 'Google'

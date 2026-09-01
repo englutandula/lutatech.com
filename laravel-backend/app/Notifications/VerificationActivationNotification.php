@@ -19,9 +19,8 @@ use Illuminate\Support\Facades\URL;
  *
  * Route: verification.verify (signed, expires 60 minutes)
  */
-class VerificationActivationNotification extends Notification implements ShouldQueue
+class VerificationActivationNotification extends Notification
 {
-    use Queueable;
 
     /**
      * The notification's delivery channels.
