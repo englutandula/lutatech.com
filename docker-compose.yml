@@ -23,6 +23,7 @@ services:
       dockerfile: Dockerfile
     container_name: luta-python-api
     ports:
+      - "80:8000"
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app

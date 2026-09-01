@@ -36,7 +36,7 @@ return [
     ],
 
     'python_ai' => [
-        'url' => env('PYTHON_AI_URL', 'http://51.20.42.164:8000'),
+        'url' => env('PYTHON_AI_URL', 'http://51.20.42.164'),
         'secret' => env('PYTHON_AI_SECRET', 'dev_internal_secret_key_123'),
         'timeout' => env('PYTHON_AI_TIMEOUT', 60),
     ],

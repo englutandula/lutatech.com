@@ -15,9 +15,23 @@ class BackgroundRemovalService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(config('services.python_ai.url', 'http://127.0.0.1:8001'), '/');
+        $this->baseUrl = rtrim(config('services.python_ai.url', 'http://51.20.42.164'), '/');
         $this->secret = config('services.python_ai.secret', 'dev_internal_secret_key_123');
         $this->timeout = (int) config('services.python_ai.timeout', 60);
+    }
+
+    /**
+     * Return list of candidate base URLs (e.g. port 80 and port 8000)
+     */
+    protected function getCandidateBaseUrls(): array
+    {
+        $urls = [$this->baseUrl];
+        if (!str_contains($this->baseUrl, ':8000')) {
+            $urls[] = $this->baseUrl . ':8000';
+        } else {
+            $urls[] = preg_replace('/:8000$/', '', $this->baseUrl);
+        }
+        return array_values(array_unique($urls));
     }
 
     /**
@@ -25,81 +39,66 @@ class BackgroundRemovalService
      *
      * @param UploadedFile $file
      * @return array
-     * @throws Exception
      */
     public function removeBackground(UploadedFile $file): array
     {
-        try {
-            $response = Http::timeout($this->timeout)
-                ->withHeaders([
-                    'X-Internal-Secret' => $this->secret,
-                    'Accept' => 'application/json',
-                ])
-                ->attach(
-                    'file',
-                    file_get_contents($file->getRealPath()),
-                    $file->getClientOriginalName(),
-                    ['Content-Type' => $file->getMimeType()]
-                )
-                ->post("{$this->baseUrl}/api/remove-background");
+        $fileBytes = file_get_contents($file->getRealPath());
+        $fileName = $file->getClientOriginalName();
+        $mimeType = $file->getMimeType();
 
-            if (!$response->successful() && $response->status() === 404) {
-                $response = Http::timeout($this->timeout)
-                    ->withHeaders([
-                        'X-Internal-Secret' => $this->secret,
-                        'Accept' => 'application/json',
-                    ])
-                    ->attach(
-                        'file',
-                        file_get_contents($file->getRealPath()),
-                        $file->getClientOriginalName(),
-                        ['Content-Type' => $file->getMimeType()]
-                    )
-                    ->post("{$this->baseUrl}/api/v1/background/remove");
+        $endpoints = ['/api/remove-background', '/api/v1/background/remove', '/api/v1/remove-background'];
+        $lastException = null;
+        $lastResponse = null;
+
+        foreach ($this->getCandidateBaseUrls() as $base) {
+            foreach ($endpoints as $ep) {
+                try {
+                    $response = Http::timeout($this->timeout)
+                        ->withHeaders([
+                            'X-Internal-Secret' => $this->secret,
+                            'Accept' => 'application/json',
+                        ])
+                        ->attach('file', $fileBytes, $fileName, ['Content-Type' => $mimeType])
+                        ->post("{$base}{$ep}");
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $processedImage = $data['processed_image'] ?? ($data['data']['processed_image'] ?? null);
+                        $imageDataUrl = $data['data']['image_data_url'] ?? ($processedImage ? (str_starts_with($processedImage, 'data:') ? $processedImage : 'data:image/png;base64,' . $processedImage) : null);
+
+                        return [
+                            'success' => true,
+                            'data' => [
+                                'image_data_url' => $imageDataUrl,
+                                'processed_image' => $processedImage,
+                            ],
+                            'message' => $data['message'] ?? 'Background removed successfully',
+                        ];
+                    }
+
+                    if ($response->status() !== 404) {
+                        $lastResponse = $response;
+                        break 2;
+                    }
+                } catch (Exception $e) {
+                    $lastException = $e;
+                }
             }
+        }
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $processedImage = $data['processed_image'] ?? ($data['data']['processed_image'] ?? null);
-                $imageDataUrl = $data['data']['image_data_url'] ?? ($processedImage ? (str_starts_with($processedImage, 'data:') ? $processedImage : 'data:image/png;base64,' . $processedImage) : null);
-
-                return [
-                    'success' => true,
-                    'data' => [
-                        'image_data_url' => $imageDataUrl,
-                        'processed_image' => $processedImage,
-                    ],
-                    'message' => $data['message'] ?? 'Background removed successfully',
-                ];
-            }
-
-            Log::error('Python AI background removal failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            $errorData = $response->json();
-            $errorMessage = $errorData['message'] ?? 'AI processing service error.';
-
+        if ($lastResponse) {
+            $errorData = $lastResponse->json();
             return [
                 'success' => false,
-                'message' => $errorMessage,
-                'status' => $response->status(),
-            ];
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            Log::error('Cannot connect to Python AI microservice', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'message' => 'AI processing service is temporarily unavailable. Please try again later.',
-                'status' => 503,
-            ];
-        } catch (Exception $e) {
-            Log::error('Background removal exception', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'message' => 'An unexpected error occurred while processing the image.',
-                'status' => 500,
+                'message' => $errorData['detail'] ?? ($errorData['message'] ?? 'AI processing service error.'),
+                'status' => $lastResponse->status(),
             ];
         }
+
+        return [
+            'success' => false,
+            'message' => 'Cannot connect to AI service. ' . ($lastException?->getMessage() ?? 'Service unavailable.'),
+            'status' => 503,
+        ];
     }
 }
