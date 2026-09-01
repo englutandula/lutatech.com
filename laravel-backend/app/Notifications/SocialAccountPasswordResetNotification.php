@@ -29,7 +29,7 @@ class SocialAccountPasswordResetNotification extends Notification implements Sho
 
     public function toMail(object $notifiable): MailMessage
     {
-        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
         $providerName = ucfirst($this->provider);
 
         return (new MailMessage)

@@ -52,7 +52,7 @@ class AccountActivationNotification extends Notification implements ShouldQueue
      */
     protected function buildActivationUrl(object $notifiable): string
     {
-        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
         $signedBackendUrl = URL::temporarySignedRoute(
             'activation.activate',

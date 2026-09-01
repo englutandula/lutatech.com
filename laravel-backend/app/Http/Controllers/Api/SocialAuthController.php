@@ -52,7 +52,7 @@ class SocialAuthController extends Controller
      */
     public function redirect(string $provider): \Symfony\Component\HttpFoundation\RedirectResponse|RedirectResponse
     {
-        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
         if (! in_array($provider, $this->supportedProviders, true)) {
             Log::warning("OAuth redirect attempted for unsupported provider: [{$provider}].");
@@ -83,7 +83,7 @@ class SocialAuthController extends Controller
      */
     public function callback(string $provider): RedirectResponse
     {
-        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
         if (! in_array($provider, $this->supportedProviders, true)) {
             return redirect($frontendUrl . '/login?error=' . urlencode('This sign-in method is not supported.'));

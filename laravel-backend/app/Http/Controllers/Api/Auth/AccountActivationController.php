@@ -31,7 +31,7 @@ class AccountActivationController extends Controller
      */
     public function activate(Request $request, int $id, string $hash): Response
     {
-        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'https://lutatech.com')), '/');
 
         // ------------------------------------------------------------------
         // 1. Validate signed URL (tamper-proof, time-limited).

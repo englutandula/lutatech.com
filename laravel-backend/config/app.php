@@ -52,7 +52,8 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://lutatech.com'),
+    'frontend_url' => env('FRONTEND_URL', 'https://lutatech.com'),
 
     /*
     |--------------------------------------------------------------------------
