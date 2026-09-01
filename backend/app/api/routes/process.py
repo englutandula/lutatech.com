@@ -117,6 +117,8 @@ async def detect_face_endpoint(file: UploadFile = File(...)):
 
 @router.post("/remove-background", response_model=BackgroundRemoveResponse)
 @router.post("/remove-background/", response_model=BackgroundRemoveResponse, include_in_schema=False)
+@router.post("/background/remove", response_model=BackgroundRemoveResponse, include_in_schema=False)
+@router.post("/background/remove/", response_model=BackgroundRemoveResponse, include_in_schema=False)
 @router.post("/ai/remove-background", response_model=BackgroundRemoveResponse)
 @router.post("/ai/remove-background/", response_model=BackgroundRemoveResponse, include_in_schema=False)
 async def remove_bg_endpoint(

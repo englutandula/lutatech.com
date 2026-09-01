@@ -41,13 +41,34 @@ class BackgroundRemovalService
                     $file->getClientOriginalName(),
                     ['Content-Type' => $file->getMimeType()]
                 )
-                ->post("{$this->baseUrl}/api/v1/background/remove");
+                ->post("{$this->baseUrl}/api/remove-background");
+
+            if (!$response->successful() && $response->status() === 404) {
+                $response = Http::timeout($this->timeout)
+                    ->withHeaders([
+                        'X-Internal-Secret' => $this->secret,
+                        'Accept' => 'application/json',
+                    ])
+                    ->attach(
+                        'file',
+                        file_get_contents($file->getRealPath()),
+                        $file->getClientOriginalName(),
+                        ['Content-Type' => $file->getMimeType()]
+                    )
+                    ->post("{$this->baseUrl}/api/v1/background/remove");
+            }
 
             if ($response->successful()) {
                 $data = $response->json();
+                $processedImage = $data['processed_image'] ?? ($data['data']['processed_image'] ?? null);
+                $imageDataUrl = $data['data']['image_data_url'] ?? ($processedImage ? (str_starts_with($processedImage, 'data:') ? $processedImage : 'data:image/png;base64,' . $processedImage) : null);
+
                 return [
                     'success' => true,
-                    'data' => $data['data'] ?? $data,
+                    'data' => [
+                        'image_data_url' => $imageDataUrl,
+                        'processed_image' => $processedImage,
+                    ],
                     'message' => $data['message'] ?? 'Background removed successfully',
                 ];
             }

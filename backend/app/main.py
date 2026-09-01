@@ -61,6 +61,13 @@ app.include_router(process.router, prefix="/api", tags=["process"])
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(jobs.router, prefix="/api", tags=["jobs"])
 
+# Mount under /api/v1 for complete compatibility
+app.include_router(health.router, prefix="/api/v1", tags=["health"])
+app.include_router(requirements.router, prefix="/api/v1", tags=["requirements"])
+app.include_router(process.router, prefix="/api/v1", tags=["process"])
+app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
+app.include_router(jobs.router, prefix="/api/v1", tags=["jobs"])
+
 # Mount static build of Next.js frontend if available
 frontend_build_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/out"))
 if os.path.exists(frontend_build_dir):

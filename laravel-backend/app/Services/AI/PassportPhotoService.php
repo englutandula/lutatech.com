@@ -31,7 +31,16 @@ class PassportPhotoService
                     'X-Internal-Secret' => $this->secret,
                     'Accept' => 'application/json',
                 ])
-                ->get("{$this->baseUrl}/api/v1/requirements");
+                ->get("{$this->baseUrl}/api/requirements");
+
+            if (!$response->successful()) {
+                $response = Http::timeout(10)
+                    ->withHeaders([
+                        'X-Internal-Secret' => $this->secret,
+                        'Accept' => 'application/json',
+                    ])
+                    ->get("{$this->baseUrl}/api/v1/requirements");
+            }
 
             if ($response->successful()) {
                 return $response->json();
@@ -62,10 +71,28 @@ class PassportPhotoService
                     $file->getClientOriginalName(),
                     ['Content-Type' => $file->getMimeType()]
                 )
-                ->post("{$this->baseUrl}/api/v1/process", [
+                ->post("{$this->baseUrl}/api/process", [
                     'document_type' => $documentType,
                     'options' => $optionsJson,
                 ]);
+
+            if (!$response->successful() && $response->status() === 404) {
+                $response = Http::timeout($this->timeout)
+                    ->withHeaders([
+                        'X-Internal-Secret' => $this->secret,
+                        'Accept' => 'application/json',
+                    ])
+                    ->attach(
+                        'file',
+                        file_get_contents($file->getRealPath()),
+                        $file->getClientOriginalName(),
+                        ['Content-Type' => $file->getMimeType()]
+                    )
+                    ->post("{$this->baseUrl}/api/v1/process", [
+                        'document_type' => $documentType,
+                        'options' => $optionsJson,
+                    ]);
+            }
 
             if ($response->successful()) {
                 return [
