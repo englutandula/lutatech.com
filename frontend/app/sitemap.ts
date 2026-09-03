@@ -88,7 +88,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Dedicated alias routes that provide specific utility tools
   const additionalToolRoutes = [
     '/tools/passport/',
+    '/tools/passport-photo-maker/',
     '/tools/remove-bg/',
+    '/tools/background-remover/',
     '/tools/pdf/',
   ];
 

@@ -6,7 +6,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/lib/auth-context';
-import { WebSiteJsonLd } from '@/components/seo/JsonLd';
+import { WebSiteJsonLd, SiteNavigationJsonLd } from '@/components/seo/JsonLd';
 import NextTopLoader from 'nextjs-toploader';
 import { Suspense } from 'react';
 
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   verification: {
     google: 'nlS3X7Gv7B4seJoBBt-7zIbRJV',
     other: {
-      'google-adsense-account': 'ca-pub-6772678386645395',
+      'google-adsense-account': 'ca-pub-9660710706059023',
     },
   },
   openGraph: {
@@ -117,10 +117,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <WebSiteJsonLd />
-        <meta name="google-adsense-account" content="ca-pub-6772678386645395" />
+        <SiteNavigationJsonLd />
+        <meta name="google-adsense-account" content="ca-pub-9660710706059023" />
         <script
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6772678386645395"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9660710706059023"
           crossOrigin="anonymous"
         />
       </head>

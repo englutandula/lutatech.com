@@ -23,7 +23,7 @@ export function WebSiteJsonLd({
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/tools?search={search_term_string}`,
+        urlTemplate: `${siteUrl}/tools/?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -146,3 +146,76 @@ export function FaqJsonLd({ items }: { items: FaqItem[] }) {
     />
   );
 }
+
+export function SiteNavigationJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: [
+      {
+        '@type': 'SiteNavigationElement',
+        position: 1,
+        name: 'Tools Directory',
+        description: 'Explore free, browser-based tools for images, PDFs, converters, and developers.',
+        url: `${siteUrl}/tools/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 2,
+        name: 'Passport Photo Maker',
+        description: 'Create compliant official passport and visa photos online in seconds.',
+        url: `${siteUrl}/tools/passport/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 3,
+        name: 'Background Remover',
+        description: 'Remove photo backgrounds automatically with AI in one click.',
+        url: `${siteUrl}/tools/remove-bg/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 4,
+        name: 'PDF Compressor',
+        description: 'Compress PDF documents to smaller sizes privately in your browser.',
+        url: `${siteUrl}/tools/pdf-compressor/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 5,
+        name: 'Image Compressor',
+        description: 'Reduce JPG, PNG, and WebP image sizes without losing visible quality.',
+        url: `${siteUrl}/tools/image-compressor/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 6,
+        name: 'Tool Categories',
+        description: 'Browse tools organized by Image, PDF, Utility, and Developer categories.',
+        url: `${siteUrl}/categories/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 7,
+        name: 'Pricing & Plans',
+        description: 'Transparent pricing with free access to digital tools.',
+        url: `${siteUrl}/pricing/`,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        position: 8,
+        name: 'About Us',
+        description: 'Learn about Luta Tech mission, privacy-first tools, and technology.',
+        url: `${siteUrl}/about/`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
