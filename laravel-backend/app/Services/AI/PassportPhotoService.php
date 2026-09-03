@@ -15,22 +15,29 @@ class PassportPhotoService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(config('services.python_ai.url', 'http://51.20.42.164'), '/');
+        $rawUrl = config('services.python_ai.url', 'http://13.48.43.240:8000');
+        if (str_contains($rawUrl, '51.20.42.164')) {
+            $rawUrl = 'http://13.48.43.240:8000';
+        }
+        $this->baseUrl = rtrim($rawUrl, '/');
         $this->secret = config('services.python_ai.secret', 'dev_internal_secret_key_123');
-        $this->timeout = (int) config('services.python_ai.timeout', 60);
+        $this->timeout = (int) config('services.python_ai.timeout', 120);
     }
 
     /**
-     * Return list of candidate base URLs (e.g. port 80 and port 8000)
+     * Return list of candidate base URLs (preferring port 8000 directly)
      */
     protected function getCandidateBaseUrls(): array
     {
-        $urls = [$this->baseUrl];
-        if (!str_contains($this->baseUrl, ':8000')) {
-            $urls[] = $this->baseUrl . ':8000';
-        } else {
+        $urls = [];
+        if (str_contains($this->baseUrl, ':8000')) {
+            $urls[] = $this->baseUrl;
             $urls[] = preg_replace('/:8000$/', '', $this->baseUrl);
+        } else {
+            $urls[] = $this->baseUrl . ':8000';
+            $urls[] = $this->baseUrl;
         }
+        $urls[] = 'http://13.48.43.240:8000';
         return array_values(array_unique($urls));
     }
 

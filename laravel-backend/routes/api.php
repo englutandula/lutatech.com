@@ -85,6 +85,22 @@ $registerV1Routes = function () {
         ]);
     });
 
+    Route::get('/maintenance/clear-cache', function (\Illuminate\Http\Request $request) {
+        if ($request->query('secret') !== 'luta-reset-2026-fresh-start') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+
+        return response()->json([
+            'success'       => true,
+            'message'       => 'Config and application cache cleared successfully!',
+            'python_ai_url' => config('services.python_ai.url'),
+        ]);
+    });
+
     // =========================================================================
     // Authentication Endpoints
     // =========================================================================
