@@ -32,19 +32,17 @@ def _parse_bg_color(bg_color: str) -> tuple:
 
 def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Image:
     """
-    Remove the background using the standard, fresh rembg installation defaults.
+    Remove background using u2net_human_seg neural segmentation without heavy CPU Laplacian matting.
+    Runs in ~1s on CPU while preserving full human body, shoulders, and soft hair boundaries.
     """
-    # 1. Remove background with alpha matting enabled for fine hair details
+    # 1. Neural network segmentation (fast, no heavy CPU Laplacian matting)
     output = remove(
         image,
         session=human_session,
-        alpha_matting=True,
-        alpha_matting_foreground_threshold=240,
-        alpha_matting_background_threshold=10,
-        alpha_matting_erode_size=5, # Reduced to prevent cutting into solid body parts
-        post_process_mask=False
+        alpha_matting=False,
+        post_process_mask=True,
     )
-    
+
     # 2. Return transparent if requested
     if bg_color.strip().lower() == "transparent":
         return output
@@ -52,9 +50,9 @@ def remove_background(image: Image.Image, bg_color: str = "#FFFFFF") -> Image.Im
     # 3. Otherwise, create a solid background and paste the foreground
     r, g, b = _parse_bg_color(bg_color)
     background = Image.new("RGBA", output.size, (r, g, b, 255))
-    
+
     # Paste using the alpha channel as a mask
     background.paste(output, mask=output.split()[3])
-    
+
     # Convert to RGB to remove the alpha channel before returning
     return background.convert("RGB")

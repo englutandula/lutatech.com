@@ -88,7 +88,7 @@ def process_photo(
     image = image.convert("RGB")
 
     # Optimize input dimension for speed while exceeding 300 DPI passport output specs
-    MAX_INPUT_DIM = 1600
+    MAX_INPUT_DIM = 1024
     if max(image.size) > MAX_INPUT_DIM:
         image.thumbnail((MAX_INPUT_DIM, MAX_INPUT_DIM), Image.LANCZOS)
 
