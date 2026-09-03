@@ -30,13 +30,14 @@ jobs:
           EC2_HOST: ${{ secrets.AWS_EC2_HOST || secrets.AWS_EC2_H0ST }}
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -T 30 -H "$EC2_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: 🚀 Sync & Redeploy on AWS EC2
         env:
           EC2_HOST: ${{ secrets.AWS_EC2_HOST || secrets.AWS_EC2_H0ST }}
         run: |
           rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30" \
             --exclude 'node_modules' \
             --exclude '.next' \
             --exclude 'venv' \
@@ -46,7 +47,7 @@ jobs:
             --exclude 'frontend' \
             ./ ubuntu@$EC2_HOST:/home/ubuntu/luta-studio/
 
-          ssh ubuntu@$EC2_HOST "cd /home/ubuntu/luta-studio && docker compose up -d --build"
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 ubuntu@$EC2_HOST "cd /home/ubuntu/luta-studio && docker compose up -d --build"
 
       - name: 🩺 Run Health Check
         env:
