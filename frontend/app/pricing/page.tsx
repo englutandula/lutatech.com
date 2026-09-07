@@ -214,10 +214,10 @@ export default function PricingPage() {
               Try every tool for free. No credit card, no time limit.
             </p>
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/tools" className="lt-btn-primary">
+              <Link href="/tools/" className="lt-btn-primary">
                 Browse all tools <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/register" className="lt-btn-secondary">
+              <Link href="/register/" className="lt-btn-secondary">
                 Create free account
               </Link>
             </div>

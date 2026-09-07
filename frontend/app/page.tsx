@@ -108,7 +108,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/passport" prefetch={false} className="lt-btn-primary">
+                <Link href="/tools/passport/" prefetch={false} className="lt-btn-primary">
                   Launch Passport Photo Maker <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="pt-4">
-                <Link href="/tools/remove-bg" prefetch={false} className="lt-btn-primary">
+                <Link href="/tools/remove-bg/" prefetch={false} className="lt-btn-primary">
                   Launch Background Remover <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -187,7 +187,7 @@ export default function HomePage() {
                 Ranked in real time based on user interactions, speed, and daily usage.
               </p>
             </div>
-            <Link href="/tools" prefetch={false} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
+            <Link href="/tools/" prefetch={false} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
               View full catalog ({tools.length}) <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
@@ -312,10 +312,10 @@ export default function HomePage() {
               No installation required. Jump right into our online tools or create a free account to track your usage history.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/tools" className="lt-btn-primary w-full sm:w-auto">
+              <Link href="/tools/" className="lt-btn-primary w-full sm:w-auto">
                 Explore Tools Catalog <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/register" className="lt-btn-secondary w-full sm:w-auto">
+              <Link href="/register/" className="lt-btn-secondary w-full sm:w-auto">
                 Create Free Account
               </Link>
             </div>

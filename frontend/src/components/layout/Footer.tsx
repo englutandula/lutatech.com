@@ -55,29 +55,29 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Platform</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/tools" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Tools</Link></li>
-              <li><Link href="/categories" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Categories</Link></li>
-              <li><Link href="/pricing" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Pricing</Link></li>
-              <li><Link href="/about" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">About Us</Link></li>
-              <li><Link href="/contact" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Contact</Link></li>
+              <li><Link href="/tools/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Tools</Link></li>
+              <li><Link href="/categories/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Categories</Link></li>
+              <li><Link href="/pricing/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Pricing</Link></li>
+              <li><Link href="/about/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">About Us</Link></li>
+              <li><Link href="/contact/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Contact</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Legal & Privacy</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/privacy" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Terms of Service</Link></li>
-              <li><Link href="/contact" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Help & Support</Link></li>
+              <li><Link href="/privacy/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Privacy Policy</Link></li>
+              <li><Link href="/terms/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Terms of Service</Link></li>
+              <li><Link href="/contact/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Help & Support</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Account</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/login" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Login</Link></li>
-              <li><Link href="/register" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Sign Up</Link></li>
-              <li><Link href="/dashboard" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Dashboard</Link></li>
+              <li><Link href="/login/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Login</Link></li>
+              <li><Link href="/register/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Sign Up</Link></li>
+              <li><Link href="/dashboard/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Dashboard</Link></li>
             </ul>
           </div>
         </div>
@@ -85,9 +85,9 @@ export function Footer() {
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t lt-border-color pt-6 sm:flex-row">
           <p className="text-xs lt-text-muted">© 2026 Luta Tech. All rights reserved.</p>
           <div className="flex items-center gap-6 text-xs lt-text-muted">
-            <Link href="/privacy" className="hover:text-[rgb(var(--lt-text))]">Privacy</Link>
-            <Link href="/terms" className="hover:text-[rgb(var(--lt-text))]">Terms</Link>
-            <Link href="/contact" className="hover:text-[rgb(var(--lt-text))]">Contact</Link>
+            <Link href="/privacy/" className="hover:text-[rgb(var(--lt-text))]">Privacy</Link>
+            <Link href="/terms/" className="hover:text-[rgb(var(--lt-text))]">Terms</Link>
+            <Link href="/contact/" className="hover:text-[rgb(var(--lt-text))]">Contact</Link>
           </div>
         </div>
       </div>

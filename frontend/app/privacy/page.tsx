@@ -177,7 +177,7 @@ export default function PrivacyPolicyPage() {
                 info@lutatech.com
               </a>{' '}
               or visit our{' '}
-              <Link href="/contact" className="text-[rgb(var(--lt-primary))] hover:underline">
+              <Link href="/contact/" className="text-[rgb(var(--lt-primary))] hover:underline">
                 Contact Page
               </Link>
               .

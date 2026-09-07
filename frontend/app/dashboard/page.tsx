@@ -269,10 +269,10 @@ export default function DashboardPage() {
                     <span className="lt-text-muted">Standard export quality</span>
                   </div>
                 </div>
-                <Link href="/pricing" className="lt-btn-primary mt-5 w-full">
+                <Link href="/pricing/" className="lt-btn-primary mt-5 w-full">
                   <Crown className="h-4 w-4" /> Upgrade plan
                 </Link>
-                <Link href="/pricing" className="lt-btn-secondary mt-2 w-full">
+                <Link href="/pricing/" className="lt-btn-secondary mt-2 w-full">
                   Compare plans
                 </Link>
               </div>
@@ -339,7 +339,7 @@ export default function DashboardPage() {
               <Clock className="mx-auto h-10 w-10 text-[rgb(var(--lt-text-muted))]" />
               <p className="mt-3 text-sm font-medium text-[rgb(var(--lt-text))]">No activity yet</p>
               <p className="mt-1 text-xs lt-text-muted">Use a tool and your history will appear here.</p>
-              <Link href="/tools" className="lt-btn-primary mt-5">
+              <Link href="/tools/" className="lt-btn-primary mt-5">
                 Browse tools <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -347,7 +347,7 @@ export default function DashboardPage() {
             <div className="mt-6 lt-card overflow-hidden">
               <div className="divide-y lt-border-color">
                 {history.map((record) => {
-                  const toolHref = record.tool_type.includes('passport') ? '/tools/passport' : '/tools/remove-bg';
+                  const toolHref = record.tool_type.includes('passport') ? '/tools/passport/' : '/tools/remove-bg/';
                   return (
                     <div key={record.id} className="flex items-center gap-4 p-4 transition-colors hover:bg-[rgb(var(--lt-surface-2))]">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[rgb(var(--lt-primary)/0.1)] text-[rgb(var(--lt-primary))]">
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 </div>
-                <Link href="/pricing" className="lt-btn-primary">
+                <Link href="/pricing/" className="lt-btn-primary">
                   Upgrade <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

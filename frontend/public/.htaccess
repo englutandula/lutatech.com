@@ -48,6 +48,20 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 RewriteCond %{HTTP_HOST} ^www\.lutatech\.com [NC]
 RewriteRule ^(.*)$ https://lutatech.com/$1 [R=301,L]
 
+# ── 3.1 301 Permanent Redirects for Duplicate Tool Aliases ────
+# Consolidates link equity and tells search engines the exact canonical tool URL
+RewriteRule ^tools/passport-photo-maker/?$ https://lutatech.com/tools/passport/ [R=301,L]
+RewriteRule ^tools/background-remover/?$ https://lutatech.com/tools/remove-bg/ [R=301,L]
+RewriteRule ^tools/pdf/?$ https://lutatech.com/tools/pdf-merger/ [R=301,L]
+
+# ── 3.2 Enforce Trailing Slash (Strictly Align With Next.js trailingSlash: true) ─
+# Prevents duplicate 200 OK responses across /path and /path/ which trigger GSC alternate page warnings
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !^/(api|livewire|filament)(/|$)
+RewriteCond %{REQUEST_URI} !(\.[a-zA-Z0-9]{1,5})$
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule ^(.*)$ https://lutatech.com/$1/ [R=301,L]
+
 # ── 4. Redirect /admin to Home Page ───────────────────────────
 RewriteRule ^admin(/.*)?$ / [R=302,L]
 

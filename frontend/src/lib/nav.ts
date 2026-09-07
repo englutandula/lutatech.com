@@ -119,7 +119,7 @@ export const navPdfGroups: NavPdfGroup[] = [
     iconBg: 'bg-amber-100 dark:bg-amber-900/40',
     iconText: 'text-amber-600 dark:text-amber-400',
     items: [
-      { label: 'Compress PDF', href: '/tools/pdf-compressor', status: 'live' },
+      { label: 'Compress PDF', href: '/tools/pdf-compressor/', status: 'live' },
       { label: 'Metadata Editor', href: '#', status: 'soon' },
       { label: 'Page Size', href: '#', status: 'soon' },
       { label: 'Crop PDF', href: '#', status: 'soon' },

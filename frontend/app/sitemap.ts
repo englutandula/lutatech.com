@@ -58,21 +58,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
-    {
-      url: `${SITE_URL}/login/`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
-    {
-      url: `${SITE_URL}/register/`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
   ];
 
-  // Tool specific pages
+  // Tool specific pages (all 22 canonical live tools)
   const liveTools = getLiveTools();
   const toolPages: MetadataRoute.Sitemap = liveTools.map((tool) => {
     const path = tool.href || `/tools/${tool.slug}`;
@@ -85,23 +73,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  // Dedicated alias routes that provide specific utility tools
-  const additionalToolRoutes = [
-    '/tools/passport/',
-    '/tools/passport-photo-maker/',
-    '/tools/remove-bg/',
-    '/tools/background-remover/',
-    '/tools/pdf/',
-  ];
-
-  const aliasPages: MetadataRoute.Sitemap = additionalToolRoutes
-    .filter((route) => !toolPages.some((tp) => tp.url === `${SITE_URL}${route}`))
-    .map((route) => ({
-      url: `${SITE_URL}${route}`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    }));
-
-  return [...staticPages, ...toolPages, ...aliasPages];
+  return [...staticPages, ...toolPages];
 }

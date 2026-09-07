@@ -125,7 +125,7 @@ export function Navbar() {
 
               {/* ── Categories mega-menu trigger ── */}
               <Link
-                href="/categories"
+                href="/categories/"
                 id="tools-menu-btn"
                 onMouseEnter={openTools}
                 onMouseLeave={scheduleClose}
@@ -146,7 +146,7 @@ export function Navbar() {
 
               {/* All Tools */}
               <Link
-                href="/tools"
+                href="/tools/"
                 prefetch={false}
                 className={`rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
                   isToolsActive
@@ -159,8 +159,8 @@ export function Navbar() {
 
               {/* Pricing / About */}
               {[
-                { label: 'Pricing', href: '/pricing' },
-                { label: 'About',   href: '/about'   },
+                { label: 'Pricing', href: '/pricing/' },
+                { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -319,7 +319,7 @@ export function Navbar() {
 
               {/* All Tools */}
               <Link
-                href="/tools"
+                href="/tools/"
                 onClick={() => setMobileOpen(false)}
                 className={`block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                   isToolsActive
@@ -406,7 +406,7 @@ export function Navbar() {
 
                     {/* View all */}
                     <Link
-                      href="/tools"
+                      href="/tools/"
                       onClick={() => setMobileOpen(false)}
                       className="mt-2 flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary)/0.07)] transition-colors"
                     >
@@ -418,8 +418,8 @@ export function Navbar() {
 
               {/* Pricing / About */}
               {[
-                { label: 'Pricing', href: '/pricing' },
-                { label: 'About',   href: '/about'   },
+                { label: 'Pricing', href: '/pricing/' },
+                { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link
                   key={link.href}

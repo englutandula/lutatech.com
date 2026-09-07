@@ -13,12 +13,12 @@ export const metadata = {
 
 export default function NotFound() {
   const popularTools = [
-    { name: 'Passport Photo Maker', href: '/tools/passport' },
-    { name: 'AI Background Remover', href: '/tools/remove-bg' },
-    { name: 'PDF Compressor', href: '/tools/pdf-compressor' },
-    { name: 'Image Compressor', href: '/tools/image-compressor' },
-    { name: 'Image Resizer', href: '/tools/image-resizer' },
-    { name: 'PDF Merger', href: '/tools/pdf-merger' },
+    { name: 'Passport Photo Maker', href: '/tools/passport/' },
+    { name: 'AI Background Remover', href: '/tools/remove-bg/' },
+    { name: 'PDF Compressor', href: '/tools/pdf-compressor/' },
+    { name: 'Image Compressor', href: '/tools/image-compressor/' },
+    { name: 'Image Resizer', href: '/tools/image-resizer/' },
+    { name: 'PDF Merger', href: '/tools/pdf-merger/' },
   ];
 
   return (
@@ -67,7 +67,7 @@ export default function NotFound() {
           <Link href="/" className="lt-btn-primary w-full sm:w-auto">
             <Home className="h-4 w-4" /> Return to Homepage
           </Link>
-          <Link href="/tools" className="lt-btn-secondary w-full sm:w-auto">
+          <Link href="/tools/" className="lt-btn-secondary w-full sm:w-auto">
             <Search className="h-4 w-4" /> Browse All Tools
           </Link>
         </div>

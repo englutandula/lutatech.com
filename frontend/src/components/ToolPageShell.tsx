@@ -13,7 +13,7 @@ export function ToolPageShell({ tool, children }: { tool: Tool; children: ReactN
           Home
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link href="/tools" className="hover:text-[rgb(var(--lt-text))] transition-colors">
+        <Link href="/tools/" className="hover:text-[rgb(var(--lt-text))] transition-colors">
           Tools
         </Link>
         <ChevronRight className="h-3 w-3" />
