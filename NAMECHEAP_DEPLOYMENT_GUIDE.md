@@ -33,7 +33,7 @@ You only need to add your credentials to GitHub Secrets once, and everything wil
 
 ### Step 1: Open GitHub Secrets
 Go to your repository settings:
-👉 **[github.com/englutandula/Luta-Studio-web-/settings/secrets/actions](https://github.com/englutandula/Luta-Studio-web-/settings/secrets/actions)**
+👉 **[github.com/englutandula/lutatech.com/settings/secrets/actions](https://github.com/englutandula/lutatech.com/settings/secrets/actions)**
 
 ### Step 2: Add These 3 Secrets for Namecheap:
 
