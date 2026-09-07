@@ -37,11 +37,13 @@ $registerV1Routes = function () {
     });
 
     // =========================================================================
-    // Maintenance: Fresh Start (Clear Non-Admin Registered Clients)
+    // Maintenance: Fresh Start & Admin Utilities
+    // STRICTLY disabled in production unless a dedicated MAINTENANCE_SECRET is configured.
     // =========================================================================
     Route::get('/maintenance/reset-clients', function (\Illuminate\Http\Request $request) {
-        if ($request->query('secret') !== 'luta-reset-2026-fresh-start') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        $secret = config('services.maintenance_secret') ?? env('MAINTENANCE_SECRET');
+        if (!app()->environment('local') && (!$secret || !hash_equals($secret, (string) $request->query('secret')))) {
+            return response()->json(['error' => 'Unauthorized maintenance request.'], 403);
         }
 
         $deletedUsers = [];
@@ -66,8 +68,9 @@ $registerV1Routes = function () {
     });
 
     Route::get('/maintenance/activate-all', function (\Illuminate\Http\Request $request) {
-        if ($request->query('secret') !== 'luta-activate-2026') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        $secret = config('services.maintenance_secret') ?? env('MAINTENANCE_SECRET');
+        if (!app()->environment('local') && (!$secret || !hash_equals($secret, (string) $request->query('secret')))) {
+            return response()->json(['error' => 'Unauthorized maintenance request.'], 403);
         }
 
         $activated = [];
@@ -86,8 +89,9 @@ $registerV1Routes = function () {
     });
 
     Route::get('/maintenance/clear-cache', function (\Illuminate\Http\Request $request) {
-        if ($request->query('secret') !== 'luta-reset-2026-fresh-start') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        $secret = config('services.maintenance_secret') ?? env('MAINTENANCE_SECRET');
+        if (!app()->environment('local') && (!$secret || !hash_equals($secret, (string) $request->query('secret')))) {
+            return response()->json(['error' => 'Unauthorized maintenance request.'], 403);
         }
 
         \Illuminate\Support\Facades\Artisan::call('config:clear');

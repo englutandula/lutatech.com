@@ -13,9 +13,11 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
+        'https://lutatech.com',
+        'https://www.lutatech.com',
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-        env('FRONTEND_URL', 'http://localhost:3000'),
+        env('FRONTEND_URL', 'https://lutatech.com'),
     ],
 
     'allowed_origins_patterns' => [],

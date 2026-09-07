@@ -45,7 +45,6 @@ class User extends Authenticatable implements FilamentUser
         'account_status',
         'last_login_at',
         'welcome_email_sent_at',
-        'is_admin',
     ];
 
     // -------------------------------------------------------------------------

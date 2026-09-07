@@ -18,24 +18,14 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@lutatech.com'],
-            [
-                'name'              => 'Luta Admin',
-                'password'          => Hash::make('Admin@Lutatech2024!'),
-                'email_verified_at' => now(),
-                'is_admin'          => true,
-                'account_status'    => 'active',
-            ]
-        );
-
-        // If admin already existed, make sure it's marked as admin and active.
-        if ($admin->wasRecentlyCreated === false) {
-            $admin->update([
-                'is_admin'       => true,
-                'account_status' => 'active',
-            ]);
-        }
+        $admin = User::firstOrNew(['email' => 'admin@lutatech.com']);
+        $admin->forceFill([
+            'name'              => 'Luta Admin',
+            'password'          => Hash::make('Admin@Lutatech2024!'),
+            'email_verified_at' => now(),
+            'is_admin'          => true,
+            'account_status'    => 'active',
+        ])->save();
 
         $this->command->info('✅ Admin user ready: admin@lutatech.com');
         $this->command->warn('⚠️  IMPORTANT: Change the admin password immediately after first login!');

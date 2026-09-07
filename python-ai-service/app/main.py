@@ -29,12 +29,17 @@ app = FastAPI(
     redoc_url=None,
 )
 
-# CORS restricted - Laravel gateway communicates internally
+# CORS restricted - Gateway and application communication only
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=[
+        "https://lutatech.com",
+        "https://www.lutatech.com",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
