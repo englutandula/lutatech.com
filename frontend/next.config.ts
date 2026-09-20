@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   devIndicators: false,
   productionBrowserSourceMaps: false,
+  compress: true,
+  poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
   
   // Rewrites are only allowed in development when not using static export
   ...(process.env.NODE_ENV === 'development' ? {

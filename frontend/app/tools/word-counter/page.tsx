@@ -19,6 +19,7 @@ import {
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 const STOP_WORDS = new Set([
   'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'aren\'t', 'as',
@@ -433,6 +434,69 @@ export default function WordCounterPage() {
           </div>
         </div>
       </div>
+
+      {/* SEO & Educational Guide Section */}
+      <ToolContentSection
+        toolName="Word Counter"
+        category="Productivity"
+        tagline="Analyze word density, sentence structure, reading duration, and grade level in real-time."
+        steps={[
+          {
+            title: 'Paste or Type Your Text',
+            description: 'Enter or paste any document, article, essay, or social media caption directly into the editor.',
+          },
+          {
+            title: 'Inspect Real-time Metrics',
+            description: 'Monitor live word count, character density (with & without spaces), reading time, and keyword frequencies.',
+          },
+          {
+            title: 'Format & Export',
+            description: 'Quickly change letter casing (UPPER, lower, Title, Sentence) or export your clean text file with one click.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Readability & Grade Level',
+            description: 'Calculates Flesch Reading Ease scores to indicate whether your writing suits 5th grade, high school, or college readers.',
+          },
+          {
+            title: 'Keyword Density & Stop-Word Filter',
+            description: 'Identifies overused words and optimizes SEO keyword distribution with automatic filtering of common filler words.',
+          },
+          {
+            title: 'Speech & Reading Time Estimates',
+            description: 'Computes approximate reading time (200 words/min) and speech delivery time (130 words/min) for presentations.',
+          },
+          {
+            title: 'Case Transformation Tools',
+            description: 'Instantly transform text between UPPERCASE, lowercase, Title Case, Sentence case, and normalize irregular whitespace.',
+          },
+        ]}
+        specs={[
+          { label: 'Character Limit', value: 'Unlimited (In-Memory)' },
+          { label: 'Execution', value: '100% In-Browser' },
+          { label: 'Export Options', value: '.txt & Clipboard' },
+          { label: 'Data Privacy', value: 'Zero Server Storage' },
+        ]}
+        faqs={[
+          {
+            question: 'How is reading time calculated?',
+            answer: 'Reading time is calculated using the globally accepted average adult reading speed of 200 words per minute (WPM). Speaking time is based on standard conversational pacing of 130 WPM.',
+          },
+          {
+            question: 'Does LutaTech save or transmit my written text?',
+            answer: 'No. All word counting and text analysis algorithms execute entirely on your device inside your web browser. Your text never leaves your computer and is never sent to any server.',
+          },
+          {
+            question: 'What is the difference between characters with and without spaces?',
+            answer: 'Characters with spaces count every single keystroke including spaces, tabs, and line breaks. Characters without spaces only count alphanumeric letters, digits, and punctuation marks, which is often required for academic submissions and character-restricted platforms like Twitter/X or SMS.',
+          },
+          {
+            question: 'Can I use this word counter offline?',
+            answer: 'Yes! Once the page is loaded, the word counter runs entirely through client-side JavaScript, meaning it continues functioning seamlessly even without an active internet connection.',
+          },
+        ]}
+      />
     </ToolPageShell>
   );
 }

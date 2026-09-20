@@ -12,9 +12,9 @@ export function Footer() {
           <div className="col-span-2 lg:col-span-2">
             <Link
               href="/"
-              className="inline-flex items-center text-xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-transform hover:opacity-90 select-none"
+              className="inline-flex items-center transition-transform hover:opacity-90 select-none"
             >
-              <Logo className="h-[1.3em] w-auto shrink-0" />
+              <Logo className="h-9 sm:h-10 w-auto shrink-0" />
             </Link>
             <p className="mt-4 max-w-xs text-sm lt-text-muted">
               A world-class digital tools platform. Fast, private, and built for everyone.
@@ -55,9 +55,8 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Platform</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/tools/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Tools</Link></li>
-              <li><Link href="/categories/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Categories</Link></li>
-              <li><Link href="/pricing/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Pricing</Link></li>
+              <li><Link href="/products/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Products</Link></li>
+              <li><Link href="/products/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">All Tools</Link></li>
               <li><Link href="/about/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">About Us</Link></li>
               <li><Link href="/contact/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Contact</Link></li>
             </ul>
@@ -69,15 +68,6 @@ export function Footer() {
               <li><Link href="/privacy/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Privacy Policy</Link></li>
               <li><Link href="/terms/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Terms of Service</Link></li>
               <li><Link href="/contact/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Help & Support</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-semibold text-[rgb(var(--lt-text))]">Account</h4>
-            <ul className="mt-4 space-y-2.5 text-sm">
-              <li><Link href="/login/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Login</Link></li>
-              <li><Link href="/register/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Sign Up</Link></li>
-              <li><Link href="/dashboard/" className="lt-text-muted hover:text-[rgb(var(--lt-text))]">Dashboard</Link></li>
             </ul>
           </div>
         </div>

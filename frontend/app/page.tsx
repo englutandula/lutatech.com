@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
-  Sparkles,
   ArrowRight,
   Shield,
   Zap,
@@ -30,17 +29,19 @@ import { getRankedTools } from '@/lib/toolRanking';
 
 export default function HomePage() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [rankingVersion, setRankingVersion] = useState(0);
 
   useEffect(() => {
+    setIsMounted(true);
     const handleUsageUpdate = () => setRankingVersion((v) => v + 1);
     window.addEventListener('luta_tool_usage_updated', handleUsageUpdate);
     return () => window.removeEventListener('luta_tool_usage_updated', handleUsageUpdate);
   }, []);
 
   const allRankedTools = useMemo(() => {
-    return getRankedTools(tools);
-  }, [rankingVersion]);
+    return getRankedTools(tools, isMounted);
+  }, [rankingVersion, isMounted]);
 
   const featuredTools = tools.filter((t) => t.popular || t.status === 'live');
 
@@ -52,16 +53,8 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full lt-glow blur-3xl opacity-70" />
 
         <div className="lt-container relative z-10 text-center">
-          {/* Pill Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border lt-border-color bg-[rgb(var(--lt-surface))] px-3.5 py-1.5 text-xs font-semibold text-[rgb(var(--lt-text))] shadow-xs lt-fade-up">
-            <span className="flex h-2 w-2 rounded-full bg-[rgb(var(--lt-primary))] animate-pulse" />
-            <span className="text-[rgb(var(--lt-text-muted))]">Next-Gen Tools Suite</span>
-            <span className="text-gray-300 dark:text-gray-700">|</span>
-            <span className="font-bold text-[rgb(var(--lt-primary))]">100% Free & Private</span>
-          </div>
-
           {/* Main Headline */}
-          <h1 className="mt-6 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[rgb(var(--lt-text))] lt-fade-up leading-[1.14]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[rgb(var(--lt-text))] lt-fade-up leading-[1.14]">
             Every tool you need,
             <br />
             in one platform
@@ -85,11 +78,8 @@ export default function HomePage() {
         <div className="lt-container">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             <div className="lg:col-span-5 space-y-4">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[rgb(var(--lt-primary))] uppercase tracking-wider">
-                <Sparkles className="h-4 w-4" /> Official Standard Compliance
-              </div>
               <h2 className="text-2xl font-bold sm:text-3xl text-[rgb(var(--lt-text))]">
-                Create compliant passport & visa photos in seconds
+                Create compliant passport &amp; visa photos in seconds
               </h2>
               <p className="text-sm lt-text-muted leading-relaxed">
                 Automatically aligns, crops, and sizes your photo to official country standards (US 2×2 in, EU/UK 35×45 mm, Tanzania, Kenya, and 15+ countries).
@@ -127,9 +117,6 @@ export default function HomePage() {
         <div className="lt-container">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             <div className="lg:col-span-5 space-y-4">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[rgb(var(--lt-primary))] uppercase tracking-wider">
-                <Zap className="h-4 w-4" /> 1-Click Neural Erase
-              </div>
               <h2 className="text-2xl font-bold sm:text-3xl text-[rgb(var(--lt-text))]">
                 Instant AI Background Removal with zero quality loss
               </h2>
@@ -165,6 +152,7 @@ export default function HomePage() {
                   loop
                   muted
                   playsInline
+                  preload="none"
                   className="w-full h-full object-cover rounded-2xl"
                 />
               </div>
@@ -187,8 +175,9 @@ export default function HomePage() {
                 Ranked in real time based on user interactions, speed, and daily usage.
               </p>
             </div>
-            <Link href="/tools/" prefetch={false} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
-              View full catalog ({tools.length}) <ChevronRight className="h-4 w-4" />
+            {/* "View more" → /products/ */}
+            <Link href="/products/" prefetch={false} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:underline">
+              View all products ({tools.length}) <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
 
@@ -306,17 +295,15 @@ export default function HomePage() {
           <div className="pointer-events-none absolute inset-0 lt-glow opacity-80" />
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-[rgb(var(--lt-text))]">
-              Start building & creating with Luta Tech
+              Start building &amp; creating with Luta Tech
             </h2>
             <p className="mt-4 text-base lt-text-muted leading-relaxed">
-              No installation required. Jump right into our online tools or create a free account to track your usage history.
+              No installation required. Jump right into our online tools — 100% private, instant, and browser-native.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/tools/" className="lt-btn-primary w-full sm:w-auto">
-                Explore Tools Catalog <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/register/" className="lt-btn-secondary w-full sm:w-auto">
-                Create Free Account
+              {/* CTA → /products/ */}
+              <Link href="/products/" className="lt-btn-primary w-full sm:w-auto">
+                Explore Products Catalog <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -324,7 +311,7 @@ export default function HomePage() {
       </section>
 
       {/* Search Modal */}
-      <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen && <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
     </div>
   );
 }

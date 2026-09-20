@@ -1,0 +1,11 @@
+:root {
+  --brand-primary: #EB1000;
+  --brand-primary-dark: #C80C00;
+  --brand-primary-light: #FF4B3C;
+  --brand-dark-bg: #090B10;
+  --brand-dark-surface: #121620;
+  --brand-dark-border: #232B3E;
+  --brand-dark-text: #FFFFFF;
+  --brand-light-bg: #FFFFFF;
+  --brand-light-text: #EB1000;
+}

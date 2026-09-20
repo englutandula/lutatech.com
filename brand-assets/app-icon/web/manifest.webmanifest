@@ -1,0 +1,21 @@
+{
+  "name": "LutaTech",
+  "short_name": "LutaTech",
+  "description": "Fast, Private, Modern Digital Tools Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090B10",
+  "theme_color": "#EB1000",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

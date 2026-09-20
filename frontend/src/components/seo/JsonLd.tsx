@@ -10,13 +10,15 @@ interface WebSiteJsonLdProps {
 
 export function WebSiteJsonLd({
   siteUrl = SITE_URL,
-  name = 'Luta Tech',
+  name = 'LutaTech',
   description = 'High-performance digital tools for images, PDFs, converters, and AI — fast, private, running in your browser.',
 }: WebSiteJsonLdProps) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
     name,
+    alternateName: 'Luta Tech',
     url: siteUrl,
     description,
     potentialAction: {
@@ -29,18 +31,75 @@ export function WebSiteJsonLd({
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Luta Tech',
+      '@id': `${siteUrl}/#organization`,
+      name: 'LutaTech',
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/icon-512.png`,
+        '@id': `${siteUrl}/#logo`,
+        url: `${siteUrl}/logo-light.svg`,
+        contentUrl: `${siteUrl}/logo-light.svg`,
+        width: '510',
+        height: '120',
       },
     },
   };
 
   return (
     <script
+      id="website-jsonld"
       type="application/ld+json"
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+interface OrganizationJsonLdProps {
+  siteUrl?: string;
+  name?: string;
+  legalName?: string;
+  logoUrl?: string;
+  description?: string;
+}
+
+export function OrganizationJsonLd({
+  siteUrl = SITE_URL,
+  name = 'LutaTech',
+  legalName = 'LutaTech Digital Tools',
+  logoUrl = `${SITE_URL}/logo-light.svg`,
+  description = 'High-performance digital tools for images, PDFs, converters, and AI — private by design, running in your browser.',
+}: OrganizationJsonLdProps) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name,
+    legalName,
+    alternateName: ['Luta Tech', 'LutaTech Tools', 'LutaTech Platform'],
+    url: siteUrl,
+    logo: {
+      '@type': 'ImageObject',
+      '@id': `${siteUrl}/#logo`,
+      url: logoUrl,
+      contentUrl: logoUrl,
+      caption: `${name} Logo`,
+      width: '510',
+      height: '120',
+    },
+    image: `${siteUrl}/og-image.png`,
+    description,
+    sameAs: [
+      'https://twitter.com/lutatech',
+      'https://github.com/lutatech',
+    ],
+  };
+
+  return (
+    <script
+      id="organization-jsonld"
+      type="application/ld+json"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
@@ -89,7 +148,9 @@ export function SoftwareAppJsonLd({
 
   return (
     <script
+      id={`software-jsonld-${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
       type="application/ld+json"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
@@ -114,7 +175,9 @@ export function BreadcrumbJsonLd({ items }: { items: BreadcrumbItem[] }) {
 
   return (
     <script
+      id="breadcrumb-jsonld"
       type="application/ld+json"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
@@ -141,7 +204,9 @@ export function FaqJsonLd({ items }: { items: FaqItem[] }) {
 
   return (
     <script
+      id="faq-jsonld"
       type="application/ld+json"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
@@ -213,7 +278,9 @@ export function SiteNavigationJsonLd({ siteUrl = SITE_URL }: { siteUrl?: string 
 
   return (
     <script
+      id="navigation-jsonld"
       type="application/ld+json"
+      suppressHydrationWarning
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );

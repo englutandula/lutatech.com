@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'High-performance digital tools for images, PDFs, developer utilities, and AI. Fast, secure, and private.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0b0f19',
-    theme_color: '#ef4444',
+    background_color: '#090B10',
+    theme_color: '#EB1000',
     icons: [
       {
         src: '/favicon.ico',

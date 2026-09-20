@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getApiBaseUrl } from '../../lib/api'
+import { Logo } from './Logo'
 
 export default function TopBar() {
   const pathname = usePathname()
@@ -46,11 +47,9 @@ export default function TopBar() {
       <div className="flex items-center gap-3">
         <Link
           href="/"
-          className="flex items-center gap-2 group text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          className="flex items-center gap-2 group transition-opacity hover:opacity-90 shrink-0"
         >
-          <span className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400">
-            Luta Tech
-          </span>
+          <Logo className="h-5 w-auto" />
         </Link>
         <span className="text-gray-300 dark:text-slate-700">/</span>
         <span className="text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950/60 px-2 py-0.5 rounded-md border border-primary-100 dark:border-primary-900/40">

@@ -339,7 +339,7 @@ export default function DashboardPage() {
               <Clock className="mx-auto h-10 w-10 text-[rgb(var(--lt-text-muted))]" />
               <p className="mt-3 text-sm font-medium text-[rgb(var(--lt-text))]">No activity yet</p>
               <p className="mt-1 text-xs lt-text-muted">Use a tool and your history will appear here.</p>
-              <Link href="/tools/" className="lt-btn-primary mt-5">
+              <Link href="/products/" className="lt-btn-primary mt-5">
                 Browse tools <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

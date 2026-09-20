@@ -110,7 +110,7 @@ export default function AboutPage() {
               Jump straight into our tools — no account required to try them.
             </p>
             <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/tools/" className="lt-btn-primary">
+              <Link href="/products/" className="lt-btn-primary">
                 Browse tools <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/register/" className="lt-btn-secondary">

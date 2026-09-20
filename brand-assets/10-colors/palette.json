@@ -1,0 +1,45 @@
+{
+  "brand": {
+    "name": "LutaTech",
+    "version": "2.0.0",
+    "primary": {
+      "hex": "#FF5758",
+      "rgb": "255, 87, 88",
+      "hsl": "360, 100%, 67%",
+      "cmyk": "0, 66, 65, 0"
+    },
+    "primaryDark": {
+      "hex": "#E03E3F",
+      "rgb": "224, 62, 63",
+      "hsl": "360, 73%, 56%"
+    },
+    "primaryLight": {
+      "hex": "#FFA3A4",
+      "rgb": "255, 163, 164",
+      "hsl": "359, 100%, 82%"
+    }
+  },
+  "logo": {
+    "lightTheme": "#FF5758",
+    "darkTheme": "#FFFFFF",
+    "monochromeBlack": "#000000",
+    "monochromeWhite": "#FFFFFF",
+    "rule": "Icon and text MUST share the exact same color when appearing together."
+  },
+  "neutral": {
+    "darkBackground": "#090B10",
+    "darkSurface": "#121620",
+    "darkBorder": "#232B3E",
+    "darkText": "#F8FAFC",
+    "lightBackground": "#FFFFFF",
+    "lightSurface": "#F8FAFC",
+    "lightBorder": "#E2E8F0",
+    "lightText": "#0F172A"
+  },
+  "semantic": {
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "error": "#EF4444",
+    "info": "#3B82F6"
+  }
+}

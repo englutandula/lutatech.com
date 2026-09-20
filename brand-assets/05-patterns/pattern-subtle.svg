@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <pattern id="brandPattern" width="100" height="100" patternUnits="userSpaceOnUse">
+      <g transform="translate(10, 15) scale(0.09)">
+        
+  <g class="lutatech-icon-mark">
+    <path d="M 344 0 L 656 0 L 1000 1000 L 728 1000 L 586 297 L 414 297 L 272 1000 L 0 1000 Z" fill="#FF5758" />
+    <path d="M 500 676 L 672 1000 L 328 1000 Z" fill="#FF5758" />
+  </g>
+      </g>
+      <g transform="translate(60, 65) scale(0.05)" opacity="0.4">
+        
+  <g class="lutatech-icon-mark">
+    <path d="M 344 0 L 656 0 L 1000 1000 L 728 1000 L 586 297 L 414 297 L 272 1000 L 0 1000 Z" fill="#94A3B8" />
+    <path d="M 500 676 L 672 1000 L 328 1000 Z" fill="#94A3B8" />
+  </g>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="#090B10" />
+  <rect width="100%" height="100%" fill="url(#brandPattern)" />
+</svg>

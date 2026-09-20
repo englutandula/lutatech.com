@@ -22,8 +22,11 @@ DirectoryIndex index.html
     # Enforce HTTPS strictly (HSTS: 1 year, subdomains, preload)
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 
-    # Restrict device sensor and microphone/camera APIs unless explicitly requested
-    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    # Allow camera on same-origin for Passport Photo capture; restrict microphone & geolocation
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(self)"
+
+    # Allow Google OAuth and AdSense popups while isolating cross-origin window objects
+    Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
 </IfModule>
 
 # ── 2. Block Hidden & Sensitive Files ─────────────────────────

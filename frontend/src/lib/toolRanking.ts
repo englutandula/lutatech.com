@@ -28,21 +28,21 @@ const BASELINE_TOOL_SCORES: Record<string, number> = {
 const STORAGE_KEY = 'luta_tool_analytics_usage';
 
 /**
- * Get the total usage score for a tool (Baseline + Local User Clicks)
+ * Get the total usage score for a tool (Baseline + optional Local User Clicks)
  */
-export function getToolUsageScore(slug: string): number {
-  if (typeof window === 'undefined') {
-    return BASELINE_TOOL_SCORES[slug] || 100;
+export function getToolUsageScore(slug: string, includeLocalStorage: boolean = false): number {
+  const base = BASELINE_TOOL_SCORES[slug] || 100;
+  if (!includeLocalStorage || typeof window === 'undefined') {
+    return base;
   }
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const localUsage: Record<string, number> = raw ? JSON.parse(raw) : {};
     const localClicks = localUsage[slug] || 0;
-    const base = BASELINE_TOOL_SCORES[slug] || 250;
     return base + localClicks * 15; // Local actions give weighted boost
   } catch {
-    return BASELINE_TOOL_SCORES[slug] || 100;
+    return base;
   }
 }
 
@@ -77,7 +77,7 @@ export interface RankedTool extends Tool {
 /**
  * Sort tools by popularity algorithm
  */
-export function getRankedTools(tools: Tool[]): RankedTool[] {
+export function getRankedTools(tools: Tool[], includeLocalStorage: boolean = false): RankedTool[] {
   // Sort: Live tools with highest scores first, then remaining live tools, then soon tools
   const sorted = [...tools].sort((a, b) => {
     // 1. Live status precedence
@@ -87,14 +87,14 @@ export function getRankedTools(tools: Tool[]): RankedTool[] {
     if (!aLive && bLive) return 1;
 
     // 2. Score precedence
-    const scoreA = getToolUsageScore(a.slug);
-    const scoreB = getToolUsageScore(b.slug);
+    const scoreA = getToolUsageScore(a.slug, includeLocalStorage);
+    const scoreB = getToolUsageScore(b.slug, includeLocalStorage);
     return scoreB - scoreA;
   });
 
   return sorted.map((tool, index) => {
     const rank = index + 1;
-    const score = getToolUsageScore(tool.slug);
+    const score = getToolUsageScore(tool.slug, includeLocalStorage);
 
     let rankBadge: { label: string; badgeStyle: string } | undefined = undefined;
 

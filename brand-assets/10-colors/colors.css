@@ -1,0 +1,21 @@
+:root {
+  /* LutaTech Brand Design Tokens */
+  --lt-primary: 255 87 88;
+  --lt-primary-hex: #FF5758;
+  --lt-primary-dark: 224 62 63;
+  --lt-primary-light: 255 163 164;
+  
+  --lt-bg: 255 255 255;
+  --lt-surface: 248 250 252;
+  --lt-border: 226 232 240;
+  --lt-text: 15 23 42;
+  --lt-text-muted: 100 116 139;
+}
+
+.dark {
+  --lt-bg: 9 11 16;
+  --lt-surface: 18 22 32;
+  --lt-border: 35 43 62;
+  --lt-text: 248 250 252;
+  --lt-text-muted: 148 163 184;
+}

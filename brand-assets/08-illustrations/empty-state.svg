@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 350" width="500" height="350">
+  <rect width="100%" height="100%" fill="#090B10" rx="16" />
+  <circle cx="250" cy="140" r="80" fill="#121620" stroke="#232B3E" stroke-width="2" />
+  <g transform="translate(195, 85) scale(0.125)">
+    
+  <g class="lutatech-icon-mark">
+    <path d="M 344 0 L 656 0 L 1000 1000 L 728 1000 L 586 297 L 414 297 L 272 1000 L 0 1000 Z" fill="#EB1000" />
+    <path d="M 500 676 L 672 1000 L 328 1000 Z" fill="#EB1000" />
+  </g>
+  </g>
+  <text x="250" y="250" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#F8FAFC">
+    No Files Processed Yet
+  </text>
+  <text x="250" y="280" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="400" fill="#94A3B8">
+    Upload an image or document to get started with LutaTech tools.
+  </text>
+</svg>

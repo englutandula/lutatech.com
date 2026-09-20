@@ -5,6 +5,7 @@ import { Upload, Download, Sparkles, X, Check, ArrowRight, FileArchive, Sliders,
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 interface CompressedImageItem {
   id: string;
@@ -418,6 +419,69 @@ export default function ImageCompressorPage() {
         onChange={(e) => {
           if (e.target.files) handleFiles(e.target.files);
         }}
+      />
+
+      {/* SEO & Educational Guide Section */}
+      <ToolContentSection
+        toolName="Image Compressor"
+        category="Image"
+        tagline="Reduce JPG, PNG, and WebP image file sizes by up to 85% without sacrificing visible clarity."
+        steps={[
+          {
+            title: 'Select or Drop Images',
+            description: 'Upload single or batch photos in JPG, PNG, WebP, or HEIC formats from your phone or computer.',
+          },
+          {
+            title: 'Choose Compression Mode',
+            description: 'Select Recommended (balanced 70–80% savings), Maximum compression, or manually set target quality with live preview.',
+          },
+          {
+            title: 'Download Optimized Files',
+            description: 'Save individual compressed images or download all files packaged together in a single ZIP file.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Batch Image Processing',
+            description: 'Optimize dozens of images at once without throttling, queue limits, or waiting in line.',
+          },
+          {
+            title: 'Perceptual Quality Optimization',
+            description: 'Advanced canvas algorithms discard imperceptible digital noise while keeping text, edges, and portrait details crisp.',
+          },
+          {
+            title: 'Automatic WebP Conversion',
+            description: 'Convert heavy legacy PNG or JPG images into modern, lightweight WebP formats for faster website page load speeds.',
+          },
+          {
+            title: 'One-Click ZIP Packaging',
+            description: 'Bundle all processed files into a single, clean ZIP download without sending files through an external server.',
+          },
+        ]}
+        specs={[
+          { label: 'Supported Inputs', value: 'JPG, PNG, WebP, HEIC' },
+          { label: 'File Size Savings', value: 'Up to 85% Reduction' },
+          { label: 'Batch Processing', value: '50+ Images at once' },
+          { label: 'Data Security', value: '100% Client-Side In-Browser' },
+        ]}
+        faqs={[
+          {
+            question: 'Will compressing my images reduce their physical dimensions or resolution?',
+            answer: 'No, by default our compressor maintains the exact pixel width and height of your original photos. It achieves smaller file sizes by optimizing color encoding and stripping unnecessary camera metadata (EXIF). However, you can also set an optional maximum dimension if you wish to downscale large camera photos.',
+          },
+          {
+            question: 'Are my uploaded photos safe and private?',
+            answer: 'Yes, completely. LutaTech Image Compressor operates 100% within your web browser using HTML5 Canvas and WebAssembly. Your photos are never uploaded or transmitted to any server.',
+          },
+          {
+            question: 'What is the best format for website images?',
+            answer: 'WebP is currently the recommended format for modern websites. It provides 25%–35% smaller file sizes than comparable JPEG or PNG images while supporting both transparency and high-definition photography.',
+          },
+          {
+            question: 'Is there any file size limit?',
+            answer: 'Because compression is performed directly in your browser using your local device memory, you can compress images of any size, including massive 40+ megapixel camera RAW/JPEG photos.',
+          },
+        ]}
       />
     </ToolPageShell>
   );

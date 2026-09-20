@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import TopBar from './TopBar'
+import { Logo } from './Logo'
 
 const HomeIcon = ({ className }: { className?: string }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,16 +45,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           {/* Logo & Brand Header */}
           <div className="h-16 flex items-center px-5 border-b border-gray-200 dark:border-slate-800">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative w-8 h-8 flex flex-shrink-0 items-center justify-center">
-                <img src="/logo.png" alt="Luta Tech Logo" className="w-full h-full object-contain dark:hidden" />
-                <img src="/logo-white.png" alt="Luta Tech Logo" className="w-full h-full object-contain hidden dark:block" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 leading-tight">
-                  Luta Tech
-                </span>
-                <span className="text-xs text-gray-400 font-medium tracking-wide">AI Photo Tools</span>
-              </div>
+              <Logo className="h-7 w-auto" />
             </Link>
           </div>
 
@@ -105,13 +97,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         {/* Mobile Header */}
         <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-[#0F172A] border-b border-gray-200 dark:border-slate-800 z-50 flex items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-7 h-7 flex flex-shrink-0 items-center justify-center">
-              <img src="/logo.png" alt="Luta Tech Logo" className="w-full h-full object-contain dark:hidden" />
-              <img src="/logo-white.png" alt="Luta Tech Logo" className="w-full h-full object-contain hidden dark:block" />
-            </div>
-            <span className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-              Luta Tech
-            </span>
+            <Logo className="h-6 w-auto" />
           </Link>
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

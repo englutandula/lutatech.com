@@ -1,0 +1,22 @@
+{
+  "primary": "#EB1000",
+  "primaryDark": "#C80C00",
+  "primaryLight": "#FF4B3C",
+  "primaryGlow": "rgba(235, 16, 0, 0.25)",
+  "darkBg": "#090B10",
+  "darkSurface": "#121620",
+  "darkBorder": "#232B3E",
+  "darkText": "#FFFFFF",
+  "darkMuted": "#94A3B8",
+  "lightBg": "#FFFFFF",
+  "lightSurface": "#F8FAFC",
+  "lightBorder": "#E2E8F0",
+  "lightText": "#EB1000",
+  "lightMuted": "#64748B",
+  "monoBlack": "#000000",
+  "monoWhite": "#FFFFFF",
+  "success": "#10B981",
+  "warning": "#F59E0B",
+  "error": "#EB1000",
+  "info": "#3B82F6"
+}

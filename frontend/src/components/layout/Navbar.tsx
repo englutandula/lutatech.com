@@ -1,18 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
   Sun, Moon, Menu, X, LogOut, User as UserIcon, LayoutGrid,
-  Search, ChevronDown, ChevronRight, FileText,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { Logo } from './Logo';
 import { SearchDialog } from '../SearchDialog';
-import { MegaMenuPanel } from './MegaMenuPanel';
-import { navPdfGroups } from '@/lib/nav';
+import { AppLauncher } from './AppLauncher';
+
+// Feature flags: set to true when ready to activate Pricing and Auth
+const SHOW_PRICING = false;
+const SHOW_AUTH = false;
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
@@ -24,37 +26,13 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenu, setUserMenu] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [toolsOpen, setToolsOpen] = useState(false);
-
-  // Hover-delay timer (shared between trigger button and panel)
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const openTools = useCallback(() => {
-    if (closeTimerRef.current) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-    setToolsOpen(true);
-  }, []);
-
-  const scheduleClose = useCallback(() => {
-    closeTimerRef.current = setTimeout(() => setToolsOpen(false), 180);
-  }, []);
-
-  // Mobile accordion states
-  const [mobilePdfOpen, setMobilePdfOpen] = useState(false);
-  const [mobilePdfGroup, setMobilePdfGroup] = useState<string | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
-
-  // Clear timer on unmount
-  useEffect(() => () => { if (closeTimerRef.current) clearTimeout(closeTimerRef.current); }, []);
 
   // Close all menus on navigation
   useEffect(() => {
     setMobileOpen(false);
     setUserMenu(false);
-    setToolsOpen(false);
   }, [pathname]);
 
   // Prevent body scroll only when mobile menu drawer is open
@@ -77,15 +55,12 @@ export function Navbar() {
         setSearchOpen((v) => !v);
       }
       if (e.key === 'Escape') {
-        setToolsOpen(false);
         setMobileOpen(false);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
-
-  const isToolsActive = pathname.startsWith('/tools');
 
   const handleSignOut = async () => {
     await logout();
@@ -103,9 +78,9 @@ export function Navbar() {
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-5 xl:gap-7 min-w-0">
             <Link
               href="/"
-              className="inline-flex items-center text-base sm:text-lg md:text-xl font-black tracking-tight leading-none text-[#0F172A] dark:text-white transition-opacity hover:opacity-90 select-none shrink-0"
+              className="inline-flex items-center transition-opacity hover:opacity-90 select-none shrink-0"
             >
-              <Logo className="h-[1.15em] sm:h-[1.25em] md:h-[1.3em] w-auto shrink-0" />
+              <Logo className="h-8 sm:h-9 md:h-9.5 w-auto shrink-0" />
             </Link>
 
             {/* Desktop links — Fluidly Scalable & Non-wrapping */}
@@ -123,43 +98,23 @@ export function Navbar() {
                 Home
               </Link>
 
-              {/* ── Categories mega-menu trigger ── */}
+              {/* Products (Direct Link - Opens Full Directory) */}
               <Link
-                href="/categories/"
-                id="tools-menu-btn"
-                onMouseEnter={openTools}
-                onMouseLeave={scheduleClose}
-                onClick={() => setToolsOpen(false)}
-                className={`flex items-center gap-1 rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                  toolsOpen || pathname.startsWith('/categories')
+                href="/products/"
+                prefetch={false}
+                className={`rounded-lg px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
+                  pathname.startsWith('/products')
                     ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
                     : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
                 }`}
-                aria-expanded={toolsOpen}
-                aria-haspopup="true"
               >
-                <span>Categories</span>
-                <ChevronDown
-                  className={`h-3 w-3 lg:h-3.5 lg:w-3.5 transition-transform duration-200 ${toolsOpen ? 'rotate-180' : ''}`}
-                />
+                Products
               </Link>
 
-              {/* All Tools */}
-              <Link
-                href="/tools/"
-                prefetch={false}
-                className={`rounded-lg px-1.5 md:px-2 lg:px-2.5 xl:px-3 py-1.5 text-[11px] md:text-xs xl:text-sm font-medium whitespace-nowrap shrink-0 transition-all ${
-                  isToolsActive
-                    ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)] font-semibold'
-                    : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
-                }`}
-              >
-                All Tools
-              </Link>
 
               {/* Pricing / About */}
               {[
-                { label: 'Pricing', href: '/pricing/' },
+                ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
                 { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link
@@ -180,21 +135,8 @@ export function Navbar() {
 
           {/* Right actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 lg:gap-3 shrink-0">
-            {/* Search — Flexible & Adaptive across all screen sizes */}
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="flex items-center justify-between gap-1.5 sm:gap-2 rounded-xl border border-[rgb(var(--lt-border))] bg-[rgb(var(--lt-surface-2))] hover:bg-[rgb(var(--lt-surface-3))] px-2 md:px-2.5 lg:px-3 py-1.5 text-xs text-[rgb(var(--lt-text-muted))] hover:border-[rgb(var(--lt-primary)/0.4)] hover:text-[rgb(var(--lt-text))] transition-all cursor-pointer shadow-xs group w-auto sm:w-36 md:w-40 lg:w-48 xl:w-56"
-              aria-label="Search tools"
-            >
-              <div className="flex items-center gap-1.5 min-w-0">
-                <Search className="h-3.5 w-3.5 shrink-0 group-hover:text-[rgb(var(--lt-primary))] transition-colors" />
-                <span className="hidden sm:inline truncate text-[11px] lg:text-xs">Search tools...</span>
-              </div>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md bg-[rgb(var(--lt-surface))] border border-[rgb(var(--lt-border))] px-1.5 py-0.5 text-[10px] font-mono shrink-0 text-[rgb(var(--lt-text-muted))] shadow-2xs">
-                ⌘K
-              </kbd>
-            </button>
+            {/* 9-Dot App Switcher (Adobe/Google Waffle Menu) */}
+            <AppLauncher />
 
             {/* Theme */}
             <button
@@ -261,7 +203,7 @@ export function Navbar() {
                   </>
                 )}
               </div>
-            ) : (
+            ) : SHOW_AUTH ? (
               <div className="hidden items-center gap-1.5 md:flex shrink-0">
                 <Link
                   href="/login"
@@ -277,11 +219,11 @@ export function Navbar() {
                   <span>Sign Up</span>
                 </Link>
               </div>
-            )}
+            ) : null}
 
             {/* Mobile hamburger */}
             <button
-              onClick={() => { setMobileOpen((v) => !v); setToolsOpen(false); }}
+              onClick={() => setMobileOpen((v) => !v)}
               className="rounded-lg p-2 text-[rgb(var(--lt-text-muted))] transition-colors hover:bg-[rgb(var(--lt-surface-2))] md:hidden cursor-pointer"
               aria-label="Menu"
             >
@@ -289,15 +231,6 @@ export function Navbar() {
             </button>
           </div>
         </nav>
-
-        {/* ── Desktop Mega Menu panel (absolute, sits below the header) ── */}
-        {toolsOpen && (
-          <MegaMenuPanel
-            onClose={() => setToolsOpen(false)}
-            onMouseEnter={openTools}
-            onMouseLeave={scheduleClose}
-          />
-        )}
 
         {/* ── Mobile Drawer ──────────────────────────────────────────── */}
         {mobileOpen && (
@@ -317,108 +250,22 @@ export function Navbar() {
                 Home
               </Link>
 
-              {/* All Tools */}
+              {/* Products (Direct Link) */}
               <Link
-                href="/tools/"
+                href="/products/"
                 onClick={() => setMobileOpen(false)}
                 className={`block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                  isToolsActive
+                  pathname.startsWith('/products')
                     ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)]'
                     : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
                 }`}
               >
-                All Tools
+                Products
               </Link>
-
-              {/* Categories accordion */}
-              <div className="rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setMobilePdfOpen((v) => !v)}
-                  className={`flex w-full items-center justify-between px-3 py-2.5 text-sm font-medium transition-colors cursor-pointer ${
-                    mobilePdfOpen
-                      ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.08)]'
-                      : 'text-[rgb(var(--lt-text-muted))] hover:bg-[rgb(var(--lt-surface-2))] hover:text-[rgb(var(--lt-text))]'
-                  }`}
-                >
-                  Categories
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${mobilePdfOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {mobilePdfOpen && (
-                  <div className="ml-4 pl-3 border-l-2 border-[rgb(var(--lt-border))] my-1 space-y-0.5 pb-1">
-
-                    {/* Subcategories (AI, PDF, etc.) */}
-                    {navPdfGroups.map((group) => (
-                      <div key={group.id}>
-                        <button
-                          onClick={() => setMobilePdfGroup((v) => v === group.id ? null : group.id)}
-                          className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-sm font-semibold text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))] transition-colors cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className={`flex h-5 w-5 items-center justify-center rounded ${group.iconBg} ${group.iconText}`}>
-                              <FileText className="h-3 w-3" />
-                            </div>
-                            {group.label}
-                          </div>
-                          <ChevronRight
-                            className={`h-3.5 w-3.5 text-[rgb(var(--lt-text-muted))] transition-transform duration-200 ${mobilePdfGroup === group.id ? 'rotate-90' : ''}`}
-                          />
-                        </button>
-
-                        {mobilePdfGroup === group.id && (
-                          <div className="ml-7 mt-0.5 space-y-px pb-1">
-                            {group.items.map((item) =>
-                              item.status === 'live' ? (
-                                <Link
-                                  key={item.label}
-                                  href={item.href}
-                                  onClick={() => setMobileOpen(false)}
-                                  className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
-                                    pathname === item.href
-                                      ? 'text-[rgb(var(--lt-primary))] bg-[rgb(var(--lt-primary)/0.07)]'
-                                      : 'text-[rgb(var(--lt-text-muted))] hover:text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))]'
-                                  }`}
-                                >
-                                  <span className="h-1 w-1 rounded-full bg-current opacity-40 shrink-0" />
-                                  {item.label}
-                                </Link>
-                              ) : (
-                                <div
-                                  key={item.label}
-                                  className="flex items-center justify-between rounded-md px-2 py-1.5"
-                                >
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="h-1 w-1 rounded-full bg-[rgb(var(--lt-border))] shrink-0" />
-                                    <span className="text-xs font-medium text-[rgb(var(--lt-text-muted))] opacity-50">
-                                      {item.label}
-                                    </span>
-                                  </div>
-                                  <span className="text-[9px] font-bold text-[rgb(var(--lt-text-muted))]">
-                                    Soon
-                                  </span>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* View all */}
-                    <Link
-                      href="/tools/"
-                      onClick={() => setMobileOpen(false)}
-                      className="mt-2 flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-[rgb(var(--lt-primary))] hover:bg-[rgb(var(--lt-primary)/0.07)] transition-colors"
-                    >
-                      View all tools →
-                    </Link>
-                  </div>
-                )}
-              </div>
 
               {/* Pricing / About */}
               {[
-                { label: 'Pricing', href: '/pricing/' },
+                ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
                 { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link
@@ -452,7 +299,7 @@ export function Navbar() {
                     <LogOut className="h-4 w-4" /> Sign Out
                   </button>
                 </>
-              ) : (
+              ) : SHOW_AUTH ? (
                 <div className="mt-3 flex flex-col gap-2 pt-3 border-t lt-border-color">
                   <Link
                     href="/login"
@@ -470,24 +317,14 @@ export function Navbar() {
                     <span>Sign Up</span>
                   </Link>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         )}
       </header>
 
-      {/* ── Page dimmer — dims content behind the mega menu (Apple style) ── */}
-      {toolsOpen && (
-        <div
-          className="fixed inset-0 z-[35] page-dimmer"
-          style={{ background: 'rgba(0,0,0,0.08)', backdropFilter: 'blur(1px)' }}
-          aria-hidden="true"
-          onClick={() => setToolsOpen(false)}
-        />
-      )}
-
       {/* ── Global Search Modal ─────────────────────────────────────────── */}
-      <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen && <SearchDialog isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
     </>
   );
 }

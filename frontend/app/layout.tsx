@@ -6,9 +6,11 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthProvider } from '@/lib/auth-context';
-import { WebSiteJsonLd, SiteNavigationJsonLd } from '@/components/seo/JsonLd';
+import { WebSiteJsonLd, OrganizationJsonLd, SiteNavigationJsonLd } from '@/components/seo/JsonLd';
 import NextTopLoader from 'nextjs-toploader';
+import Script from 'next/script';
 import { Suspense } from 'react';
+import CookieConsent from '@/components/CookieConsent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -101,11 +103,13 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48 32x32 16x16' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
     ],
+    shortcut: '/favicon.ico',
     apple: [
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
@@ -115,17 +119,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <head>
+      <body className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] font-sans antialiased transition-colors">
+        <OrganizationJsonLd />
         <WebSiteJsonLd />
         <SiteNavigationJsonLd />
-        <meta name="google-adsense-account" content="ca-pub-9660710706059023" />
-        <script
-          async
+        <Script
+          id="google-adsense"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9660710706059023"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
-      </head>
-      <body className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] font-sans antialiased transition-colors">
         <Suspense fallback={null}>
           <NextTopLoader color="rgb(var(--lt-primary))" showSpinner={false} />
         </Suspense>
@@ -136,6 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
+            <CookieConsent />
           </AuthProvider>
           <Analytics />
         </ThemeProvider>

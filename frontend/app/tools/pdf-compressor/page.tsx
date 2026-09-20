@@ -6,6 +6,7 @@ import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { compressPdfFile, inspectPdfFile, formatBytes, PdfFileInfo } from '@/lib/pdf';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 export default function PdfCompressorPage() {
   const tool = getTool('pdf-compressor') || {
@@ -330,6 +331,69 @@ export default function PdfCompressorPage() {
         onChange={(e) => {
           if (e.target.files?.[0]) handleFile(e.target.files[0]);
         }}
+      />
+
+      {/* SEO & Educational Guide Section */}
+      <ToolContentSection
+        toolName="PDF Compressor"
+        category="PDF"
+        tagline="Shrink heavy PDF documents for email attachments, online job portals, and web publishing without losing legibility."
+        steps={[
+          {
+            title: 'Upload Your PDF Document',
+            description: 'Drag & drop or browse your computer or mobile device for any multi-page PDF file.',
+          },
+          {
+            title: 'Choose Compression Strength',
+            description: 'Select Recommended (ideal balance for email & portals), Extreme, or High Quality according to your document requirements.',
+          },
+          {
+            title: 'Download Optimized PDF',
+            description: 'Inspect exact file size savings and download your optimized document immediately.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Preserve Document Quality',
+            description: 'Optimizes embedded high-DPI imagery and stream data while maintaining clear, legible text for reading and printing.',
+          },
+          {
+            title: 'Bypass Email Attachment Limits',
+            description: 'Easily reduce bloated scans and slide decks from 40MB down to under 10MB to fit within Gmail and Outlook limits.',
+          },
+          {
+            title: 'Live Page-by-Page Progress',
+            description: 'Watch real-time visual progress as each page is evaluated and optimized without sudden browser freezes.',
+          },
+          {
+            title: 'Confidential & Private',
+            description: 'Financial reports, contracts, and legal documents are processed entirely in your browser without ever hitting a third-party server.',
+          },
+        ]}
+        specs={[
+          { label: 'Page Limit', value: '500+ Pages' },
+          { label: 'File Type', value: 'Standard PDF (.pdf)' },
+          { label: 'Engine', value: 'pdf-lib & PDF.js' },
+          { label: 'Confidentiality', value: '100% In-Browser Execution' },
+        ]}
+        faqs={[
+          {
+            question: 'Will compressing my PDF make the text blurry or unreadable?',
+            answer: 'No. Our compression engine selectively re-encodes oversized embedded photographs and scans while keeping vector fonts and text definitions crisp and completely readable at standard zoom levels.',
+          },
+          {
+            question: 'Are my confidential documents uploaded to your servers?',
+            answer: 'Never. LutaTech operates on a strict zero-knowledge, client-side architecture. The PDF is parsed and rebuilt directly in your browser memory using WebAssembly. We do not store or transmit your documents.',
+          },
+          {
+            question: 'Can I compress password-protected PDF files?',
+            answer: 'If a PDF has an open password, please unlock it before compressing. For security reasons, encrypted PDF files cannot be processed without the original decryption key.',
+          },
+          {
+            question: 'Why did my PDF only shrink by a small percentage?',
+            answer: 'If your PDF consists primarily of plain text, vector line art, or was already optimized by professional desktop software, there are fewer redundant image pixels to compress. Scanned documents with high-resolution photos typically experience the greatest size reduction (up to 70–80%).',
+          },
+        ]}
       />
     </ToolPageShell>
   );

@@ -67,7 +67,7 @@ export default function NotFound() {
           <Link href="/" className="lt-btn-primary w-full sm:w-auto">
             <Home className="h-4 w-4" /> Return to Homepage
           </Link>
-          <Link href="/tools/" className="lt-btn-secondary w-full sm:w-auto">
+          <Link href="/products/" className="lt-btn-secondary w-full sm:w-auto">
             <Search className="h-4 w-4" /> Browse All Tools
           </Link>
         </div>
