@@ -67,7 +67,7 @@ export function OrganizationJsonLd({
   siteUrl = SITE_URL,
   name = 'LutaTech',
   legalName = 'LutaTech Digital Tools',
-  logoUrl = `${SITE_URL}/logo-light.svg`,
+  logoUrl = `${SITE_URL}/logo.png`,
   description = 'High-performance digital tools for images, PDFs, converters, and AI — private by design, running in your browser.',
 }: OrganizationJsonLdProps) {
   const schema = {
@@ -84,8 +84,8 @@ export function OrganizationJsonLd({
       url: logoUrl,
       contentUrl: logoUrl,
       caption: `${name} Logo`,
-      width: '510',
-      height: '120',
+      width: '512',
+      height: '512',
     },
     image: `${siteUrl}/og-image.png`,
     description,

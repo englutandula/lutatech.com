@@ -104,9 +104,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.svg?v=3', type: 'image/svg+xml' },
+      { url: '/favicon-48x48.png?v=3', sizes: '48x48', type: 'image/png' },
+      { url: '/icon-192.png?v=3', sizes: '192x192', type: 'image/png' },
       { url: '/favicon-32x32.png?v=3', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-16x16.png?v=3', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-48x48.png?v=3', sizes: '48x48', type: 'image/png' },
       { url: '/favicon.ico?v=3', sizes: '48x48 32x32 16x16' },
     ],
     shortcut: '/favicon.ico?v=3',
