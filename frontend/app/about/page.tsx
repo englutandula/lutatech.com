@@ -1,6 +1,5 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { Target, Eye, Heart, Zap, ShieldCheck, Users, ArrowRight } from 'lucide-react';
 import { BreadcrumbJsonLd } from '@/components/seo/JsonLd';
 
@@ -101,25 +100,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="lt-container pb-16">
-        <div className="relative overflow-hidden rounded-3xl border lt-border-color lt-surface p-10 text-center sm:p-16">
-          <div className="absolute inset-0 lt-glow pointer-events-none" />
-          <div className="relative">
-            <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl text-[rgb(var(--lt-text))]">Start using Luta Tech</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm lt-text-muted">
-              Jump straight into our tools — no account required to try them.
-            </p>
-            <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/products/" className="lt-btn-primary">
-                Browse tools <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/register/" className="lt-btn-secondary">
-                Create account
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

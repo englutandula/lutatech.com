@@ -49,9 +49,6 @@ export default function HomePage() {
     <div className="flex flex-col">
       {/* ── HERO SECTION ── */}
       <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
-        {/* Ambient Glows */}
-        <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full lt-glow blur-3xl opacity-70" />
-
         <div className="lt-container relative z-10 text-center">
           {/* Main Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[rgb(var(--lt-text))] lt-fade-up leading-[1.14]">
