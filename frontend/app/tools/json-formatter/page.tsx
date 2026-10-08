@@ -19,6 +19,7 @@ import {
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 const SAMPLE_JSON = `{
   "platform": "LutaTech",
@@ -377,6 +378,79 @@ export default function JsonFormatterPage() {
           </div>
         </div>
       </div>
+
+      <ToolContentSection
+        toolName="JSON Formatter & Validator"
+        category="Developer"
+        tagline="Prettify, validate, minify, and debug JSON objects in real-time with instant syntax error detection."
+        steps={[
+          {
+            title: 'Paste or Load JSON Code',
+            description:
+              'Paste raw, unformatted, minified, or messy JSON data into the input editor or load our sample structure.',
+          },
+          {
+            title: 'Choose Indentation & Format',
+            description:
+              'Select 2 spaces, 4 spaces, or Tabs for clean readability, or click Minify to compact your JSON down to a single line.',
+          },
+          {
+            title: 'Copy or Download .json File',
+            description:
+              'Copy formatted JSON to your clipboard with one click or download the clean file directly to your computer.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Real-Time Syntax Error Diagnostics',
+            description:
+              'Detects unclosed quotes, trailing commas, missing colons, and invalid data types instantly with descriptive error feedback.',
+          },
+          {
+            title: 'Configurable Code Formatting',
+            description:
+              'Easily toggle between 2-space, 4-space, and tab indentation to match your company style guide or IDE configuration.',
+          },
+          {
+            title: 'Instant 1-Click Minifier',
+            description:
+              'Strip all unnecessary whitespace and line breaks to minimize payload size for network requests and database storage.',
+          },
+          {
+            title: '100% In-Browser Privacy',
+            description:
+              'Proprietary API tokens, database backups, and confidential business payloads are processed in memory and never sent over the internet.',
+          },
+        ]}
+        specs={[
+          { label: 'Standard', value: 'RFC 8259 & ECMA-404' },
+          { label: 'Indentation', value: '2 Spaces, 4 Spaces, Tabs' },
+          { label: 'Minification', value: 'Single-Line Compact' },
+          { label: 'Security', value: 'Zero Server Logging' },
+        ]}
+        faqs={[
+          {
+            question: 'Why should I use an in-browser JSON formatter over cloud alternatives?',
+            answer:
+              'Many online formatting tools transmit your data to remote logging servers. LutaTech processes JSON entirely in your browser using native JavaScript engines, keeping API keys, authentication tokens, and customer data 100% confidential.',
+          },
+          {
+            question: 'How does real-time syntax validation work?',
+            answer:
+              'The editor validates your text against the official ECMA-404 standard in real-time. If there is a syntax issue (like a trailing comma or mismatched brace), the error box highlights the exact parsing fault.',
+          },
+          {
+            question: 'Can I format large multi-megabyte JSON payloads?',
+            answer:
+              'Yes. Because processing runs locally using high-speed client-side engines, you can format large API responses without being blocked by network timeouts or file upload limits.',
+          },
+          {
+            question: 'Can I minify JSON to reduce file size?',
+            answer:
+              'Yes. Click the Minify button to instantly strip all line breaks and whitespace, producing compact JSON ready for production API payloads.',
+          },
+        ]}
+      />
     </ToolPageShell>
   );
 }

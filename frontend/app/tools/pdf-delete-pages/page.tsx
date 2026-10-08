@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
+import ToolContentSection from '@/components/seo/ToolContentSection';
+
 export default function PdfDeletePagesPage() {
   const tool = getTool('pdf-delete-pages')!;
   return (
@@ -49,6 +51,78 @@ export default function PdfDeletePagesPage() {
       />
       <ToolPageShell tool={tool}>
         <PdfDeletePagesTool />
+        <ToolContentSection
+          toolName="PDF Page Deleter"
+          category="PDF"
+          tagline="Select and permanently remove blank or unwanted pages from your PDF document with 100% in-browser privacy."
+          steps={[
+            {
+              title: 'Upload Your PDF File',
+              description:
+                'Select or drop your PDF document to generate interactive page thumbnails.',
+            },
+            {
+              title: 'Select Pages to Remove',
+              description:
+                'Click on any pages you wish to eliminate (blank pages, obsolete appendices, or private sheets).',
+            },
+            {
+              title: 'Download Clean PDF',
+              description:
+                'Process the deletion instantly in your browser and download the sanitized PDF document immediately.',
+            },
+          ]}
+          features={[
+            {
+              title: 'Visual Multi-Page Selection',
+              description:
+                'Easily select single or multiple pages visually across your entire document before deleting.',
+            },
+            {
+              title: '100% In-Browser Privacy',
+              description:
+                'Page stripping runs locally in client-side memory. Zero confidential documents are uploaded to cloud servers.',
+            },
+            {
+              title: 'Lossless Quality',
+              description:
+                'Retains all original document streams, hyperlinks, bookmarks, and font vector clarity without compression losses.',
+            },
+            {
+              title: 'Instant Execution',
+              description:
+                'No waiting for server uploads or queues. Large documents are modified in milliseconds.',
+            },
+          ]}
+          specs={[
+            { label: 'Page Limit', value: 'Unlimited (In-Browser)' },
+            { label: 'File Type', value: 'Standard PDF (.pdf)' },
+            { label: 'Engine', value: 'Client-Side WebAssembly' },
+            { label: 'Data Security', value: 'Zero Cloud Storage' },
+          ]}
+          faqs={[
+            {
+              question: 'Are deleted pages permanently removed?',
+              answer:
+                'Yes. The resulting downloaded PDF file is completely rebuilt without the selected pages, ensuring that sensitive data is permanently stripped.',
+            },
+            {
+              question: 'Will deleting pages affect the numbering of remaining pages?',
+              answer:
+                'The physical document page tree is updated immediately so remaining pages flow continuously.',
+            },
+            {
+              question: 'Are my confidential documents uploaded to an external server?',
+              answer:
+                'Never. LutaTech operates on a strict zero-knowledge, client-side architecture. Processing happens purely inside your web browser session.',
+            },
+            {
+              question: 'Can I delete pages from scanned documents?',
+              answer:
+                'Yes! Both native digital PDFs and scanned image-based PDF documents are fully supported.',
+            },
+          ]}
+        />
       </ToolPageShell>
     </>
   );

@@ -27,6 +27,7 @@ import {
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 // --- Color Conversion Helpers ---
 
@@ -1328,6 +1329,79 @@ export default function AdvancedColorPickerPage() {
           </div>
         </div>
       )}
+
+      <ToolContentSection
+        toolName="Color Picker & Palette Generator"
+        category="Developer"
+        tagline="Extract shades, inspect WCAG accessibility contrast ratios, and convert HEX, RGB, HSL, and CMYK colors."
+        steps={[
+          {
+            title: 'Pick or Enter a Color',
+            description:
+              'Click anywhere on the interactive canvas spectrum, use the browser eyedropper tool, or paste any HEX, RGB, or HSL color code.',
+          },
+          {
+            title: 'Explore Harmonies & Contrast',
+            description:
+              'Generate complementary, split-complementary, monochromatic, and triadic color harmonies alongside live WCAG 2.1 accessibility scores.',
+          },
+          {
+            title: 'Copy Formats or Export CSS',
+            description:
+              'Copy color values in HEX, RGB, HSL, HSV, or CMYK with a single click, or export entire CSS custom property theme palettes.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Multi-Format Color Conversions',
+            description:
+              'Convert effortlessly between HEX, RGB, HSL, HSV, CMYK, and modern CSS variables with instant mathematical precision.',
+          },
+          {
+            title: 'WCAG 2.1 Accessibility Contrast Checker',
+            description:
+              'Calculate real-time luminance contrast ratios against white and dark backgrounds to ensure your designs pass AA and AAA standards.',
+          },
+          {
+            title: 'Curated Color Harmonies',
+            description:
+              'Derive harmonious designer palettes including complementary, triadic, tetradic, analogous, and monochromatic arrangements automatically.',
+          },
+          {
+            title: 'Colorblindness Vision Simulation',
+            description:
+              'Preview how your selected hues appear to users with deuteranopia, protanopia, tritanopia, and achromatopsia.',
+          },
+        ]}
+        specs={[
+          { label: 'Color Formats', value: 'HEX, RGB, HSL, HSV, CMYK' },
+          { label: 'Accessibility', value: 'WCAG 2.1 AA & AAA Ratios' },
+          { label: 'Harmonies', value: 'Complementary, Triadic, Analogous' },
+          { label: 'Eyedropper Tool', value: 'Native EyeDropper API' },
+        ]}
+        faqs={[
+          {
+            question: 'How do I know if my color choice meets WCAG accessibility requirements?',
+            answer:
+              'Our tool computes the exact contrast ratio between your color and standard background surfaces. A minimum contrast ratio of 4.5:1 is required for WCAG AA normal body text, and 7:1 for AAA compliance.',
+          },
+          {
+            question: 'What color formats are supported for conversion?',
+            answer:
+              'You can convert and copy values in HEX (hexadecimal), RGB (Red, Green, Blue), HSL (Hue, Saturation, Lightness), HSV (Hue, Saturation, Value), and CMYK (Cyan, Magenta, Yellow, Key/Black) for professional print work.',
+          },
+          {
+            question: 'Can I sample a color directly from my screen or another window?',
+            answer:
+              'Yes! In supported desktop browsers (Chrome, Edge, Opera), click the Pipette icon to activate the native screen Eyedropper and grab exact pixel colors from anywhere on your display.',
+          },
+          {
+            question: 'How are colorblindness simulations calculated?',
+            answer:
+              'We apply LMS color-space matrix projections that model specific cone deficiencies, allowing developers and designers to build universally accessible user interfaces.',
+          },
+        ]}
+      />
     </ToolPageShell>
   );
 }

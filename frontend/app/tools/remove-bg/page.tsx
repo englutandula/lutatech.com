@@ -6,6 +6,7 @@ import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
 import { Upload, Download, Sparkles, Check, X, Scissors } from 'lucide-react';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 const COLOR_PRESETS = [
   { color: 'transparent', label: 'Transparent', isTransparent: true, isLight: false },
@@ -332,6 +333,84 @@ export default function BackgroundRemover() {
         onChange={handleImageSelect}
         accept="image/png, image/jpeg, image/webp"
         className="hidden"
+      />
+
+      <ToolContentSection
+        toolName="AI Background Remover"
+        category="Image"
+        tagline="Erase backgrounds from portraits, product listings, animals, and logos with deep-learning precision in seconds."
+        steps={[
+          {
+            title: 'Upload Any Photo or Graphic',
+            description:
+              'Drag and drop or select any PNG, JPG, WebP, or HEIC image from your device. High-resolution photos are supported.',
+          },
+          {
+            title: 'Instant AI Edge Isolation',
+            description:
+              'Our neural network model analyzes the image to isolate foreground elements, preserving fine hair, fur, transparent accessories, and sharp outlines.',
+          },
+          {
+            title: 'Choose Solid Backdrop & Download HD',
+            description:
+              'Keep the background transparent (PNG) or switch to solid studio backdrops (White, Slate, Crimson, Royal Blue) before downloading full HD results.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Fine Edge & Hair Isolation',
+            description:
+              'Accurately distinguishes tricky strands of hair, complex textures, and semi-transparent edges without harsh borders.',
+          },
+          {
+            title: 'E-Commerce Marketplace Ready',
+            description:
+              'Produce clean, white-background product photography tailored to Amazon, Shopify, eBay, and Etsy requirements in one click.',
+          },
+          {
+            title: 'Solid Palette Color Switcher',
+            description:
+              'Test various backdrop colors instantly using our built-in curated palette presets or export raw alpha transparencies.',
+          },
+          {
+            title: '100% Free & No Watermarks',
+            description:
+              'Get crystal-clear high-definition cutouts without mandatory subscriptions, email sign-ups, or annoying watermarks.',
+          },
+        ]}
+        specs={[
+          { label: 'Supported Inputs', value: 'JPG, PNG, WebP, HEIC' },
+          { label: 'Output Formats', value: 'Transparent PNG / JPG' },
+          { label: 'AI Architecture', value: 'BiRefNet & MediaPipe' },
+          { label: 'Export Quality', value: 'Original HD (No Watermark)' },
+        ]}
+        faqs={[
+          {
+            question: 'How does the AI Background Remover detect the subject?',
+            answer:
+              'The tool uses deep-learning neural networks trained on millions of diverse portrait and product images to recognize foreground subjects and separate them with sub-pixel alpha matting.',
+          },
+          {
+            question: 'Can I replace the background with a solid white or custom color?',
+            answer:
+              'Yes! After removal, simply click any color swatch in the palette below your preview (such as pure white, black, blue, or red) to instantly apply a solid background before exporting.',
+          },
+          {
+            question: 'Is there a limit on the number of images I can process?',
+            answer:
+              'No. You can process as many images as you need without daily quotas, paywalls, or hidden watermarks.',
+          },
+          {
+            question: 'What types of photos yield the best background removal?',
+            answer:
+              'High-resolution portraits, headshots, pets, cars, and product photos with good focus on the subject work best. Even complex backgrounds with foliage or indoor clutter are cleanly separated.',
+          },
+          {
+            question: 'Are my uploaded images kept secure and private?',
+            answer:
+              'Yes. Your photos are processed exclusively for your session and are never saved permanently, publicly shared, or used to train third-party machine learning models.',
+          },
+        ]}
       />
     </ToolPageShell>
   );

@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
+import ToolContentSection from '@/components/seo/ToolContentSection';
+
 export default function PdfExtractPagesPage() {
   const tool = getTool('pdf-extract-pages')!;
   return (
@@ -49,6 +51,78 @@ export default function PdfExtractPagesPage() {
       />
       <ToolPageShell tool={tool}>
         <PdfExtractPagesTool />
+        <ToolContentSection
+          toolName="PDF Page Extractor"
+          category="PDF"
+          tagline="Choose specific pages from any document and extract them into a brand new, lightweight PDF file."
+          steps={[
+            {
+              title: 'Upload Your PDF Document',
+              description:
+                'Select or drop your PDF document to view visual thumbnails for every page.',
+            },
+            {
+              title: 'Select Specific Pages',
+              description:
+                'Click the pages you need to extract (invoices, signatures, agreements, or diagrams).',
+            },
+            {
+              title: 'Export Extracted Document',
+              description:
+                'Create and download your newly compiled PDF containing only the selected pages in seconds.',
+            },
+          ]}
+          features={[
+            {
+              title: 'Targeted Page Extraction',
+              description:
+                'Pull out precisely the sheets you need without carrying unnecessary bloated chapters.',
+            },
+            {
+              title: '100% In-Browser Privacy',
+              description:
+                'Document manipulation occurs locally in memory. Zero sensitive agreements or pages touch a remote server.',
+            },
+            {
+              title: 'Retains Document Clarity',
+              description:
+                'Preserves all vector fonts, digital forms, and high-definition illustrations losslessly.',
+            },
+            {
+              title: 'Zero Software Required',
+              description:
+                'Works smoothly on all desktop and mobile browsers without requiring paid Adobe software.',
+            },
+          ]}
+          specs={[
+            { label: 'Page Limit', value: 'Unlimited (In-Browser)' },
+            { label: 'File Type', value: 'Standard PDF (.pdf)' },
+            { label: 'Extraction', value: 'Lossless Vector Preservation' },
+            { label: 'Data Security', value: '100% In-Browser Execution' },
+          ]}
+          faqs={[
+            {
+              question: 'How is page extraction different from splitting a PDF?',
+              answer:
+                'Splitting typically divides an entire document into chunks or single sheets, whereas Extraction allows you to hand-pick specific pages to assemble into a fresh standalone PDF.',
+            },
+            {
+              question: 'Will text or links inside extracted pages stop working?',
+              answer:
+                'No. The internal PDF stream dictionaries for the chosen pages are preserved, meaning fonts, hyperlinks, and vector artwork remain fully functional.',
+            },
+            {
+              question: 'Are my extracted documents uploaded to your servers?',
+              answer:
+                'No. All extraction operations occur entirely inside your browser session. No data is stored, logged, or uploaded.',
+            },
+            {
+              question: 'Can I extract pages from password-protected files?',
+              answer:
+                'Please unlock your PDF before extraction, as our browser tool respects security encryption.',
+            },
+          ]}
+        />
       </ToolPageShell>
     </>
   );

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getLiveTools } from '@/lib/tools';
+import { guides } from '@/lib/guides';
 
 export const dynamic = 'force-static';
 
@@ -41,6 +42,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     //   priority: 0.8,
     // },
     {
+      url: `${SITE_URL}/guides/`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
       url: `${SITE_URL}/about/`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
@@ -66,7 +73,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // Tool specific pages (all 22 canonical live tools)
+  // Tool specific pages (all canonical live tools)
   const liveTools = getLiveTools();
   const toolPages: MetadataRoute.Sitemap = liveTools.map((tool) => {
     const path = tool.href || `/tools/${tool.slug}`;
@@ -79,5 +86,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  return [...staticPages, ...toolPages];
+  // Educational guides
+  const guidePages: MetadataRoute.Sitemap = guides.map((guide) => ({
+    url: `${SITE_URL}/guides/${guide.slug}/`,
+    lastModified: currentDate,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...toolPages, ...guidePages];
 }

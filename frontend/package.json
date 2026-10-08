@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && (test -f public/.htaccess && cp public/.htaccess out/.htaccess || true)",
+    "build": "next build --webpack && (test -f public/.htaccess && cp public/.htaccess out/.htaccess || true)",
     "start": "next start",
     "lint": "eslint"
   },
@@ -37,5 +37,8 @@
     "eslint-config-next": "16.1.7",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-x64": "^16.1.7"
   }
 }

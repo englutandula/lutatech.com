@@ -5,6 +5,7 @@ import { Upload, Download, Sparkles, X, Lock, Unlock, RefreshCw, Layers, Check, 
 import ToolPageShell from '@/components/ToolPageShell';
 import { getTool } from '@/lib/tools';
 import { recordToolUsage } from '@/lib/toolRanking';
+import ToolContentSection from '@/components/seo/ToolContentSection';
 
 interface Preset {
   name: string;
@@ -492,6 +493,79 @@ export default function ImageResizerPage() {
         onChange={(e) => {
           if (e.target.files?.[0]) handleFile(e.target.files[0]);
         }}
+      />
+
+      <ToolContentSection
+        toolName="Image Resizer"
+        category="Image"
+        tagline="Resize photos and graphics to exact pixel dimensions, percentage scales, or social media aspect ratios with zero loss in sharpness."
+        steps={[
+          {
+            title: 'Upload Your Photo',
+            description:
+              'Choose or drag and drop any JPG, PNG, or WebP picture from your computer, tablet, or phone.',
+          },
+          {
+            title: 'Set Dimensions or Select Presets',
+            description:
+              'Enter exact pixel width and height, lock aspect ratios, or pick standard presets for Instagram, YouTube, Twitter, and print photos.',
+          },
+          {
+            title: 'Download Resized Image',
+            description:
+              'Select your desired output format (JPG, PNG, WebP) and download your optimized, resized picture instantly.',
+          },
+        ]}
+        features={[
+          {
+            title: 'Pixel-Perfect Aspect Ratio Locking',
+            description:
+              'Maintain exact original proportions automatically or unlock to apply custom non-uniform width and height dimensions.',
+          },
+          {
+            title: 'Social Media & Print Presets',
+            description:
+              'One-click dimensions tailored to Instagram Square, Stories, YouTube Thumbnails, Facebook Banners, and 4x6" photo prints.',
+          },
+          {
+            title: 'Multi-Format Export & Quality Tuning',
+            description:
+              'Easily convert between JPG, PNG, and WebP while fine-tuning image compression quality sliders for optimal file size.',
+          },
+          {
+            title: '100% In-Browser Privacy',
+            description:
+              'All image decoding and resizing operations run client-side using HTML5 Canvas. Your personal photos are never uploaded to any remote server.',
+          },
+        ]}
+        specs={[
+          { label: 'Supported Inputs', value: 'JPG, PNG, WebP, SVG' },
+          { label: 'Resize Modes', value: 'Pixels, %, Presets' },
+          { label: 'Quality Control', value: 'Granular 1% - 100%' },
+          { label: 'Data Privacy', value: 'Zero Server Uploads' },
+        ]}
+        faqs={[
+          {
+            question: 'Does resizing an image degrade its visual quality?',
+            answer:
+              'Downscaling images retains crisp detail through smooth bicubic resampling. When enlarging images beyond their original dimensions, our canvas renderer preserves smooth edges without jagged pixelation.',
+          },
+          {
+            question: 'Can I resize photos for social media without cropping?',
+            answer:
+              'Yes. You can select standard social media dimensions (like 1080x1080 for Instagram or 1280x720 for YouTube) to ensure your images meet platform requirements before uploading.',
+          },
+          {
+            question: 'What are the benefits of in-browser image resizing?',
+            answer:
+              'Because images are processed locally on your device, processing is instantaneous with no upload/download wait times, no bandwidth waste, and complete confidentiality for private photos.',
+          },
+          {
+            question: 'Which image format should I export to?',
+            answer:
+              'JPEG is recommended for photographic images, PNG is ideal for graphics requiring transparency or sharp line art, and WebP offers the best modern compression for fast web loading.',
+          },
+        ]}
       />
     </ToolPageShell>
   );

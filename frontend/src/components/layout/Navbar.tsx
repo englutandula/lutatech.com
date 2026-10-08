@@ -112,9 +112,10 @@ export function Navbar() {
               </Link>
 
 
-              {/* Pricing / About */}
+              {/* Pricing / Guides / About */}
               {[
                 ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
+                { label: 'Guides',  href: '/guides/'  },
                 { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link
@@ -263,9 +264,10 @@ export function Navbar() {
                 Products
               </Link>
 
-              {/* Pricing / About */}
+              {/* Pricing / Guides / About */}
               {[
                 ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
+                { label: 'Guides',  href: '/guides/'  },
                 { label: 'About',   href: '/about/'   },
               ].map((link) => (
                 <Link

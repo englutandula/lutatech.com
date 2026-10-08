@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   },
 };
 
+import ToolContentSection from '@/components/seo/ToolContentSection';
+
 export default function PdfOrganizerPage() {
   const tool = getTool('pdf-organizer')!;
 
@@ -52,6 +54,78 @@ export default function PdfOrganizerPage() {
       />
       <ToolPageShell tool={tool}>
         <PdfOrganizerTool />
+        <ToolContentSection
+          toolName="Visual PDF Page Organizer"
+          category="PDF"
+          tagline="Drag to reorder, rotate inverted sheets, remove unwanted pages, and duplicate layouts with interactive thumbnail previews."
+          steps={[
+            {
+              title: 'Upload Your Document',
+              description:
+                'Select or drop any multi-page PDF document to load thumbnail previews for every page.',
+            },
+            {
+              title: 'Reorder, Rotate & Edit',
+              description:
+                'Drag thumbnails to adjust sequence, click 90° rotate to fix upside-down scans, or click trash to remove unwanted sheets.',
+            },
+            {
+              title: 'Download Organized PDF',
+              description:
+                'Save and export your clean, re-structured PDF file instantly processed directly inside your browser.',
+            },
+          ]}
+          features={[
+            {
+              title: 'Interactive Visual Grid',
+              description:
+                'See exact thumbnail previews for every single page before making structural modifications.',
+            },
+            {
+              title: '100% In-Browser Privacy',
+              description:
+                'All page manipulation occurs client-side using WebAssembly. Confidential legal contracts never touch a third-party server.',
+            },
+            {
+              title: '90° Rotation & Page Deletion',
+              description:
+                'Fix orientation issues on scanned receipts or remove irrelevant cover pages in seconds.',
+            },
+            {
+              title: 'Lossless Vector Preservation',
+              description:
+                'Preserves embedded typography, hyperlinks, digital signatures, and high-definition imagery intact.',
+            },
+          ]}
+          specs={[
+            { label: 'Page Limit', value: 'Unlimited (In-Browser)' },
+            { label: 'Editing Actions', value: 'Reorder, Rotate, Delete' },
+            { label: 'Execution', value: 'Client-Side WebAssembly' },
+            { label: 'Data Security', value: '100% In-Browser Execution' },
+          ]}
+          faqs={[
+            {
+              question: 'Can I rotate individual upside-down pages without affecting the rest of the PDF?',
+              answer:
+                'Yes! Each page thumbnail has individual 90° clockwise and counter-clockwise rotation controls so you can fix only the inverted scans.',
+            },
+            {
+              question: 'Will rearranging or deleting pages reduce text quality?',
+              answer:
+                'No. The operation alters page dictionary trees losslessly without re-encoding text or downsampling embedded graphics.',
+            },
+            {
+              question: 'Are my confidential documents uploaded to a remote cloud server?',
+              answer:
+                'Never. LutaTech operates on a zero-knowledge architecture. Your documents are modified purely in your local browser memory.',
+            },
+            {
+              question: 'Can I duplicate specific pages within the same document?',
+              answer:
+                'Yes. You can duplicate any page in the organizer to repeat specific forms or cover sheets across your document.',
+            },
+          ]}
+        />
       </ToolPageShell>
     </>
   );
