@@ -167,17 +167,19 @@ export default function DownloadPage() {
   }, []);
 
   const triggerDownload = (fileId: string, fileName: string, os: 'windows' | 'macos' | 'linux', steps: string[]) => {
-    // 1. Trigger direct browser download without opening any new tab or leaving the website
-    const downloadApiUrl = `/api/download?file=${encodeURIComponent(fileId)}`;
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = downloadApiUrl;
-    document.body.appendChild(iframe);
+    // 1. Direct download URL pointing to public LutaPDF release binary
+    const downloadUrl = `https://github.com/englutandula/LutaPDF/releases/latest/download/${encodeURIComponent(fileName)}`;
+    
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
     setTimeout(() => {
       try {
-        document.body.removeChild(iframe);
+        document.body.removeChild(link);
       } catch {}
-    }, 30000);
+    }, 1000);
 
     // 2. Open on-page polite success dialog with instructions
     setDownloadModal({
