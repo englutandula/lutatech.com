@@ -1,15 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import {
   Download,
-  ShieldCheck,
   Cpu,
   Zap,
-  Check,
-  Copy,
-  ExternalLink,
   Layers,
   Lock,
   X,
@@ -195,7 +190,6 @@ const PLATFORMS: PlatformOption[] = [
 
 export default function DownloadPage() {
   const [detectedOs, setDetectedOs] = useState<'windows' | 'macos' | 'linux'>('windows');
-  const [copiedVerify, setCopiedVerify] = useState(false);
   const [downloadModal, setDownloadModal] = useState<{
     open: boolean;
     fileName: string;
@@ -245,17 +239,9 @@ export default function DownloadPage() {
     });
   };
 
-  const handleCopyVerify = (command: string) => {
-    navigator.clipboard.writeText(command);
-    setCopiedVerify(true);
-    setTimeout(() => setCopiedVerify(false), 2500);
-  };
-
   const detectedPlatform =
     PLATFORMS.find((p) => p.os === detectedOs) || PLATFORMS[0];
 
-  const shaCommand =
-    'curl -sSL https://github.com/englutandula/LutaPDF/releases/latest/download/SHA256SUMS.txt | sha256sum -c --ignore-missing';
 
   return (
     <div className="min-h-screen bg-[rgb(var(--lt-bg))] text-[rgb(var(--lt-text))] py-12 md:py-20 transition-colors duration-200">
@@ -420,84 +406,6 @@ export default function DownloadPage() {
           })}
         </div>
 
-        {/* ── 3. TECHNICAL SPECIFICATIONS & CRYPTOGRAPHIC INTEGRITY ── */}
-        <div className="rounded-2xl border lt-border-color bg-[rgb(var(--lt-surface))] p-8 md:p-10 mb-16 shadow-sm">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b lt-border-color">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-[rgb(var(--lt-text))]">Verified Package Integrity</h3>
-                <p className="text-xs text-[rgb(var(--lt-text-muted))]">
-                  Every executable is cryptographically verified with SHA-256 signatures before release.
-                </p>
-              </div>
-            </div>
-
-            <a
-              href="https://github.com/englutandula/LutaPDF/releases/latest/download/SHA256SUMS.txt"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border lt-border-color bg-[rgb(var(--lt-surface-2))] px-4 py-2.5 text-xs font-semibold text-[rgb(var(--lt-text))] transition-colors hover:border-[rgb(var(--lt-primary))]"
-            >
-              <span>Download SHA256SUMS.txt</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          </div>
-
-          <div className="pt-6">
-            <label className="block text-xs font-bold text-[rgb(var(--lt-text-muted))] uppercase tracking-wider mb-2">
-              Verify Release Hash in Terminal
-            </label>
-            <div className="rounded-xl border lt-border-color bg-[rgb(var(--lt-bg))] p-4 font-mono text-xs text-[rgb(var(--lt-text))] flex items-center justify-between gap-4 overflow-x-auto">
-              <code className="text-xs text-[rgb(var(--lt-text))] select-all">
-                {shaCommand}
-              </code>
-              <button
-                onClick={() => handleCopyVerify(shaCommand)}
-                className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border lt-border-color bg-[rgb(var(--lt-surface))] px-3 py-1.5 text-xs font-medium text-[rgb(var(--lt-text))] hover:bg-[rgb(var(--lt-surface-2))] cursor-pointer transition-colors"
-              >
-                {copiedVerify ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="text-emerald-500 font-semibold">Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" />
-                    <span>Copy</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* System Requirements Table */}
-          <div className="mt-8 pt-6 border-t lt-border-color">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[rgb(var(--lt-text-muted))] mb-4">
-              Recommended System Specifications
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="p-3.5 rounded-xl bg-[rgb(var(--lt-surface-2))] border lt-border-color">
-                <span className="block text-[11px] font-medium text-[rgb(var(--lt-text-muted))]">Supported OS</span>
-                <span className="font-semibold text-[rgb(var(--lt-text))] mt-0.5 block">Windows 10/11, macOS 11+, Linux</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-[rgb(var(--lt-surface-2))] border lt-border-color">
-                <span className="block text-[11px] font-medium text-[rgb(var(--lt-text-muted))]">System Memory</span>
-                <span className="font-semibold text-[rgb(var(--lt-text))] mt-0.5 block">512 MB minimum (2 GB recommended)</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-[rgb(var(--lt-surface-2))] border lt-border-color">
-                <span className="block text-[11px] font-medium text-[rgb(var(--lt-text-muted))]">Disk Space</span>
-                <span className="font-semibold text-[rgb(var(--lt-text))] mt-0.5 block">120 MB free space</span>
-              </div>
-              <div className="p-3.5 rounded-xl bg-[rgb(var(--lt-surface-2))] border lt-border-color">
-                <span className="block text-[11px] font-medium text-[rgb(var(--lt-text-muted))]">GPU Acceleration</span>
-                <span className="font-semibold text-[rgb(var(--lt-text))] mt-0.5 block">DirectX 12, Metal, or Vulkan</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* ── 4. ARCHITECTURAL HIGHLIGHTS ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
