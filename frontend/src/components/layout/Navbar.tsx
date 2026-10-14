@@ -114,6 +114,7 @@ export function Navbar() {
 
               {/* Pricing / Guides / About */}
               {[
+                { label: 'Download', href: '/download/' },
                 ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
                 { label: 'Guides',  href: '/guides/'  },
                 { label: 'About',   href: '/about/'   },
@@ -266,6 +267,7 @@ export function Navbar() {
 
               {/* Pricing / Guides / About */}
               {[
+                { label: 'Download', href: '/download/' },
                 ...(SHOW_PRICING ? [{ label: 'Pricing', href: '/pricing/' }] : []),
                 { label: 'Guides',  href: '/guides/'  },
                 { label: 'About',   href: '/about/'   },

@@ -61,6 +61,7 @@ import {
   Type,
   Minimize2,
   ArrowDownUp,
+  Download,
 } from 'lucide-react';
 
 /**
@@ -127,6 +128,7 @@ const iconMap: Record<string, LucideIcon> = {
   FileText,
   Sparkles,
   Code2,
+  Download,
 
   // ── Fallbacks / legacy ─────────────────────────────────────────────
   Camera,

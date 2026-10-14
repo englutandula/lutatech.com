@@ -65,6 +65,7 @@ export const PRODUCT_SUITES: ProductSuite[] = [
         id: 'organize-pdf',
         title: 'Organize PDF',
         items: [
+          { id: 'lutapdf-desktop', name: 'LutaPDF Desktop', description: 'Native Windows, macOS & Linux desktop application.', href: '/download/', badge: 'New', icon: 'Download' },
           { id: 'pdf-merger', name: 'Merge PDF', description: 'Combine multiple PDF files into one.', href: '/tools/pdf-merger/', badge: 'Popular', icon: 'Combine' },
           { id: 'pdf-splitter', name: 'Split PDF', description: 'Separate PDF pages into individual files.', href: '/tools/pdf-splitter/', icon: 'ScissorsLineDashed' },
           { id: 'pdf-organizer', name: 'Page Organizer', description: 'Visually rearrange and sort pages.', href: '/tools/pdf-organizer/', badge: 'Pro', icon: 'LayoutGrid' },
