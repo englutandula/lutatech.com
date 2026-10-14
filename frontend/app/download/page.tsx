@@ -190,7 +190,7 @@ export default function DownloadPage() {
   };
 
   const handleCopyVerify = () => {
-    navigator.clipboard.writeText('curl -sSL https://github.com/englutandula/LutaPDF-releases/releases/latest/download/SHA256SUMS.txt | sha256sum -c --ignore-missing');
+    navigator.clipboard.writeText('curl -sSL https://github.com/englutandula/LutaPDF/releases/latest/download/SHA256SUMS.txt | sha256sum -c --ignore-missing');
     setCopiedVerify(true);
     setTimeout(() => setCopiedVerify(false), 2500);
   };
@@ -339,7 +339,7 @@ export default function DownloadPage() {
 
           <div className="rounded-xl border lt-border-color bg-[rgb(var(--lt-bg))] p-4 font-mono text-xs text-[rgb(var(--lt-text))] flex items-center justify-between gap-4 overflow-x-auto">
             <code className="text-xs text-[rgb(var(--lt-text))]">
-              curl -sSL https://github.com/englutandula/LutaPDF-releases/releases/latest/download/SHA256SUMS.txt | sha256sum -c --ignore-missing
+              curl -sSL https://github.com/englutandula/LutaPDF/releases/latest/download/SHA256SUMS.txt | sha256sum -c --ignore-missing
             </code>
             <button
               onClick={handleCopyVerify}

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     targetFileName = fileKey;
   }
 
-  const downloadUrl = `https://github.com/englutandula/LutaPDF-releases/releases/latest/download/${targetFileName}`;
+  const downloadUrl = `https://github.com/englutandula/LutaPDF/releases/latest/download/${targetFileName}`;
 
   return NextResponse.redirect(downloadUrl, {
     status: 307,
