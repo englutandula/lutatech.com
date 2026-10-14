@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Feet -->
+  <ellipse cx="36" cy="88" rx="14" ry="7" fill="#FFA500"/>
+  <ellipse cx="64" cy="88" rx="14" ry="7" fill="#FFA500"/>
+  <!-- Body/Head -->
+  <path d="M50 12 C32 12 30 32 30 50 C26 56 22 66 22 76 C22 84 32 86 50 86 C68 86 78 84 78 76 C78 66 74 56 70 50 C70 32 68 12 50 12 Z" fill="#1E232A"/>
+  <!-- Belly -->
+  <path d="M50 42 C38 42 34 56 34 70 C34 82 40 84 50 84 C60 84 66 82 66 70 C66 56 62 42 50 42 Z" fill="#FFFFFF"/>
+  <!-- Wings / Flippers -->
+  <path d="M28 50 C20 54 18 68 22 74 C26 70 28 62 30 54 Z" fill="#1E232A"/>
+  <path d="M72 50 C80 54 82 68 78 74 C74 70 72 62 70 54 Z" fill="#1E232A"/>
+  <!-- Eyes -->
+  <ellipse cx="44" cy="27" rx="3.5" ry="5.5" fill="#FFFFFF"/>
+  <ellipse cx="56" cy="27" rx="3.5" ry="5.5" fill="#FFFFFF"/>
+  <circle cx="45" cy="27" r="2" fill="#1E232A"/>
+  <circle cx="55" cy="27" r="2" fill="#1E232A"/>
+  <!-- Beak -->
+  <path d="M42 33 C42 31 58 31 58 33 C58 40 54 44 50 44 C46 44 42 40 42 33 Z" fill="#FFA500"/>
+</svg>
